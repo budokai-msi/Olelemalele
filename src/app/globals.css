@@ -1,0 +1,332 @@
+/* stylelint-disable at-rule-no-unknown */
+/* postcss-disable */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Olelemalele Design System — 9:16 Viewport Optimized
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Dynamic viewport height fix for mobile browsers */
+  --vh: 1vh;
+
+  /* Premium color tokens */
+  --accent-primary: 99 102 241;
+  /* Indigo */
+  --accent-glow: 139 92 246;
+  /* Violet */
+  --surface-dark: 10 10 10;
+  --surface-elevated: 18 18 18;
+
+  /* Typography scale for 9:16 */
+  --text-hero: clamp(3rem, 15vw, 8rem);
+  --text-section: clamp(2rem, 10vw, 5rem);
+  --text-body: clamp(0.875rem, 2.5vw, 1.125rem);
+
+  /* Font families */
+  --font-sans: var(--font-outfit), var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Transition timing functions */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-black text-white;
+    overflow-x: hidden;
+  }
+
+  /* Mobile viewport height fix */
+  .h-screen-safe {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+  }
+
+  /* Selection styling */
+  ::selection {
+    background: rgb(var(--accent-primary) / 0.4);
+    color: white;
+  }
+}
+
+@layer components {
+
+  /* 9:16 optimized card */
+  .card-portrait {
+    aspect-ratio: 9 / 16;
+    @apply relative overflow-hidden rounded-2xl;
+  }
+
+  /* Premium gradient text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg,
+        rgb(var(--accent-primary)) 0%,
+        rgb(var(--accent-glow)) 50%,
+        #fff 100%);
+  }
+
+  /* Glow effect */
+  .glow {
+    box-shadow:
+      0 0 20px rgb(var(--accent-primary) / 0.3),
+      0 0 60px rgb(var(--accent-primary) / 0.1);
+  }
+
+  /* Glass morphism */
+  .glass {
+    @apply backdrop-blur-xl;
+    background: rgb(var(--surface-elevated) / 0.6);
+    border: 1px solid rgb(255 255 255 / 0.05);
+  }
+
+  /* Premium Skeleton Loading */
+  .skeleton {
+    @apply relative overflow-hidden bg-zinc-800/50;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        transparent 100%);
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* Content Fade In */
+  .content-loaded {
+    animation: content-fade-in 0.5s var(--ease-out-expo) forwards;
+  }
+}
+
+@layer utilities {
+
+  /* 9:16 aspect ratio */
+  .aspect-9-16 {
+    aspect-ratio: 9 / 16;
+  }
+
+  /* 4:5 for product cards */
+  .aspect-4-5 {
+    aspect-ratio: 4 / 5;
+  }
+
+  /* Smooth hover transitions */
+  .hover-lift {
+    @apply transition-all duration-500 ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+  }
+
+  /* Text reveal animation */
+  @keyframes reveal-up {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-reveal {
+    animation: reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Conic gradient for rotating effects */
+  .bg-gradient-conic {
+    background: conic-gradient(var(--tw-gradient-stops));
+  }
+
+  /* Shimmer effect */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  /* Skeleton shimmer animation */
+  @keyframes skeleton-shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Content fade in */
+  @keyframes content-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Staggered reveal for lists */
+  .stagger-reveal>* {
+    opacity: 0;
+    animation: reveal-up 0.6s var(--ease-out-expo) forwards;
+  }
+
+  .stagger-reveal>*:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+
+  .stagger-reveal>*:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  .stagger-reveal>*:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+
+  .stagger-reveal>*:nth-child(4) {
+    animation-delay: 0.25s;
+  }
+
+  .stagger-reveal>*:nth-child(5) {
+    animation-delay: 0.3s;
+  }
+
+  .stagger-reveal>*:nth-child(6) {
+    animation-delay: 0.35s;
+  }
+
+  /* Smooth page transitions */
+  .page-enter {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.5s var(--ease-out-expo);
+  }
+
+  .page-exit {
+    opacity: 1;
+  }
+
+  .page-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s var(--ease-in-out-smooth);
+  }
+
+  /* Blur fade transition */
+  .blur-fade-in {
+    animation: blur-fade 0.6s var(--ease-out-expo) forwards;
+  }
+
+  @keyframes blur-fade {
+    from {
+      opacity: 0;
+      filter: blur(10px);
+    }
+
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+}
+
+/* Locomotive Scroll v5 (Lenis) - minimal config */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Hide default cursor only on desktop/pointer devices */
+@media (pointer: fine) {
+
+  body,
+  a,
+  button,
+  select,
+  input {
+    cursor: none !important;
+  }
+}
+
+/* Custom scrollbar hiding */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Frame color swatches - Gelato-style frame options */
+.swatch-black {
+  background-color: #1a1a1a;
+}
+
+.swatch-white {
+  background-color: #f5f5f5;
+}
+
+.swatch-natural {
+  background-color: #c4a574;
+}
+
+.swatch-walnut {
+  background-color: #5c4033;
+}
+
+.swatch-gold {
+  background-color: #1a1a1a;
+}
