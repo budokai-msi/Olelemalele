@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { seedProducts } from '@/lib/products'
+import { seedProducts } from '@/lib/db/products'
 
 // POST /api/admin/seed - Seed database with static products
 export async function POST() {
