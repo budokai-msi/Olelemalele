@@ -2,14 +2,21 @@
 
 import { motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
-import { memo, useMemo, useRef } from 'react'
+import { memo, useMemo, useRef, useState, useEffect } from 'react'
 import * as THREE from 'three'
+import { useFrame } from '@react-three/fiber'
 
-// Lazy load R3F for faster initial page load
-const Canvas = dynamic(
-  () => import('@react-three/fiber').then(mod => mod.Canvas),
-  { ssr: false }
-)
+// Check if WebGL is available
+function isWebGLAvailable() {
+  if (typeof window === 'undefined') return false
+  try {
+    const canvas = document.createElement('canvas')
+    return !!(window.WebGLRenderingContext && 
+      (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')))
+  } catch (e) {
+    return false
+  }
+}
 
 const vertexShader = `
   varying vec2 vUv;
@@ -28,14 +35,11 @@ const fragmentShader = `
     vec2 p = vUv - 0.5;
     float d = length(p);
 
-    // Gravitational Lensing effect
     float r = length(p - uMouse * 0.2);
     float lensing = 0.02 / (r + 0.01);
 
-    // The "Void" core
     float core = smoothstep(0.1, 0.02, d);
 
-    // Accretion disk vibes
     float disk = sin(d * 20.0 - uTime * 2.0) * 0.5 + 0.5;
     disk *= smoothstep(0.4, 0.2, d);
 
@@ -59,10 +63,7 @@ const Singularity = memo(function Singularity() {
     uMouse: { value: new THREE.Vector2(0, 0) },
   }), [])
 
-  // Import useFrame dynamically to avoid SSR issues
-  const { useFrame } = require('@react-three/fiber')
-
-  useFrame((state: { clock: { elapsedTime: number }; mouse: { x: number; y: number } }) => {
+  useFrame((state) => {
     if (materialRef.current) {
       materialRef.current.uniforms.uTime.value = state.clock.elapsedTime
       materialRef.current.uniforms.uMouse.value.lerp(
@@ -90,7 +91,28 @@ const Singularity = memo(function Singularity() {
   )
 })
 
+// Lazy load R3F for faster initial page load
+const Canvas = dynamic(
+  () => import('@react-three/fiber').then(mod => mod.Canvas),
+  { ssr: false }
+)
+
 function VoidArt() {
+  const [webglAvailable, setWebglAvailable] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    setWebglAvailable(isWebGLAvailable())
+  }, [])
+
+  // Don't render on server or if WebGL not available
+  if (!mounted || !webglAvailable) {
+    return (
+      <div className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-b from-indigo-900/20 via-black to-black" />
+    )
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -109,6 +131,9 @@ function VoidArt() {
         }}
         frameloop="demand"
         performance={{ min: 0.5 }}
+        onError={(e) => {
+          console.warn('Canvas error:', e)
+        }}
       >
         <Singularity />
       </Canvas>

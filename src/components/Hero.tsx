@@ -8,7 +8,7 @@ import { memo, useCallback, useEffect, useState } from 'react'
 // Lazy load VoidArt (heavy 3D component)
 const VoidArt = dynamic(() => import('@/components/VoidArt'), {
   ssr: false,
-  loading: () => <div className="absolute inset-0 bg-black" />
+  loading: () => <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/20 via-transparent to-black" />
 })
 
 function Hero() {
@@ -37,7 +37,7 @@ function Hero() {
 
   return (
     <section className="relative h-screen-safe w-full overflow-hidden flex items-center justify-center bg-black">
-      {/* Background Video - lazy loaded */}
+      {/* Background Video - with fallback */}
       <motion.div
         className="absolute inset-0 z-0"
         style={{ scale: videoScale }}
@@ -49,13 +49,19 @@ function Hero() {
           playsInline
           preload="metadata"
           className="absolute inset-0 w-full h-full object-cover opacity-70"
+          poster="/products/Petra_opt.jpg"
+          onError={(e) => {
+            console.warn('Video failed to load')
+            e.currentTarget.style.display = 'none'
+          }}
         >
           <source src="/WebGL_Fluid_Simulation_Video_Generation.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/20" />
+        {/* Gradient overlay for when video fails */}
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/50 via-black/80 to-black" />
       </motion.div>
 
-      {/* Simulated Void Art */}
+      {/* Simulated Void Art - with error handling */}
       <VoidArt />
 
       {/* Main Content */}
