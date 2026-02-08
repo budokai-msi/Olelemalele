@@ -2,14 +2,7 @@
 
 import { useHaptic } from '@/hooks/useHaptic'
 import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion'
-import dynamic from 'next/dynamic'
 import { memo, useCallback, useEffect, useState } from 'react'
-
-// Lazy load VoidArt (heavy 3D component)
-const VoidArt = dynamic(() => import('@/components/VoidArt'), {
-  ssr: false,
-  loading: () => <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/20 via-transparent to-black" />
-})
 
 function Hero() {
   const triggerHaptic = useHaptic()
@@ -60,9 +53,6 @@ function Hero() {
         {/* Gradient overlay for when video fails */}
         <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/50 via-black/80 to-black" />
       </motion.div>
-
-      {/* Simulated Void Art - with error handling */}
-      <VoidArt />
 
       {/* Main Content */}
       <div className="relative z-10 w-full h-full flex flex-col items-center justify-center pt-10 px-4">

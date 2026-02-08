@@ -386,12 +386,12 @@ export default function ARViewer({
                       
                       {showQRCode ? (
                         <div className="flex flex-col items-center gap-4">
-                          <div className="relative w-48 h-48 bg-white rounded-xl overflow-hidden">
-                            <Image
+                          <div className="w-48 h-48 bg-white rounded-xl overflow-hidden flex items-center justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
                               src={generateQRCode()}
                               alt="QR Code"
-                              fill
-                              className="object-contain p-2"
+                              className="w-44 h-44 object-contain"
                             />
                           </div>
                           <button
