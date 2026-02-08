@@ -35,6 +35,9 @@ const isWebXRSupported = async () => {
   }
 }
 
+// Camera permission version - increment to force reset
+const CAMERA_PERMISSION_VERSION = '2.0'
+
 // Size dimensions in meters for AR
 const SIZE_DIMENSIONS: Record<string, { width: number; height: number }> = {
   '12x16': { width: 0.305, height: 0.406 },
@@ -161,12 +164,45 @@ export default function ARViewer({
     }
   }, [productImage, productName, frameStyle, size])
 
+  // Check and reset camera permissions if version changed
+  const checkCameraPermissionVersion = () => {
+    const storedVersion = localStorage.getItem('ar_camera_permission_version')
+    if (storedVersion !== CAMERA_PERMISSION_VERSION) {
+      // Clear any cached camera permissions
+      localStorage.setItem('ar_camera_permission_version', CAMERA_PERMISSION_VERSION)
+      return true // Version was reset
+    }
+    return false
+  }
+
   // Start camera-based AR preview
   const startCameraAR = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      })
+      // Check if we need to force permission reset
+      const wasReset = checkCameraPermissionVersion()
+      
+      if (wasReset) {
+        console.log('Camera permission version updated - requesting fresh permissions')
+      }
+      
+      // Stop any existing streams first
+      if (videoRef.current?.srcObject) {
+        const existingStream = videoRef.current.srcObject as MediaStream
+        existingStream.getTracks().forEach(track => track.stop())
+        videoRef.current.srcObject = null
+      }
+      
+      // Add cache-busting timestamp and stricter constraints to force permission dialog
+      const constraints = {
+        video: { 
+          facingMode: { exact: 'environment' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        },
+        audio: false
+      }
+      
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream
@@ -175,7 +211,22 @@ export default function ARViewer({
       }
     } catch (error) {
       console.error('Camera access error:', error)
-      alert('Camera access is required for AR preview. Please allow camera access and try again.')
+      
+      // Fallback to less strict constraints if exact fails
+      try {
+        const fallbackStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        })
+        
+        if (videoRef.current) {
+          videoRef.current.srcObject = fallbackStream
+          setCameraActive(true)
+          setArMode('camera')
+        }
+      } catch (fallbackError) {
+        console.error('Fallback camera access error:', fallbackError)
+        alert('Camera access is required for AR preview.\n\nPlease:\n1. Clear site data/settings for this website\n2. Reload the page\n3. Allow camera access when prompted')
+      }
     }
   }
 
