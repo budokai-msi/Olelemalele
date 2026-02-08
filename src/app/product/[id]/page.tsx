@@ -1,6 +1,7 @@
 'use client'
 
 import { GELATO_FRAME_OPTIONS, type FrameStyle } from '@/components/Product3D'
+import ARButton from '@/components/ARButton'
 import RelatedProducts from '@/components/RelatedProducts'
 import { useHaptic } from '@/hooks/useHaptic'
 import { useHardwareDetection } from '@/hooks/useHardwareDetection'
@@ -44,7 +45,7 @@ export default function ProductPage() {
     if (!product) return ['art', 'vision']
     const basePhrases = [
       product.name,
-      product.collection || '',
+      product.productCollection || '',
       ...(product.tags || []),
     ].filter(Boolean) // Remove empty strings
     return basePhrases.length > 0 ? basePhrases : [product.name]
@@ -476,6 +477,14 @@ export default function ProductPage() {
 
             {/* CTA */}
             <div className="flex flex-col gap-4">
+              {/* AR Button - New */}
+              <ARButton
+                productImage={product.image}
+                productName={product.name}
+                frameStyle={selectedFrame}
+                size={selectedSize}
+              />
+
               <button
                 disabled={isAdding}
                 onClick={addToCart}

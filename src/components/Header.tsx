@@ -10,6 +10,7 @@ import MobileNav from './MobileNav'
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/gallery', label: 'Gallery' },
+  { href: '/upload', label: 'Custom Print' },
   { href: '/about', label: 'About' },
 ]
 
@@ -109,6 +110,7 @@ export default function Header() {
           {user ? (
             <>
               <NavLink href="/dashboard" label="Dashboard" />
+              <NavLink href="/admin" label="Admin" />
               <motion.button
                 onClick={logout}
                 className="text-gray-400 hover:text-white transition-colors"

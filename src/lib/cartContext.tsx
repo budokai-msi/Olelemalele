@@ -10,6 +10,7 @@ interface CartItem {
   quantity: number
   variant: string
   image: string
+  isCustom?: boolean
 }
 
 interface CartState {

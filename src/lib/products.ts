@@ -1,4 +1,11 @@
-// src/lib/products.ts
+import connectDB from './db'
+import Product from '@/models/Product'
+
+export interface ProductVariant {
+  size: string
+  color?: string
+}
+
 export interface Product {
   id: string
   name: string
@@ -7,12 +14,15 @@ export interface Product {
   image: string
   price: number
   description?: string
-  variants: { size: string; color?: string }[]
-  collection?: string
+  variants: ProductVariant[]
+  productCollection?: string
   tags?: string[]
+  inventory?: number
+  isActive?: boolean
 }
 
-export const products: Product[] = [
+// Static products as fallback / seed data
+export const staticProducts: Product[] = [
   // === EXPERIMENTAL COLLECTION (Featured/Premium) ===
   {
     id: '0',
@@ -23,7 +33,7 @@ export const products: Product[] = [
     price: 35000,
     description: 'The Treasury of Petra. Rose-red city half as old as time. Limited to 50 signed editions.',
     variants: [{ size: '24x36' }, { size: '36x48' }],
-    collection: 'Genesis Drop',
+    productCollection: 'Genesis Drop',
     tags: ['petra', 'heritage', 'premium'],
   },
   {
@@ -35,7 +45,7 @@ export const products: Product[] = [
     price: 32000,
     description: 'Ancient bamboo groves of Japan. Light filtering through centuries of tranquility.',
     variants: [{ size: '12x16' }, { size: '24x36' }],
-    collection: 'Genesis Drop',
+    productCollection: 'Genesis Drop',
     tags: ['bamboo', 'japan', 'zen'],
   },
   {
@@ -47,7 +57,7 @@ export const products: Product[] = [
     price: 42000,
     description: 'Bulgaria\'s crown jewel. Mountain grandeur captured at golden hour.',
     variants: [{ size: '36x48' }, { size: '48x60' }],
-    collection: 'Genesis Drop',
+    productCollection: 'Genesis Drop',
     tags: ['mountain', 'landscape', 'collector'],
   },
   {
@@ -59,7 +69,7 @@ export const products: Product[] = [
     price: 28000,
     description: 'Mars on Earth. The Valley of the Moon in golden desert light.',
     variants: [{ size: '16x20' }, { size: '24x30' }],
-    collection: 'Spectrum Series',
+    productCollection: 'Spectrum Series',
     tags: ['desert', 'jordan', 'landscape'],
   },
 
@@ -73,7 +83,7 @@ export const products: Product[] = [
     price: 24000,
     description: 'Tranquil bamboo groves of Kyoto. Archival-grade pigment on 400g canvas fibers.',
     variants: [{ size: '12x16' }, { size: '16x20' }, { size: '20x24' }],
-    collection: 'Japan Series',
+    productCollection: 'Japan Series',
     tags: ['japan', 'nature', 'bamboo'],
   },
   {
@@ -85,7 +95,7 @@ export const products: Product[] = [
     price: 26000,
     description: 'Light filtering through ancient bamboo in Kamakura. Museum-quality print with deep shadow preservation.',
     variants: [{ size: 'A3' }, { size: 'A2' }],
-    collection: 'Japan Series',
+    productCollection: 'Japan Series',
     tags: ['japan', 'bamboo', 'tranquil'],
   },
   {
@@ -97,7 +107,7 @@ export const products: Product[] = [
     price: 29000,
     description: 'The iconic Kinkaku-ji reflected in still waters. Printed in 12-color giclée.',
     variants: [{ size: '12x16' }, { size: '24x36' }],
-    collection: 'Japan Series',
+    productCollection: 'Japan Series',
     tags: ['japan', 'temple', 'iconic'],
   },
   {
@@ -109,7 +119,7 @@ export const products: Product[] = [
     price: 21000,
     description: 'Tender moment captured in Nara Park. A visual poem of wildlife and serenity.',
     variants: [{ size: 'A3' }, { size: '16x20' }],
-    collection: 'Japan Series',
+    productCollection: 'Japan Series',
     tags: ['japan', 'wildlife', 'tender'],
   },
   {
@@ -121,7 +131,7 @@ export const products: Product[] = [
     price: 27000,
     description: 'Tokyo Tower at golden hour. High-definition perspective on premium gallery-wrapped canvas.',
     variants: [{ size: '12x16' }, { size: '24x36' }],
-    collection: 'Japan Series',
+    productCollection: 'Japan Series',
     tags: ['japan', 'urban', 'iconic'],
   },
   {
@@ -133,7 +143,7 @@ export const products: Product[] = [
     price: 24000,
     description: 'Cherry blossoms in Hiroshima. A symbol of renewal and hope.',
     variants: [{ size: '16x20' }, { size: '24x30' }],
-    collection: 'Japan Series',
+    productCollection: 'Japan Series',
     tags: ['japan', 'blossom', 'spring'],
   },
 
@@ -147,7 +157,7 @@ export const products: Product[] = [
     price: 38000,
     description: 'The Treasury of Petra. One of the world\'s most iconic archaeological sites.',
     variants: [{ size: '20x30' }, { size: '30x45' }],
-    collection: 'Jordan Series',
+    productCollection: 'Jordan Series',
     tags: ['jordan', 'petra', 'heritage'],
   },
   {
@@ -159,7 +169,7 @@ export const products: Product[] = [
     price: 26000,
     description: 'The Valley of the Moon. Mars on Earth captured in stunning detail.',
     variants: [{ size: '16x24' }, { size: '24x36' }],
-    collection: 'Jordan Series',
+    productCollection: 'Jordan Series',
     tags: ['jordan', 'desert', 'landscape'],
   },
   {
@@ -171,7 +181,7 @@ export const products: Product[] = [
     price: 24000,
     description: 'Camels crossing Wadi Rum. Timeless Arabian landscapes.',
     variants: [{ size: '24x36' }, { size: '36x48' }],
-    collection: 'Jordan Series',
+    productCollection: 'Jordan Series',
     tags: ['jordan', 'camels', 'desert'],
   },
 
@@ -185,7 +195,7 @@ export const products: Product[] = [
     price: 32000,
     description: 'The Great Buddha of Kamakura. A study in monumental tranquility.',
     variants: [{ size: '20x24' }, { size: '30x36' }],
-    collection: 'Spiritual',
+    productCollection: 'Spiritual',
     tags: ['portrait', 'buddha', 'japan'],
   },
   {
@@ -197,7 +207,7 @@ export const products: Product[] = [
     price: 22000,
     description: 'Koi fish in perfect harmony. Symbol of perseverance and good fortune.',
     variants: [{ size: '16x20' }, { size: '24x30' }],
-    collection: 'Japan Series',
+    productCollection: 'Japan Series',
     tags: ['japan', 'koi', 'zen'],
   },
 
@@ -211,7 +221,7 @@ export const products: Product[] = [
     price: 45000,
     description: 'Edition of 10. Vitosha mountain at dawn. Hand-numbered and signed.',
     variants: [{ size: '48x60' }, { size: '60x72' }],
-    collection: 'Mountain Series',
+    productCollection: 'Mountain Series',
     tags: ['limited', 'mountain', 'bulgaria'],
   },
   {
@@ -223,7 +233,7 @@ export const products: Product[] = [
     price: 48000,
     description: 'Edition of 15. Where sky meets stone. Bulgaria\'s crown jewel.',
     variants: [{ size: '40x50' }, { size: '50x60' }],
-    collection: 'Mountain Series',
+    productCollection: 'Mountain Series',
     tags: ['limited', 'mountain', 'nature'],
   },
   {
@@ -235,22 +245,86 @@ export const products: Product[] = [
     price: 55000,
     description: 'Edition of 25. Vitosha blanketed in pristine snow. A masterwork of frozen perfection.',
     variants: [{ size: '36x48' }],
-    collection: 'Mountain Series',
+    productCollection: 'Mountain Series',
     tags: ['limited', 'winter', 'snow'],
   },
 ]
 
+// Fetch products from database with fallback to static
+export async function getProducts(): Promise<Product[]> {
+  try {
+    await connectDB()
+    const products = await Product.find({ isActive: true }).lean()
+    
+    if (products.length === 0) {
+      return staticProducts
+    }
+    
+    return products.map(p => ({
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      type: p.type,
+      image: p.image,
+      price: p.price,
+      description: p.description,
+      variants: p.variants.map((v: { size: string }) => ({ size: v.size })),
+      productCollection: p.productCollection,
+      tags: p.tags,
+      inventory: p.inventory,
+      isActive: p.isActive
+    }))
+  } catch (error) {
+    console.error('Error fetching products from DB:', error)
+    return staticProducts
+  }
+}
+
+// Get single product by ID
+export async function getProductById(id: string): Promise<Product | null> {
+  try {
+    await connectDB()
+    const product = await Product.findOne({ id, isActive: true }).lean()
+    
+    if (!product) {
+      // Fallback to static
+      return staticProducts.find(p => p.id === id) || null
+    }
+    
+    return {
+      id: product.id,
+      name: product.name,
+      category: product.category,
+      type: product.type,
+      image: product.image,
+      price: product.price,
+      description: product.description,
+      variants: product.variants.map((v: { size: string }) => ({ size: v.size })),
+      productCollection: product.productCollection,
+      tags: product.tags,
+      inventory: product.inventory,
+      isActive: product.isActive
+    }
+  } catch (error) {
+    console.error('Error fetching product from DB:', error)
+    return staticProducts.find(p => p.id === id) || null
+  }
+}
+
+// Legacy exports for backward compatibility
+export const products = staticProducts
+
 // Get related products based on category and tags
 export function getRelatedProducts(productId: string, limit = 4): Product[] {
-  const product = products.find(p => p.id === productId)
-  if (!product) return products.slice(0, limit)
+  const product = staticProducts.find(p => p.id === productId)
+  if (!product) return staticProducts.slice(0, limit)
 
-  return products
+  return staticProducts
     .filter(p => p.id !== productId)
     .map(p => {
       let score = 0
       if (p.category === product.category) score += 3
-      if (p.collection === product.collection) score += 2
+      if (p.productCollection === product.productCollection) score += 2
       if (p.tags?.some(tag => product.tags?.includes(tag))) score += 1
       return { product: p, score }
     })
@@ -261,10 +335,47 @@ export function getRelatedProducts(productId: string, limit = 4): Product[] {
 
 // Get products by collection
 export function getProductsByCollection(collection: string): Product[] {
-  return products.filter(p => p.collection === collection)
+  return staticProducts.filter(p => p.productCollection === collection)
 }
 
 // Get all unique collections
 export function getCollections(): string[] {
-  return Array.from(new Set(products.map(p => p.collection).filter(Boolean) as string[]))
+  return Array.from(new Set(staticProducts.map(p => p.productCollection).filter(Boolean) as string[]))
+}
+
+// Seed database with static products (for admin use)
+export async function seedProducts(): Promise<void> {
+  try {
+    await connectDB()
+    
+    for (const product of staticProducts) {
+      await Product.findOneAndUpdate(
+        { id: product.id },
+        {
+          ...product,
+          slug: product.name.toLowerCase().replace(/\s+/g, '-'),
+          inventory: 100,
+          lowStockThreshold: 10,
+          isActive: true,
+          metadata: {
+            weight: 400,
+            dimensions: product.variants[0]?.size || '24x36',
+            materials: ['Cotton canvas', 'Archival ink'],
+            care: 'Dust gently with soft cloth'
+          },
+          seo: {
+            title: `${product.name} | Olelemalele`,
+            description: product.description,
+            keywords: product.tags
+          }
+        },
+        { upsert: true, new: true }
+      )
+    }
+    
+    console.log('Products seeded successfully')
+  } catch (error) {
+    console.error('Error seeding products:', error)
+    throw error
+  }
 }

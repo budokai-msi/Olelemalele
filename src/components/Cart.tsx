@@ -114,9 +114,16 @@ export default function Cart() {
                       <div className="flex-1 flex flex-col justify-between py-1">
                         <div>
                           <div className="flex justify-between items-start">
-                            <h3 className="text-white font-bold tracking-tight uppercase text-sm group-hover:text-indigo-400 transition-colors">
-                              {item.name}
-                            </h3>
+                            <div>
+                              <h3 className="text-white font-bold tracking-tight uppercase text-sm group-hover:text-indigo-400 transition-colors">
+                                {item.name}
+                              </h3>
+                              {'isCustom' in item && item.isCustom && (
+                                <span className="inline-block mt-1 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-[9px] uppercase tracking-wider rounded-full">
+                                  Custom Upload
+                                </span>
+                              )}
+                            </div>
                             <button
                               onClick={() => {
                                 dispatch({ type: 'REMOVE_ITEM', payload: { id: item.id, variant: item.variant } });
@@ -130,7 +137,11 @@ export default function Cart() {
                               </svg>
                             </button>
                           </div>
-                          <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">{item.variant}</p>
+                          <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">
+                            {'isCustom' in item && item.isCustom 
+                              ? item.variant.split('-').join(' • ') 
+                              : item.variant}
+                          </p>
                         </div>
 
                         <div className="flex items-center justify-between">
