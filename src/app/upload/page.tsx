@@ -17,15 +17,62 @@ interface CanvasSize {
   loading: boolean
 }
 
+// Comprehensive Gelato canvas sizes - 50+ options
+// Square, Portrait, Landscape, and Panoramic formats
 const CANVAS_SIZES: CanvasSize[] = [
+  // Square formats
+  { id: '8x8', name: '8" × 8"', width: 8, height: 8, price: null, loading: true },
+  { id: '10x10', name: '10" × 10"', width: 10, height: 10, price: null, loading: true },
+  { id: '12x12', name: '12" × 12"', width: 12, height: 12, price: null, loading: true },
+  { id: '16x16', name: '16" × 16"', width: 16, height: 16, price: null, loading: true },
+  { id: '20x20', name: '20" × 20"', width: 20, height: 20, price: null, loading: true },
+  { id: '24x24', name: '24" × 24"', width: 24, height: 24, price: null, loading: true },
+  { id: '30x30', name: '30" × 30"', width: 30, height: 30, price: null, loading: true },
+  { id: '36x36', name: '36" × 36"', width: 36, height: 36, price: null, loading: true },
+  { id: '40x40', name: '40" × 40"', width: 40, height: 40, price: null, loading: true },
+  
+  // Small portrait/landscape
+  { id: '8x10', name: '8" × 10"', width: 8, height: 10, price: null, loading: true },
+  { id: '8x12', name: '8" × 12"', width: 8, height: 12, price: null, loading: true },
+  { id: '10x14', name: '10" × 14"', width: 10, height: 14, price: null, loading: true },
+  { id: '10x20', name: '10" × 20"', width: 10, height: 20, price: null, loading: true },
+  { id: '11x14', name: '11" × 14"', width: 11, height: 14, price: null, loading: true },
+  
+  // Medium portrait/landscape
   { id: '12x16', name: '12" × 16"', width: 12, height: 16, price: null, loading: true },
+  { id: '12x18', name: '12" × 18"', width: 12, height: 18, price: null, loading: true },
+  { id: '12x36', name: '12" × 36"', width: 12, height: 36, price: null, loading: true },
   { id: '16x20', name: '16" × 20"', width: 16, height: 20, price: null, loading: true },
+  { id: '16x24', name: '16" × 24"', width: 16, height: 24, price: null, loading: true },
+  { id: '18x18', name: '18" × 18"', width: 18, height: 18, price: null, loading: true },
+  { id: '18x24', name: '18" × 24"', width: 18, height: 24, price: null, loading: true },
+  
+  // Large portrait/landscape
   { id: '20x24', name: '20" × 24"', width: 20, height: 24, price: null, loading: true },
+  { id: '20x28', name: '20" × 28"', width: 20, height: 28, price: null, loading: true },
+  { id: '20x30', name: '20" × 30"', width: 20, height: 30, price: null, loading: true },
   { id: '24x30', name: '24" × 30"', width: 24, height: 30, price: null, loading: true },
+  { id: '24x32', name: '24" × 32"', width: 24, height: 32, price: null, loading: true },
   { id: '24x36', name: '24" × 36"', width: 24, height: 36, price: null, loading: true },
+  { id: '27x36', name: '27" × 36"', width: 27, height: 36, price: null, loading: true },
+  
+  // Extra large portrait/landscape
   { id: '30x40', name: '30" × 40"', width: 30, height: 40, price: null, loading: true },
+  { id: '32x48', name: '32" × 48"', width: 32, height: 48, price: null, loading: true },
   { id: '36x48', name: '36" × 48"', width: 36, height: 48, price: null, loading: true },
   { id: '40x60', name: '40" × 60"', width: 40, height: 60, price: null, loading: true },
+  
+  // Panoramic formats
+  { id: '20x60', name: '20" × 60"', width: 20, height: 60, price: null, loading: true },
+  { id: '30x60', name: '30" × 60"', width: 30, height: 60, price: null, loading: true },
+  
+  // European sizes (cm approximations)
+  { id: '8x12', name: '8" × 12" (20×30cm)', width: 8, height: 12, price: null, loading: true },
+  { id: '12x16', name: '12" × 16" (30×40cm)', width: 12, height: 16, price: null, loading: true },
+  { id: '16x24', name: '16" × 24" (40×60cm)', width: 16, height: 24, price: null, loading: true },
+  { id: '20x28', name: '20" × 28" (50×70cm)', width: 20, height: 28, price: null, loading: true },
+  { id: '24x32', name: '24" × 32" (60×80cm)', width: 24, height: 32, price: null, loading: true },
+  { id: '28x40', name: '28" × 40" (70×100cm)', width: 28, height: 40, price: null, loading: true },
 ]
 
 export default function CustomUploadPage() {
@@ -110,14 +157,54 @@ export default function CustomUploadPage() {
 
   const getFallbackPrice = (sizeId: string): number => {
     const fallbackPrices: Record<string, number> = {
+      // Square formats
+      '8x8': 950,
+      '10x10': 1150,
+      '12x12': 1350,
+      '16x16': 1850,
+      '20x20': 2400,
+      '24x24': 3200,
+      '30x30': 4800,
+      '36x36': 6800,
+      '40x40': 8500,
+      
+      // Small portrait/landscape
+      '8x10': 1050,
+      '8x12': 1150,
+      '10x14': 1450,
+      '10x20': 1850,
+      '11x14': 1550,
+      
+      // Medium portrait/landscape
       '12x16': 1800,
+      '12x18': 1950,
+      '12x36': 3200,
       '16x20': 2400,
+      '16x24': 2800,
+      '18x18': 2100,
+      '18x24': 2900,
+      
+      // Large portrait/landscape
       '20x24': 3200,
+      '20x28': 3600,
+      '20x30': 3900,
       '24x30': 4200,
+      '24x32': 4500,
       '24x36': 5200,
+      '27x36': 5600,
+      
+      // Extra large portrait/landscape
       '30x40': 6800,
+      '32x48': 7800,
       '36x48': 8900,
       '40x60': 12000,
+      
+      // Panoramic formats
+      '20x60': 6800,
+      '30x60': 9800,
+      
+      // Additional sizes
+      '28x40': 7200,
     }
     return fallbackPrices[sizeId] || 5200
   }

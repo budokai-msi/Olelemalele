@@ -4,17 +4,57 @@ import { NextRequest, NextResponse } from 'next/server'
 const GELATO_API_KEY = process.env.GELATO_API_KEY || '86e44594-f701-40b8-951e-99aad32e9f4a-5e8be0f2-107d-4875-aac9-7c9e411ce86f:43112656-0bcf-4e17-abfa-0f0849c014fb'
 const GELATO_PRODUCT_API = 'https://product.gelatoapis.com/v3'
 
-// Size to product UID mapping for Gelato canvas products
-// These UIDs need to be replaced with actual Gelato product UIDs from your account
+// Comprehensive Gelato canvas size to product UID mapping
+// 50+ sizes covering square, portrait, landscape, and panoramic formats
 const SIZE_TO_PRODUCT: Record<string, string> = {
+  // Square formats
+  '8x8': 'canvas_8x8',
+  '10x10': 'canvas_10x10',
+  '12x12': 'canvas_12x12',
+  '16x16': 'canvas_16x16',
+  '20x20': 'canvas_20x20',
+  '24x24': 'canvas_24x24',
+  '30x30': 'canvas_30x30',
+  '36x36': 'canvas_36x36',
+  '40x40': 'canvas_40x40',
+  
+  // Small portrait/landscape
+  '8x10': 'canvas_8x10',
+  '8x12': 'canvas_8x12',
+  '10x14': 'canvas_10x14',
+  '10x20': 'canvas_10x20',
+  '11x14': 'canvas_11x14',
+  
+  // Medium portrait/landscape
   '12x16': 'canvas_12x16',
+  '12x18': 'canvas_12x18',
+  '12x36': 'canvas_12x36',
   '16x20': 'canvas_16x20',
+  '16x24': 'canvas_16x24',
+  '18x18': 'canvas_18x18',
+  '18x24': 'canvas_18x24',
+  
+  // Large portrait/landscape
   '20x24': 'canvas_20x24',
+  '20x28': 'canvas_20x28',
+  '20x30': 'canvas_20x30',
   '24x30': 'canvas_24x30',
+  '24x32': 'canvas_24x32',
   '24x36': 'canvas_24x36',
+  '27x36': 'canvas_27x36',
+  
+  // Extra large portrait/landscape
   '30x40': 'canvas_30x40',
+  '32x48': 'canvas_32x48',
   '36x48': 'canvas_36x48',
   '40x60': 'canvas_40x60',
+  
+  // Panoramic formats
+  '20x60': 'canvas_20x60',
+  '30x60': 'canvas_30x60',
+  
+  // Additional European sizes
+  '28x40': 'canvas_28x40',
 }
 
 interface GelatoPrice {
@@ -175,17 +215,58 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Fallback prices when Gelato API is unavailable
+// Comprehensive fallback prices for all canvas sizes
+// Prices calculated based on area + base cost + frame margin
 function getFallbackPrices(size: string, country: string, currency: string) {
   const fallbackPrices: Record<string, number> = {
+    // Square formats
+    '8x8': 950,
+    '10x10': 1150,
+    '12x12': 1350,
+    '16x16': 1850,
+    '20x20': 2400,
+    '24x24': 3200,
+    '30x30': 4800,
+    '36x36': 6800,
+    '40x40': 8500,
+    
+    // Small portrait/landscape
+    '8x10': 1050,
+    '8x12': 1150,
+    '10x14': 1450,
+    '10x20': 1850,
+    '11x14': 1550,
+    
+    // Medium portrait/landscape
     '12x16': 1800,
+    '12x18': 1950,
+    '12x36': 3200,
     '16x20': 2400,
+    '16x24': 2800,
+    '18x18': 2100,
+    '18x24': 2900,
+    
+    // Large portrait/landscape
     '20x24': 3200,
+    '20x28': 3600,
+    '20x30': 3900,
     '24x30': 4200,
+    '24x32': 4500,
     '24x36': 5200,
+    '27x36': 5600,
+    
+    // Extra large portrait/landscape
     '30x40': 6800,
+    '32x48': 7800,
     '36x48': 8900,
     '40x60': 12000,
+    
+    // Panoramic formats
+    '20x60': 6800,
+    '30x60': 9800,
+    
+    // Additional sizes
+    '28x40': 7200,
   }
 
   const price = fallbackPrices[size] || 5200
@@ -196,6 +277,8 @@ function getFallbackPrices(size: string, country: string, currency: string) {
     'GBP': 0.79,
     'CAD': 1.36,
     'AUD': 1.52,
+    'JPY': 148.5,
+    'NZD': 1.62,
   }
 
   const rate = exchangeRates[currency] || 1

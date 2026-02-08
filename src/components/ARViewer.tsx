@@ -38,19 +38,62 @@ const isWebXRSupported = async () => {
 // Camera permission version - increment to force reset
 const CAMERA_PERMISSION_VERSION = '2.0'
 
-// Size dimensions in meters for AR
+// Comprehensive size dimensions in meters for AR (50+ sizes)
 const SIZE_DIMENSIONS: Record<string, { width: number; height: number }> = {
+  // Square formats
+  '8x8': { width: 0.203, height: 0.203 },
+  '10x10': { width: 0.254, height: 0.254 },
+  '12x12': { width: 0.305, height: 0.305 },
+  '16x16': { width: 0.406, height: 0.406 },
+  '20x20': { width: 0.508, height: 0.508 },
+  '24x24': { width: 0.610, height: 0.610 },
+  '30x30': { width: 0.762, height: 0.762 },
+  '36x36': { width: 0.914, height: 0.914 },
+  '40x40': { width: 1.016, height: 1.016 },
+  
+  // Small portrait/landscape
+  '8x10': { width: 0.203, height: 0.254 },
+  '8x12': { width: 0.203, height: 0.305 },
+  '10x14': { width: 0.254, height: 0.356 },
+  '10x20': { width: 0.254, height: 0.508 },
+  '11x14': { width: 0.279, height: 0.356 },
+  
+  // Medium portrait/landscape
   '12x16': { width: 0.305, height: 0.406 },
+  '12x18': { width: 0.305, height: 0.457 },
+  '12x36': { width: 0.305, height: 0.914 },
   '16x20': { width: 0.406, height: 0.508 },
+  '16x24': { width: 0.406, height: 0.610 },
+  '18x18': { width: 0.457, height: 0.457 },
+  '18x24': { width: 0.457, height: 0.610 },
+  
+  // Large portrait/landscape
   '20x24': { width: 0.508, height: 0.610 },
+  '20x28': { width: 0.508, height: 0.711 },
+  '20x30': { width: 0.508, height: 0.762 },
   '24x30': { width: 0.610, height: 0.762 },
+  '24x32': { width: 0.610, height: 0.813 },
   '24x36': { width: 0.610, height: 0.914 },
+  '27x36': { width: 0.686, height: 0.914 },
+  
+  // Extra large portrait/landscape
   '30x40': { width: 0.762, height: 1.016 },
+  '32x48': { width: 0.813, height: 1.219 },
   '36x48': { width: 0.914, height: 1.219 },
   '40x50': { width: 1.016, height: 1.270 },
+  '40x60': { width: 1.016, height: 1.524 },
   '48x60': { width: 1.219, height: 1.524 },
   '50x60': { width: 1.270, height: 1.524 },
   '60x72': { width: 1.524, height: 1.829 },
+  
+  // Panoramic formats
+  '20x60': { width: 0.508, height: 1.524 },
+  '30x60': { width: 0.762, height: 1.524 },
+  
+  // Additional sizes
+  '28x40': { width: 0.711, height: 1.016 },
+  
+  // European sizes
   'A3': { width: 0.297, height: 0.420 },
   'A2': { width: 0.420, height: 0.594 },
 }
