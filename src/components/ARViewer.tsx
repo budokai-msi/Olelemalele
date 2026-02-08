@@ -279,6 +279,15 @@ export default function ARViewer({
     return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl + '?ar=true')}`
   }, [])
 
+  // Frame styles for AR preview
+  const frameStyles: Record<string, string> = {
+    black: 'border-8 border-black shadow-2xl',
+    white: 'border-8 border-white shadow-2xl',
+    natural: 'border-8 border-amber-700 shadow-2xl',
+    walnut: 'border-8 border-amber-900 shadow-2xl',
+    gold: 'border-8 border-yellow-500 shadow-2xl',
+  }
+
   // Overlay component for camera AR
   const CameraAROverlay = () => (
     <div className="fixed inset-0 z-[300] bg-black">
@@ -293,23 +302,34 @@ export default function ARViewer({
       
       {/* AR Overlay UI */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Wall Detection Guide */}
+        {/* Wall Detection Guide with Frame */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-64 h-80 border-2 border-dashed border-white/50 rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-48 h-64 relative opacity-80">
-                <Image
-                  src={productImage}
-                  alt={productName}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <p className="text-white text-sm mt-2 drop-shadow-lg">
-                Point camera at wall
-              </p>
+          <div className={`relative bg-gray-800 ${frameStyles[frameStyle]} rounded-sm`} style={{ width: '260px', height: '340px' }}>
+            {/* Canvas Image */}
+            <div className="absolute inset-2 bg-white overflow-hidden">
+              <img
+                src={productImage}
+                alt={productName}
+                className="w-full h-full object-contain"
+              />
             </div>
+            
+            {/* Corner markers for wall alignment */}
+            <div className="absolute -top-2 -left-2 w-6 h-6 border-t-4 border-l-4 border-indigo-500" />
+            <div className="absolute -top-2 -right-2 w-6 h-6 border-t-4 border-r-4 border-indigo-500" />
+            <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-4 border-l-4 border-indigo-500" />
+            <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-4 border-r-4 border-indigo-500" />
           </div>
+        </div>
+        
+        {/* Instructions */}
+        <div className="absolute top-8 left-0 right-0 text-center">
+          <p className="text-white text-lg font-semibold drop-shadow-lg">
+            Point camera at wall
+          </p>
+          <p className="text-white/70 text-sm mt-1">
+            {productName} • {frameStyle} frame • {size}
+          </p>
         </div>
 
         {/* Controls */}

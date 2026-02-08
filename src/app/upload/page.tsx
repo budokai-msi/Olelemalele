@@ -66,12 +66,7 @@ const CANVAS_SIZES: CanvasSize[] = [
   { id: '20x60', name: '20" × 60"', width: 20, height: 60, price: null, loading: true },
   { id: '30x60', name: '30" × 60"', width: 30, height: 60, price: null, loading: true },
   
-  // European sizes (cm approximations)
-  { id: '8x12', name: '8" × 12" (20×30cm)', width: 8, height: 12, price: null, loading: true },
-  { id: '12x16', name: '12" × 16" (30×40cm)', width: 12, height: 16, price: null, loading: true },
-  { id: '16x24', name: '16" × 24" (40×60cm)', width: 16, height: 24, price: null, loading: true },
-  { id: '20x28', name: '20" × 28" (50×70cm)', width: 20, height: 28, price: null, loading: true },
-  { id: '24x32', name: '24" × 32" (60×80cm)', width: 24, height: 32, price: null, loading: true },
+  // Additional European sizes
   { id: '28x40', name: '28" × 40" (70×100cm)', width: 28, height: 40, price: null, loading: true },
 ]
 
