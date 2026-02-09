@@ -143,7 +143,7 @@ export default function RelatedProducts({ currentProductId, limit = 4 }: Related
                       {product.category}
                     </span>
                     <span className="text-sm font-mono text-gray-400">
-                      ${product.price.toLocaleString()}
+                      ${(product.price / 100).toFixed(0)}
                     </span>
                   </div>
                 </div>

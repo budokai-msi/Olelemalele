@@ -137,8 +137,9 @@ export default function MobileNav() {
                   </span>
                 </Link>
                 <button 
+                  type="button"
                   onClick={() => setIsOpen(false)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white"
+                  className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white relative z-10"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 6L6 18M6 6l12 12" />

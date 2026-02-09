@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import GeminiSparkle from './GeminiSparkle'
 
 const STORAGE_KEY = 'olelemalele_newsletter_dismissed'
 const SHOW_DELAY = 5000 // 5 seconds
@@ -106,10 +107,8 @@ export default function NewsletterPopup() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center py-8"
                   >
-                    <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-400">
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
+                    <div className="flex justify-center mb-6">
+                      <GeminiSparkle size={64} />
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-2">You&apos;re In!</h3>
                     <p className="text-gray-400">Welcome to the Olelemalele inner circle.</p>
@@ -149,15 +148,13 @@ export default function NewsletterPopup() {
                       <button
                         type="submit"
                         disabled={status === 'loading'}
-                        className="w-full bg-white text-black py-4 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-indigo-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-white text-black py-4 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-indigo-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                       >
                         {status === 'loading' ? (
-                          <span className="flex items-center justify-center gap-2">
-                            <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray="32" strokeDashoffset="12" />
-                            </svg>
-                            Joining...
-                          </span>
+                          <>
+                            <GeminiSparkle size={20} />
+                            <span>Joining...</span>
+                          </>
                         ) : (
                           'Get Exclusive Access'
                         )}

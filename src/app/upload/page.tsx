@@ -15,59 +15,35 @@ interface CanvasSize {
   height: number
   price: number | null
   loading: boolean
+  category: 'square' | 'portrait' | 'landscape'
 }
 
-// Comprehensive Gelato canvas sizes - 50+ options
-// Square, Portrait, Landscape, and Panoramic formats
+type SizeCategory = 'all' | 'square' | 'portrait' | 'landscape'
+
+// Popular Gelato canvas sizes - curated for best seller availability
+// Square, Portrait, Landscape formats (most commonly available)
+
 const CANVAS_SIZES: CanvasSize[] = [
-  // Square formats
-  { id: '8x8', name: '8" × 8"', width: 8, height: 8, price: null, loading: true },
-  { id: '10x10', name: '10" × 10"', width: 10, height: 10, price: null, loading: true },
-  { id: '12x12', name: '12" × 12"', width: 12, height: 12, price: null, loading: true },
-  { id: '16x16', name: '16" × 16"', width: 16, height: 16, price: null, loading: true },
-  { id: '20x20', name: '20" × 20"', width: 20, height: 20, price: null, loading: true },
-  { id: '24x24', name: '24" × 24"', width: 24, height: 24, price: null, loading: true },
-  { id: '30x30', name: '30" × 30"', width: 30, height: 30, price: null, loading: true },
-  { id: '36x36', name: '36" × 36"', width: 36, height: 36, price: null, loading: true },
-  { id: '40x40', name: '40" × 40"', width: 40, height: 40, price: null, loading: true },
+  // Square - Most popular
+  { id: '12x12', name: '12" × 12"', width: 12, height: 12, price: null, loading: true, category: 'square' },
+  { id: '16x16', name: '16" × 16"', width: 16, height: 16, price: null, loading: true, category: 'square' },
+  { id: '20x20', name: '20" × 20"', width: 20, height: 20, price: null, loading: true, category: 'square' },
+  { id: '24x24', name: '24" × 24"', width: 24, height: 24, price: null, loading: true, category: 'square' },
+  { id: '30x30', name: '30" × 30"', width: 30, height: 30, price: null, loading: true, category: 'square' },
   
-  // Small portrait/landscape
-  { id: '8x10', name: '8" × 10"', width: 8, height: 10, price: null, loading: true },
-  { id: '8x12', name: '8" × 12"', width: 8, height: 12, price: null, loading: true },
-  { id: '10x14', name: '10" × 14"', width: 10, height: 14, price: null, loading: true },
-  { id: '10x20', name: '10" × 20"', width: 10, height: 20, price: null, loading: true },
-  { id: '11x14', name: '11" × 14"', width: 11, height: 14, price: null, loading: true },
+  // Portrait - Best sellers
+  { id: '12x16', name: '12" × 16"', width: 12, height: 16, price: null, loading: true, category: 'portrait' },
+  { id: '16x20', name: '16" × 20"', width: 16, height: 20, price: null, loading: true, category: 'portrait' },
+  { id: '18x24', name: '18" × 24"', width: 18, height: 24, price: null, loading: true, category: 'portrait' },
+  { id: '24x36', name: '24" × 36"', width: 24, height: 36, price: null, loading: true, category: 'portrait' },
+  { id: '30x40', name: '30" × 40"', width: 30, height: 40, price: null, loading: true, category: 'portrait' },
   
-  // Medium portrait/landscape
-  { id: '12x16', name: '12" × 16"', width: 12, height: 16, price: null, loading: true },
-  { id: '12x18', name: '12" × 18"', width: 12, height: 18, price: null, loading: true },
-  { id: '12x36', name: '12" × 36"', width: 12, height: 36, price: null, loading: true },
-  { id: '16x20', name: '16" × 20"', width: 16, height: 20, price: null, loading: true },
-  { id: '16x24', name: '16" × 24"', width: 16, height: 24, price: null, loading: true },
-  { id: '18x18', name: '18" × 18"', width: 18, height: 18, price: null, loading: true },
-  { id: '18x24', name: '18" × 24"', width: 18, height: 24, price: null, loading: true },
-  
-  // Large portrait/landscape
-  { id: '20x24', name: '20" × 24"', width: 20, height: 24, price: null, loading: true },
-  { id: '20x28', name: '20" × 28"', width: 20, height: 28, price: null, loading: true },
-  { id: '20x30', name: '20" × 30"', width: 20, height: 30, price: null, loading: true },
-  { id: '24x30', name: '24" × 30"', width: 24, height: 30, price: null, loading: true },
-  { id: '24x32', name: '24" × 32"', width: 24, height: 32, price: null, loading: true },
-  { id: '24x36', name: '24" × 36"', width: 24, height: 36, price: null, loading: true },
-  { id: '27x36', name: '27" × 36"', width: 27, height: 36, price: null, loading: true },
-  
-  // Extra large portrait/landscape
-  { id: '30x40', name: '30" × 40"', width: 30, height: 40, price: null, loading: true },
-  { id: '32x48', name: '32" × 48"', width: 32, height: 48, price: null, loading: true },
-  { id: '36x48', name: '36" × 48"', width: 36, height: 48, price: null, loading: true },
-  { id: '40x60', name: '40" × 60"', width: 40, height: 60, price: null, loading: true },
-  
-  // Panoramic formats
-  { id: '20x60', name: '20" × 60"', width: 20, height: 60, price: null, loading: true },
-  { id: '30x60', name: '30" × 60"', width: 30, height: 60, price: null, loading: true },
-  
-  // Additional European sizes
-  { id: '28x40', name: '28" × 40" (70×100cm)', width: 28, height: 40, price: null, loading: true },
+  // Landscape - Best sellers  
+  { id: '16x12', name: '16" × 12"', width: 16, height: 12, price: null, loading: true, category: 'landscape' },
+  { id: '20x16', name: '20" × 16"', width: 20, height: 16, price: null, loading: true, category: 'landscape' },
+  { id: '24x18', name: '24" × 18"', width: 24, height: 18, price: null, loading: true, category: 'landscape' },
+  { id: '36x24', name: '36" × 24"', width: 36, height: 24, price: null, loading: true, category: 'landscape' },
+  { id: '40x30', name: '40" × 30"', width: 40, height: 30, price: null, loading: true, category: 'landscape' },
 ]
 
 export default function CustomUploadPage() {
@@ -80,6 +56,7 @@ export default function CustomUploadPage() {
   const [isDragging, setIsDragging] = useState(false)
   const [customName, setCustomName] = useState('')
   const [isLoadingPrices, setIsLoadingPrices] = useState(true)
+  const [sizeCategory, setSizeCategory] = useState<SizeCategory>('all')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { dispatch } = useCart()
   const triggerHaptic = useHaptic()
@@ -152,56 +129,38 @@ export default function CustomUploadPage() {
 
   const getFallbackPrice = (sizeId: string): number => {
     const fallbackPrices: Record<string, number> = {
-      // Square formats
-      '8x8': 950,
-      '10x10': 1150,
-      '12x12': 1350,
-      '16x16': 1850,
-      '20x20': 2400,
-      '24x24': 3200,
-      '30x30': 4800,
-      '36x36': 6800,
-      '40x40': 8500,
+      // Square formats (2x Gelato cost)
+      '12x12': 3200,
+      '16x16': 4400,
+      '20x20': 5800,
+      '24x24': 7800,
+      '30x30': 11600,
       
-      // Small portrait/landscape
-      '8x10': 1050,
-      '8x12': 1150,
-      '10x14': 1450,
-      '10x20': 1850,
-      '11x14': 1550,
+      // Portrait
+      '12x16': 4800,
+      '16x20': 5800,
+      '18x24': 7200,
+      '24x36': 13000,
+      '30x40': 17200,
       
-      // Medium portrait/landscape
-      '12x16': 1800,
-      '12x18': 1950,
-      '12x36': 3200,
-      '16x20': 2400,
-      '16x24': 2800,
-      '18x18': 2100,
-      '18x24': 2900,
-      
-      // Large portrait/landscape
-      '20x24': 3200,
-      '20x28': 3600,
-      '20x30': 3900,
-      '24x30': 4200,
-      '24x32': 4500,
-      '24x36': 5200,
-      '27x36': 5600,
-      
-      // Extra large portrait/landscape
-      '30x40': 6800,
-      '32x48': 7800,
-      '36x48': 8900,
-      '40x60': 12000,
+      // Landscape
+      '16x12': 4800,
+      '20x16': 5800,
+      '24x18': 7200,
+      '36x24': 13000,
+      '40x30': 17200,
+      '32x48': 19600,
+      '36x48': 22400,
+      '40x60': 30400,
       
       // Panoramic formats
-      '20x60': 6800,
-      '30x60': 9800,
+      '20x60': 17200,
+      '30x60': 24800,
       
       // Additional sizes
-      '28x40': 7200,
+      '28x40': 18400,
     }
-    return fallbackPrices[sizeId] || 5200
+    return fallbackPrices[sizeId] || 13000
   }
 
   const handleFileSelect = useCallback(async (file: File) => {
@@ -453,27 +412,64 @@ export default function CustomUploadPage() {
 
             {/* Size Selection */}
             <div>
-              <label className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold mb-3 block">
-                Select Size {isLoadingPrices && '(Loading...)'}
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {sizes.map((size) => (
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">
+                  Select Size {isLoadingPrices && '(Loading...)'}
+                </label>
+                <span className="text-xs text-gray-400">
+                  {sizes.filter(s => sizeCategory === 'all' || s.category === sizeCategory).length} options
+                </span>
+              </div>
+              
+              {/* Category Tabs */}
+              <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide pb-1">
+                {(['all', 'square', 'portrait', 'landscape'] as SizeCategory[]).map((cat) => (
                   <button
-                    key={size.id}
-                    onClick={() => handleSizeSelect(size)}
-                    disabled={size.loading}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      selectedSize.id === size.id
-                        ? 'border-indigo-500 bg-indigo-500/10'
-                        : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
-                    } ${size.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    key={cat}
+                    onClick={() => {
+                      setSizeCategory(cat)
+                      triggerHaptic()
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                      sizeCategory === cat
+                        ? 'bg-white text-black'
+                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                    }`}
                   >
-                    <div className="font-bold">{size.name}</div>
-                    <div className="text-sm text-gray-500 mt-1">
-                      {size.loading ? 'Loading...' : formatPrice(size.price)}
-                    </div>
+                    {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
                   </button>
                 ))}
+              </div>
+              
+              {/* Horizontal Scroll Size List */}
+              <div className="relative">
+                <div 
+                  className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1 snap-x snap-mandatory"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {sizes
+                    .filter(size => sizeCategory === 'all' || size.category === sizeCategory)
+                    .map((size) => (
+                    <button
+                      key={size.id}
+                      onClick={() => handleSizeSelect(size)}
+                      disabled={size.loading}
+                      className={`flex-shrink-0 w-28 p-3 rounded-xl border text-center transition-all snap-start ${
+                        selectedSize.id === size.id
+                          ? 'border-indigo-500 bg-indigo-500/10'
+                          : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
+                      } ${size.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <div className="font-bold text-sm">{size.name}</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {size.loading ? '...' : formatPrice(size.price)}
+                      </div>
+                      <div className="text-[10px] text-gray-600 mt-0.5 capitalize">{size.category}</div>
+                    </button>
+                  ))}
+                </div>
+                {/* Scroll hint */}
+                <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-black to-transparent pointer-events-none" />
               </div>
             </div>
 

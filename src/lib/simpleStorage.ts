@@ -22,16 +22,7 @@ const users = new Map<string, User>() // Keyed by email
 const sessions = new Map<string, { userId: string; expires: number }>()
 
 // Initialize with a default user for testing
-if (process.env.NODE_ENV !== 'production') {
-  const defaultUser: User = {
-    id: '1',
-    name: 'Test User',
-    email: 'test@example.com',
-    password: 'password123', // In production, this would be hashed
-    createdAt: new Date().toISOString()
-  }
-  users.set(defaultUser.email, defaultUser)
-}
+// No default test users in any environment
 
 export async function saveUser(userData: User) {
   users.set(userData.email, userData)

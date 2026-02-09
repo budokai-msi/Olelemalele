@@ -223,29 +223,9 @@
     animation-delay: 0.35s;
   }
 
-  /* Smooth page transitions */
-  .page-enter {
-    opacity: 0;
-    transform: translateY(20px);
-  }
+  /* Page transitions are now handled by Framer Motion in template.tsx */
 
-  .page-enter-active {
-    opacity: 1;
-    transform: translateY(0);
-    transition: all 0.5s var(--ease-out-expo);
-  }
-
-  .page-exit {
-    opacity: 1;
-  }
-
-  .page-exit-active {
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: all 0.3s var(--ease-in-out-smooth);
-  }
-
-  /* Blur fade transition */
+  /* Blur fade utility — used by entrance animations */
   .blur-fade-in {
     animation: blur-fade 0.6s var(--ease-out-expo) forwards;
   }
@@ -263,38 +243,26 @@
   }
 }
 
-/* Locomotive Scroll v5 (Lenis) - minimal config */
-html.lenis,
-html.lenis body {
-  height: auto;
+/* Smooth scrolling (Lenis removed — using native CSS scroll) */
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
+/* Simple CSS marquee animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
-}
-
-/* Hide default cursor only on desktop/pointer devices */
-@media (pointer: fine) {
-
-  body,
-  a,
-  button,
-  select,
-  input {
-    cursor: none !important;
-  }
+.animate-marquee {
+  animation: marquee 30s linear infinite;
 }
 
 /* Custom scrollbar hiding */

@@ -2,7 +2,6 @@ import Cart from '@/components/Cart'
 import CookieConsent from '@/components/CookieConsent'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
-import LocoScroll from '@/components/LocoScroll'
 import NewsletterPopup from '@/components/NewsletterPopup'
 import { CartProvider } from '@/lib/cartContext'
 import { WishlistProvider } from '@/lib/wishlistContext'
@@ -30,6 +29,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://olelemalele.com'),
   title: {
     default: 'Olelemalele — Premium Canvas Art Collection',
     template: '%s | Olelemalele',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Olelemalele — Premium Canvas Art Collection',
     description: 'Own the moment. Premium museum-quality canvas prints for the modern collector.',
-    url: 'https://olelemalele.com',
+    url: '/',
     siteName: 'Olelemalele',
     locale: 'en_US',
     type: 'website',
@@ -73,9 +73,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 }
 
-import ConsoleGuard from '@/components/ConsoleGuard'
-import CustomCursor from '@/components/CustomCursor'
-import MysticBaseline from '@/components/MysticBaseline'
+
 import LoadingScreenWrapper from './LoadingScreenWrapper'
 
 export default function RootLayout({
@@ -92,31 +90,19 @@ export default function RootLayout({
         {/* DNS prefetch for third parties */}
         <link rel="dns-prefetch" href="https://gelato.com" />
         <link rel="dns-prefetch" href="https://printify.com" />
-        {/* Preload hero video for faster LCP */}
-        <link
-          rel="preload"
-          href="/WebGL_Fluid_Simulation_Video_Generation.mp4"
-          as="fetch"
-          crossOrigin="anonymous"
-        />
       </head>
       <body className="font-sans antialiased">
         <LoadingScreenWrapper />
-        <ConsoleGuard />
-        <MysticBaseline />
-        <CustomCursor />
         <WishlistProvider>
           <CartProvider>
-            <LocoScroll>
-              <Header />
-              <main id="main">
-                {children}
-              </main>
-              <Footer />
-              <Cart />
-              <CookieConsent />
-              <NewsletterPopup />
-            </LocoScroll>
+            <Header />
+            <main id="main">
+              {children}
+            </main>
+            <Footer />
+            <Cart />
+            <CookieConsent />
+            <NewsletterPopup />
           </CartProvider>
         </WishlistProvider>
       </body>

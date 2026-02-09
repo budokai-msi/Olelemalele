@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ARViewer from './ARViewer'
 
 interface ARButtonProps {
@@ -18,6 +18,19 @@ export default function ARButton({
   size
 }: ARButtonProps) {
   const [isAROpen, setIsAROpen] = useState(false)
+
+  // Auto-open AR if ?ar=true in URL (from QR code scan)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      if (urlParams.get('ar') === 'true') {
+        setIsAROpen(true)
+        // Clean up URL
+        const newUrl = window.location.pathname
+        window.history.replaceState({}, '', newUrl)
+      }
+    }
+  }, [])
 
   return (
     <>

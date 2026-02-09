@@ -19,6 +19,10 @@ out/
 .vscode/
 .idea/
 
+# AI/Agent files
+.claude/
+.kimi/
+
 # OS files
 .DS_Store
 Thumbs.db
@@ -33,3 +37,9 @@ yarn-error.log*
 
 # Keys
 *.pem
+
+# Secret/Classified files
+*.md
+.claude/
+.kimi/
+.agent/

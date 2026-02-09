@@ -112,11 +112,17 @@ export async function GET(request: NextRequest) {
     }
 
     const prices: GelatoPrice[] = await response.json()
-    const retailPrice = prices.find(p => p.quantity === 1) || prices[0]
+    const gelatoPrice = prices.find(p => p.quantity === 1) || prices[0]
+    
+    // DOUBLE Gelato's price for retail margin
+    const retailPrice = {
+      ...gelatoPrice,
+      price: Math.round(gelatoPrice.price * 2)
+    }
 
     return NextResponse.json({
       price: retailPrice,
-      allPrices: prices,
+      allPrices: prices.map(p => ({ ...p, price: Math.round(p.price * 2) })),
       source: 'gelato',
       size,
       country,
@@ -181,12 +187,13 @@ export async function POST(request: NextRequest) {
         }
 
         const prices: GelatoPrice[] = await response.json()
-        const retailPrice = prices.find(p => p.quantity === 1) || prices[0]
+        const gelatoPrice = prices.find(p => p.quantity === 1) || prices[0]
 
+        // DOUBLE Gelato's price for retail margin
         return {
           size,
-          price: retailPrice.price,
-          currency: retailPrice.currency,
+          price: Math.round(gelatoPrice.price * 2),
+          currency: gelatoPrice.currency,
           source: 'gelato'
         }
       } catch (error) {
@@ -216,60 +223,60 @@ export async function POST(request: NextRequest) {
 }
 
 // Comprehensive fallback prices for all canvas sizes
-// Prices calculated based on area + base cost + frame margin
+// Prices are DOUBLE Gelato's base cost for retail margin
 function getFallbackPrices(size: string, country: string, currency: string) {
   const fallbackPrices: Record<string, number> = {
-    // Square formats
-    '8x8': 950,
-    '10x10': 1150,
-    '12x12': 1350,
-    '16x16': 1850,
-    '20x20': 2400,
-    '24x24': 3200,
-    '30x30': 4800,
-    '36x36': 6800,
-    '40x40': 8500,
+    // Square formats (2x Gelato cost)
+    '8x8': 2400,
+    '10x10': 2800,
+    '12x12': 3200,
+    '16x16': 4400,
+    '20x20': 5800,
+    '24x24': 7800,
+    '30x30': 11600,
+    '36x36': 16400,
+    '40x40': 20600,
     
     // Small portrait/landscape
-    '8x10': 1050,
-    '8x12': 1150,
-    '10x14': 1450,
-    '10x20': 1850,
-    '11x14': 1550,
+    '8x10': 2600,
+    '8x12': 2800,
+    '10x14': 3600,
+    '10x20': 4600,
+    '11x14': 3800,
     
     // Medium portrait/landscape
-    '12x16': 1800,
-    '12x18': 1950,
-    '12x36': 3200,
-    '16x20': 2400,
-    '16x24': 2800,
-    '18x18': 2100,
-    '18x24': 2900,
+    '12x16': 4800,
+    '12x18': 5200,
+    '12x36': 7800,
+    '16x20': 5800,
+    '16x24': 6800,
+    '18x18': 5200,
+    '18x24': 7200,
     
     // Large portrait/landscape
-    '20x24': 3200,
-    '20x28': 3600,
-    '20x30': 3900,
-    '24x30': 4200,
-    '24x32': 4500,
-    '24x36': 5200,
-    '27x36': 5600,
+    '20x24': 7800,
+    '20x28': 8800,
+    '20x30': 9600,
+    '24x30': 10400,
+    '24x32': 11200,
+    '24x36': 13000,
+    '27x36': 14000,
     
     // Extra large portrait/landscape
-    '30x40': 6800,
-    '32x48': 7800,
-    '36x48': 8900,
-    '40x60': 12000,
+    '30x40': 17200,
+    '32x48': 19600,
+    '36x48': 22400,
+    '40x60': 30400,
     
     // Panoramic formats
-    '20x60': 6800,
-    '30x60': 9800,
+    '20x60': 17200,
+    '30x60': 24800,
     
     // Additional sizes
-    '28x40': 7200,
+    '28x40': 18400,
   }
 
-  const price = fallbackPrices[size] || 5200
+  const price = fallbackPrices[size] || 13000
 
   const exchangeRates: Record<string, number> = {
     'USD': 1,

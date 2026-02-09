@@ -1,8 +1,8 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface ARViewerProps {
   productImage: string
@@ -13,569 +13,298 @@ interface ARViewerProps {
   onClose: () => void
 }
 
-// Check device capabilities
-const isIOS = () => {
+const checkIsIOS = () => {
   if (typeof navigator === 'undefined') return false
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
 }
 
-const isAndroid = () => {
+const checkIsAndroid = () => {
   if (typeof navigator === 'undefined') return false
   return /Android/.test(navigator.userAgent)
 }
 
-const isWebXRSupported = async () => {
-  if (typeof navigator === 'undefined') return false
-  if (!('xr' in navigator)) return false
-  try {
-    const supported = await (navigator as any).xr.isSessionSupported('immersive-ar')
-    return supported
-  } catch {
-    return false
-  }
-}
-
-// Camera permission version - increment to force reset
-const CAMERA_PERMISSION_VERSION = '2.0'
-
-// Comprehensive size dimensions in meters for AR (50+ sizes)
-const SIZE_DIMENSIONS: Record<string, { width: number; height: number }> = {
-  // Square formats
-  '8x8': { width: 0.203, height: 0.203 },
-  '10x10': { width: 0.254, height: 0.254 },
-  '12x12': { width: 0.305, height: 0.305 },
-  '16x16': { width: 0.406, height: 0.406 },
-  '20x20': { width: 0.508, height: 0.508 },
-  '24x24': { width: 0.610, height: 0.610 },
-  '30x30': { width: 0.762, height: 0.762 },
-  '36x36': { width: 0.914, height: 0.914 },
-  '40x40': { width: 1.016, height: 1.016 },
-  
-  // Small portrait/landscape
-  '8x10': { width: 0.203, height: 0.254 },
-  '8x12': { width: 0.203, height: 0.305 },
-  '10x14': { width: 0.254, height: 0.356 },
-  '10x20': { width: 0.254, height: 0.508 },
-  '11x14': { width: 0.279, height: 0.356 },
-  
-  // Medium portrait/landscape
-  '12x16': { width: 0.305, height: 0.406 },
-  '12x18': { width: 0.305, height: 0.457 },
-  '12x36': { width: 0.305, height: 0.914 },
-  '16x20': { width: 0.406, height: 0.508 },
-  '16x24': { width: 0.406, height: 0.610 },
-  '18x18': { width: 0.457, height: 0.457 },
-  '18x24': { width: 0.457, height: 0.610 },
-  
-  // Large portrait/landscape
-  '20x24': { width: 0.508, height: 0.610 },
-  '20x28': { width: 0.508, height: 0.711 },
-  '20x30': { width: 0.508, height: 0.762 },
-  '24x30': { width: 0.610, height: 0.762 },
-  '24x32': { width: 0.610, height: 0.813 },
-  '24x36': { width: 0.610, height: 0.914 },
-  '27x36': { width: 0.686, height: 0.914 },
-  
-  // Extra large portrait/landscape
-  '30x40': { width: 0.762, height: 1.016 },
-  '32x48': { width: 0.813, height: 1.219 },
-  '36x48': { width: 0.914, height: 1.219 },
-  '40x50': { width: 1.016, height: 1.270 },
-  '40x60': { width: 1.016, height: 1.524 },
-  '48x60': { width: 1.219, height: 1.524 },
-  '50x60': { width: 1.270, height: 1.524 },
-  '60x72': { width: 1.524, height: 1.829 },
-  
-  // Panoramic formats
-  '20x60': { width: 0.508, height: 1.524 },
-  '30x60': { width: 0.762, height: 1.524 },
-  
-  // Additional sizes
-  '28x40': { width: 0.711, height: 1.016 },
-  
-  // European sizes
-  'A3': { width: 0.297, height: 0.420 },
-  'A2': { width: 0.420, height: 0.594 },
-}
-
-export default function ARViewer({ 
-  productImage, 
-  productName, 
-  frameStyle, 
+export default function ARViewer({
+  productImage,
+  productName,
+  frameStyle,
   size,
-  isOpen, 
-  onClose 
+  isOpen,
+  onClose
 }: ARViewerProps) {
-  const [deviceType, setDeviceType] = useState<'ios' | 'android' | 'desktop' | null>(null)
-  const [webXRSupported, setWebXRSupported] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [deviceType, setDeviceType] = useState<'ios' | 'android' | 'desktop'>('desktop')
+  const [isLoading, setIsLoading] = useState(false)
   const [showQRCode, setShowQRCode] = useState(false)
   const [cameraActive, setCameraActive] = useState(false)
-  const [arMode, setArMode] = useState<'native' | 'camera' | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  const dimensions = SIZE_DIMENSIONS[size] || SIZE_DIMENSIONS['24x36']
 
   useEffect(() => {
-    const checkDevice = async () => {
-      setIsLoading(true)
-      
-      if (isIOS()) {
-        setDeviceType('ios')
-      } else if (isAndroid()) {
-        setDeviceType('android')
-      } else {
-        setDeviceType('desktop')
-      }
-
-      const xrSupported = await isWebXRSupported()
-      setWebXRSupported(xrSupported)
-      
-      setIsLoading(false)
-    }
-
-    if (isOpen) {
-      checkDevice()
-    }
+    if (!isOpen) return
+    if (checkIsIOS()) setDeviceType('ios')
+    else if (checkIsAndroid()) setDeviceType('android')
+    else setDeviceType('desktop')
   }, [isOpen])
 
-  // Cleanup camera on close
-  useEffect(() => {
-    if (!isOpen && cameraActive) {
-      stopCamera()
-    }
-  }, [isOpen, cameraActive])
-
-  const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
+  const stopCamera = useCallback(() => {
+    if (videoRef.current?.srcObject) {
       const tracks = (videoRef.current.srcObject as MediaStream).getTracks()
       tracks.forEach(track => track.stop())
+      videoRef.current.srcObject = null
     }
     setCameraActive(false)
-    setArMode(null)
-  }
+  }, [])
 
-  // Launch native AR (iOS AR Quick Look)
-  const launchIOSAR = useCallback(async () => {
-    try {
-      // Fetch AR configuration from API
-      const response = await fetch(
-        `/api/ar?productId=demo&frameStyle=${frameStyle}&size=${size}&imageUrl=${encodeURIComponent(productImage)}`
-      )
-      const config = await response.json()
-
-      // Create anchor element for AR Quick Look
-      const anchor = document.createElement('a')
-      anchor.rel = 'ar'
-      anchor.href = config.models.usdz
-      
-      // Add preview image (required for AR Quick Look)
-      const img = document.createElement('img')
-      img.src = productImage
-      img.alt = productName
-      anchor.appendChild(img)
-      
-      document.body.appendChild(anchor)
-      anchor.click()
-      document.body.removeChild(anchor)
-    } catch (error) {
-      console.error('iOS AR error:', error)
-      // Fallback to camera mode
-      startCameraAR()
-    }
-  }, [productImage, productName, frameStyle, size])
-
-  // Launch Android Scene Viewer
-  const launchAndroidAR = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `/api/ar?productId=demo&frameStyle=${frameStyle}&size=${size}&imageUrl=${encodeURIComponent(productImage)}`
-      )
-      const config = await response.json()
-
-      const glbUrl = encodeURIComponent(config.models.glb)
-      const title = encodeURIComponent(productName)
-      const fallbackUrl = encodeURIComponent(window.location.href)
-      
-      const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${glbUrl}&mode=ar_only&title=${title}#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=${fallbackUrl};end;`
-      
-      window.location.href = intentUrl
-    } catch (error) {
-      console.error('Android AR error:', error)
-      startCameraAR()
-    }
-  }, [productImage, productName, frameStyle, size])
-
-  // Check and reset camera permissions if version changed
-  const checkCameraPermissionVersion = () => {
-    const storedVersion = localStorage.getItem('ar_camera_permission_version')
-    if (storedVersion !== CAMERA_PERMISSION_VERSION) {
-      // Clear any cached camera permissions
-      localStorage.setItem('ar_camera_permission_version', CAMERA_PERMISSION_VERSION)
-      return true // Version was reset
-    }
-    return false
-  }
-
-  // Start camera-based AR preview
-  const startCameraAR = async () => {
-    try {
-      // Check if we need to force permission reset
-      const wasReset = checkCameraPermissionVersion()
-      
-      if (wasReset) {
-        console.log('Camera permission version updated - requesting fresh permissions')
+  useEffect(() => {
+    const videoEl = videoRef.current
+    return () => {
+      if (videoEl?.srcObject) {
+        const tracks = (videoEl.srcObject as MediaStream).getTracks()
+        tracks.forEach(track => track.stop())
       }
-      
-      // Stop any existing streams first
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen && cameraActive) stopCamera()
+  }, [isOpen, cameraActive, stopCamera])
+
+  const startCameraAR = useCallback(async () => {
+    setError(null)
+    setIsLoading(true)
+
+    // Check if HTTPS (required for camera)
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+      setError('Camera requires HTTPS. Please use a secure connection.')
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      // Stop any existing streams
       if (videoRef.current?.srcObject) {
-        const existingStream = videoRef.current.srcObject as MediaStream
-        existingStream.getTracks().forEach(track => track.stop())
-        videoRef.current.srcObject = null
+        const existing = videoRef.current.srcObject as MediaStream
+        existing.getTracks().forEach(t => t.stop())
       }
-      
-      // Add cache-busting timestamp and stricter constraints to force permission dialog
-      const constraints = {
-        video: { 
-          facingMode: { exact: 'environment' },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+
+      // Request camera with ideal constraints
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         },
         audio: false
-      }
-      
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
-      
+      })
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream
         setCameraActive(true)
-        setArMode('camera')
       }
-    } catch (error) {
-      console.error('Camera access error:', error)
-      
-      // Fallback to less strict constraints if exact fails
-      try {
-        const fallbackStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' }
-        })
-        
-        if (videoRef.current) {
-          videoRef.current.srcObject = fallbackStream
-          setCameraActive(true)
-          setArMode('camera')
+    } catch (err) {
+      console.error('Camera error:', err)
+
+      // Check permission state if supported
+      if (navigator.permissions && navigator.permissions.query) {
+        try {
+          const result = await navigator.permissions.query({ name: 'camera' as PermissionName })
+          if (result.state === 'denied') {
+            setError('Camera blocked. Click the lock icon in your address bar and allow camera access.')
+          } else {
+            setError('Camera error. Please allow camera access when prompted.')
+          }
+        } catch {
+          setError('Camera access denied. Please allow camera in your browser settings.')
         }
-      } catch (fallbackError) {
-        console.error('Fallback camera access error:', fallbackError)
-        alert('Camera access is required for AR preview.\n\nPlease:\n1. Clear site data/settings for this website\n2. Reload the page\n3. Allow camera access when prompted')
+      } else {
+        setError('Camera not available. Please ensure you\'re on HTTPS and have a camera.')
       }
     }
-  }
-
-  // Generate QR code for desktop users
-  const generateQRCode = useCallback(() => {
-    const currentUrl = window.location.href
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl + '?ar=true')}`
+    setIsLoading(false)
   }, [])
 
-  // Frame styles for AR preview
-  const frameStyles: Record<string, string> = {
-    black: 'border-8 border-black shadow-2xl',
-    white: 'border-8 border-white shadow-2xl',
-    natural: 'border-8 border-amber-700 shadow-2xl',
-    walnut: 'border-8 border-amber-900 shadow-2xl',
-    gold: 'border-8 border-yellow-500 shadow-2xl',
-  }
+  const generateQRCode = useCallback(() => {
+    const url = typeof window !== 'undefined' ? window.location.href : ''
+    return `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url + '?ar=true')}`
+  }, [])
 
-  // Overlay component for camera AR
-  const CameraAROverlay = () => (
-    <div className="fixed inset-0 z-[300] bg-black">
-      {/* Video Feed */}
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-      
-      {/* AR Overlay UI */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Wall Detection Guide with Frame */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className={`relative bg-gray-800 ${frameStyles[frameStyle]} rounded-sm`} style={{ width: '260px', height: '340px' }}>
-            {/* Canvas Image */}
-            <div className="absolute inset-2 bg-white overflow-hidden">
-              <img
-                src={productImage}
-                alt={productName}
-                className="w-full h-full object-contain"
-              />
-            </div>
-            
-            {/* Corner markers for wall alignment */}
-            <div className="absolute -top-2 -left-2 w-6 h-6 border-t-4 border-l-4 border-indigo-500" />
-            <div className="absolute -top-2 -right-2 w-6 h-6 border-t-4 border-r-4 border-indigo-500" />
-            <div className="absolute -bottom-2 -left-2 w-6 h-6 border-b-4 border-l-4 border-indigo-500" />
-            <div className="absolute -bottom-2 -right-2 w-6 h-6 border-b-4 border-r-4 border-indigo-500" />
-          </div>
-        </div>
-        
-        {/* Instructions */}
-        <div className="absolute top-8 left-0 right-0 text-center">
-          <p className="text-white text-lg font-semibold drop-shadow-lg">
-            Point camera at wall
-          </p>
-          <p className="text-white/70 text-sm mt-1">
-            {productName} • {frameStyle} frame • {size}
-          </p>
-        </div>
+  if (cameraActive) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[300] bg-black touch-none"
+      >
+        <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
 
-        {/* Controls */}
-        <div className="absolute bottom-8 left-0 right-0 px-6">
-          <div className="bg-black/50 backdrop-blur-lg rounded-2xl p-4 max-w-sm mx-auto">
-            <p className="text-white text-sm text-center mb-3">
-              {productName} • {size}
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={stopCamera}
-                className="flex-1 py-3 bg-white/20 text-white rounded-xl font-medium pointer-events-auto"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {}}
-                className="flex-1 py-3 bg-indigo-500 text-white rounded-xl font-medium pointer-events-auto"
-              >
-                Capture
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Close Button */}
-        <button
-          onClick={stopCamera}
-          className="absolute top-6 right-6 w-12 h-12 bg-black/50 backdrop-blur rounded-full flex items-center justify-center pointer-events-auto"
+        {/* Draggable + pinch-to-resize product overlay */}
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          drag
+          dragMomentum={false}
+          dragElastic={0.1}
+          whileDrag={{ cursor: 'grabbing' }}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+          <motion.div
+            className="w-64 h-80 border-4 border-white/80 rounded-lg relative bg-white/10 shadow-2xl"
+            style={{ touchAction: 'none' }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Image src={productImage} alt={productName} fill className="object-cover rounded-lg opacity-80" sizes="256px" />
 
-      {/* Hidden canvas for processing */}
-      <canvas ref={canvasRef} className="hidden" />
-    </div>
-  )
+            {/* Size label */}
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs text-white/60 whitespace-nowrap bg-black/50 px-2 py-1 rounded-full">
+              {size} — {frameStyle}
+            </div>
+          </motion.div>
+        </motion.div>
 
-  if (cameraActive && arMode === 'camera') {
-    return <CameraAROverlay />
+        {/* Controls bar */}
+        <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-4 px-4">
+          <span className="text-xs text-white/50">Drag to move</span>
+          <button onClick={stopCamera} className="px-6 py-2 bg-white/20 backdrop-blur-md rounded-full text-white text-sm font-medium border border-white/20">
+            Close Camera
+          </button>
+        </div>
+      </motion.div>
+    )
   }
+
+  if (!isOpen) return null
 
   return (
     <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/90 backdrop-blur-lg z-[200]"
-          />
+      <>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200]"
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-sm max-h-[80vh] bg-[#1a1a1a] rounded-2xl z-[201] shadow-2xl overflow-hidden border border-white/10 flex flex-col"
+        >
+          {/* Header - Chrome style */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+            <div className="w-5 h-5 rounded bg-indigo-500 flex items-center justify-center text-[10px] text-white font-bold">
+              AR
+            </div>
+            <span className="flex-1 text-sm font-medium">About AR Preview</span>
+            <button onClick={onClose} aria-label="Close AR preview" title="Close" className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-          {/* AR Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-zinc-900 rounded-3xl z-[201] overflow-hidden border border-white/10"
-          >
-            {/* Header */}
-            <div className="p-6 border-b border-white/10 flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold">View in Your Space</h2>
-                <p className="text-sm text-gray-400">See how this canvas looks on your wall</p>
+          {/* Secure connection indicator */}
+          <div className="px-4 py-2 flex items-center gap-2 text-xs text-gray-400 border-b border-white/5">
+            <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            <span>Camera access required for AR</span>
+          </div>
+
+          {/* Content - Scrollable */}
+          <div className="p-4 overflow-y-auto flex-1">
+            {error && (
+              <div className="mb-3 p-2 bg-red-500/20 rounded-lg text-xs text-red-200 text-center">
+                {error}
               </div>
-              <button
-                onClick={onClose}
-                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
+            )}
+
+            {/* Product preview */}
+            <div className="flex items-center gap-3 mb-4 p-3 bg-white/5 rounded-xl">
+              <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
+                <Image src={productImage} alt={productName} fill className="object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{productName}</p>
+                <p className="text-xs text-gray-500">{size} • {frameStyle}</p>
+              </div>
             </div>
 
-            {/* Content */}
-            <div className="p-6">
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+            {/* Camera permission */}
+            <div className="space-y-2">
+              <button
+                onClick={startCameraAR}
+                disabled={isLoading}
+                className="w-full flex items-center gap-3 px-3 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors group"
+              >
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-indigo-500 transition-colors">
+                  {isLoading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  )}
                 </div>
-              ) : (
+                <div className="flex-1 text-left">
+                  <p className="text-sm font-medium">Camera</p>
+                  <p className="text-xs text-gray-500">Click to allow access</p>
+                </div>
+                <span className="text-xs text-green-400 font-medium">Allow</span>
+              </button>
+
+              {/* QR Code option for desktop */}
+              {deviceType === 'desktop' && (
                 <>
-                  {/* Preview Image */}
-                  <div className="relative aspect-video rounded-2xl overflow-hidden bg-zinc-800 mb-6">
-                    <Image
-                      src={productImage}
-                      alt={productName}
-                      fill
-                      className="object-contain p-4"
-                    />
-                    {/* AR Badge */}
-                    <div className="absolute top-4 right-4 px-3 py-1.5 bg-indigo-500 rounded-full">
-                      <span className="text-xs font-bold text-white">AR READY</span>
+                  <div className="relative py-2">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-white/10" />
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="px-2 bg-[#1a1a1a] text-xs text-gray-500">or</span>
                     </div>
                   </div>
 
-                  {/* Device-specific Options */}
-                  {deviceType === 'ios' && (
-                    <div className="space-y-4">
-                      <p className="text-sm text-gray-400 text-center">
-                        Use Apple AR Quick Look to place this canvas on your wall
-                      </p>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          onClick={launchIOSAR}
-                          className="py-4 bg-white text-black rounded-xl font-bold uppercase tracking-wider hover:bg-indigo-500 hover:text-white transition-all flex items-center justify-center gap-2"
-                        >
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                          </svg>
-                          AR View
-                        </button>
-                        <button
-                          onClick={startCameraAR}
-                          className="py-4 bg-white/10 text-white rounded-xl font-bold uppercase tracking-wider hover:bg-white/20 transition-all flex items-center justify-center gap-2"
-                        >
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                          Camera
-                        </button>
+                  <button
+                    onClick={() => setShowQRCode(!showQRCode)}
+                    className="w-full flex items-center gap-3 px-3 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className="text-sm font-medium">Use Phone</p>
+                      <p className="text-xs text-gray-500">Scan QR code</p>
+                    </div>
+                    <svg className={`w-4 h-4 text-gray-500 transition-transform ${showQRCode ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {showQRCode && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="flex justify-center py-3"
+                    >
+                      <div className="w-40 h-40 bg-white rounded-lg p-2 relative">
+                        <Image src={generateQRCode()} alt="Scan QR code to open AR on your phone" fill className="object-contain" unoptimized />
                       </div>
-                    </div>
+                    </motion.div>
                   )}
-
-                  {deviceType === 'android' && (
-                    <div className="space-y-4">
-                      <p className="text-sm text-gray-400 text-center">
-                        Use Google Scene Viewer to place this canvas on your wall
-                      </p>
-                      <div className="grid grid-cols-2 gap-3">
-                        <button
-                          onClick={launchAndroidAR}
-                          className="py-4 bg-white text-black rounded-xl font-bold uppercase tracking-wider hover:bg-indigo-500 hover:text-white transition-all flex items-center justify-center gap-2"
-                        >
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                          </svg>
-                          AR View
-                        </button>
-                        <button
-                          onClick={startCameraAR}
-                          className="py-4 bg-white/10 text-white rounded-xl font-bold uppercase tracking-wider hover:bg-white/20 transition-all flex items-center justify-center gap-2"
-                        >
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                          Camera
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {deviceType === 'desktop' && (
-                    <div className="space-y-4">
-                      <p className="text-sm text-gray-400 text-center">
-                        Scan the QR code with your mobile device to view in AR
-                      </p>
-                      
-                      {showQRCode ? (
-                        <div className="flex flex-col items-center gap-4">
-                          <div className="w-48 h-48 bg-white rounded-xl overflow-hidden flex items-center justify-center">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={generateQRCode()}
-                              alt="QR Code"
-                              className="w-44 h-44 object-contain"
-                            />
-                          </div>
-                          <button
-                            onClick={() => setShowQRCode(false)}
-                            className="text-sm text-indigo-400 hover:text-indigo-300"
-                          >
-                            Hide QR Code
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setShowQRCode(true)}
-                          className="w-full py-4 bg-white text-black rounded-xl font-bold uppercase tracking-wider hover:bg-indigo-500 hover:text-white transition-all flex items-center justify-center gap-3"
-                        >
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <rect x="3" y="3" width="7" height="7" />
-                            <rect x="14" y="3" width="7" height="7" />
-                            <rect x="14" y="14" width="7" height="7" />
-                            <rect x="3" y="14" width="7" height="7" />
-                          </svg>
-                          Generate QR Code
-                        </button>
-                      )}
-
-                      {webXRSupported && (
-                        <button
-                          onClick={() => {}}
-                          className="w-full py-3 border border-white/20 rounded-xl font-medium hover:bg-white/5 transition-colors"
-                        >
-                          Try WebXR (Requires AR Headset)
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Product Info */}
-                  <div className="mt-6 pt-6 border-t border-white/10 space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Canvas Size</span>
-                      <span className="font-medium">{size}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Dimensions</span>
-                      <span className="font-medium">
-                        {dimensions.width.toFixed(2)}m × {dimensions.height.toFixed(2)}m
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Frame Style</span>
-                      <span className="font-medium capitalize">{frameStyle}</span>
-                    </div>
-                  </div>
-
-                  {/* Instructions */}
-                  <div className="mt-6 p-4 bg-white/5 rounded-xl">
-                    <h3 className="text-sm font-bold mb-2">How to use AR:</h3>
-                    <ol className="text-xs text-gray-400 space-y-1.5 list-decimal list-inside">
-                      <li>Point your camera at a well-lit wall</li>
-                      <li>Move slowly to help detect the surface</li>
-                      <li>Tap to place the canvas</li>
-                      <li>Pinch to resize, drag to move</li>
-                      <li>Tap the capture button to save</li>
-                    </ol>
-                  </div>
                 </>
               )}
             </div>
-          </motion.div>
-        </>
-      )}
+          </div>
+
+          {/* Footer */}
+          <div className="px-4 py-3 bg-white/5 border-t border-white/10 text-xs text-gray-500 text-center">
+            Point camera at a wall to preview canvas placement
+          </div>
+        </motion.div>
+      </>
     </AnimatePresence>
   )
 }

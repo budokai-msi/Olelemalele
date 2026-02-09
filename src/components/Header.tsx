@@ -2,9 +2,10 @@
 
 import { useAuth } from '@/lib/useAuth'
 import { useWishlist } from '@/lib/wishlistContext'
-import { motion } from 'framer-motion'
+import { motion, useMotionValueEvent, useScroll } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 import MobileNav from './MobileNav'
 
 const navLinks = [
@@ -78,12 +79,24 @@ function WishlistButton() {
 
 export default function Header() {
   const { user, logout } = useAuth()
+  const [hidden, setHidden] = useState(false)
+
+  // Sticky-Show-Hide: hide on scroll down, show on scroll up
+  const { scrollY } = useScroll()
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    const previous = scrollY.getPrevious() ?? 0
+    if (latest > previous && latest > 150) {
+      setHidden(true)
+    } else {
+      setHidden(false)
+    }
+  })
 
   return (
     <motion.header
       initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      animate={{ y: hidden ? '-100%' : 0, opacity: 1 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       className="fixed top-0 w-full bg-black/90 backdrop-blur-md text-white p-6 z-50 border-b border-white/5"
     >
       <nav className="flex justify-between items-center max-w-7xl mx-auto">
@@ -130,10 +143,10 @@ export default function Header() {
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 >
-                  {/* Shimmer effect */}
+                  {/* Shimmer effect — fixed: was using unicode minus U+2212 */}
                   <motion.span
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent -translate-x-full"
-                    animate={{ translateX: ['−100%', '200%'] }}
+                    animate={{ translateX: ['-100%', '200%'] }}
                     transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                   />
                   <span className="relative z-10">Sign Up</span>

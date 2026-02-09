@@ -2,46 +2,67 @@
 
 import { useHaptic } from '@/hooks/useHaptic'
 import { useCart } from '@/lib/cartContext'
-import { Product, products } from '@/lib/products'
+import { products } from '@/lib/products'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 
-type FilterType = 'all' | 'canvas' | 'poster'
+const ITEMS_PER_BATCH = 6
 
 export default function Gallery() {
-  const [filter, setFilter] = useState<FilterType>('all')
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [displayCount, setDisplayCount] = useState(ITEMS_PER_BATCH)
+  const [isLoading, setIsLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
   const triggerHaptic = useHaptic()
   const { dispatch } = useCart()
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  // Ensure hydration matches
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Fix for mobile viewport height
+  const displayedProducts = useMemo(() => {
+    return products.slice(0, displayCount)
+  }, [displayCount])
+
+  const loadMore = useCallback(() => {
+    if (isLoading || !hasMore) return
+    setIsLoading(true)
+    
+    // Simulate network delay for smooth feel
+    setTimeout(() => {
+      const newCount = Math.min(displayCount + ITEMS_PER_BATCH, products.length)
+      setDisplayCount(newCount)
+      setHasMore(newCount < products.length)
+      setIsLoading(false)
+      triggerHaptic()
+    }, 300)
+  }, [displayCount, hasMore, isLoading, triggerHaptic])
+
+  // Intersection Observer for infinite scroll
+  const observerTargetRef = useRef<HTMLDivElement>(null)
+  
   useEffect(() => {
-    const setVH = () => {
-      const vh = window.innerHeight * 0.01
-      document.documentElement.style.setProperty('--vh', `${vh}px`)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          loadMore()
+        }
+      },
+      { threshold: 0.1, rootMargin: '200px' }
+    )
+
+    if (observerTargetRef.current) {
+      observer.observe(observerTargetRef.current)
     }
-    setVH()
-    window.addEventListener('resize', setVH)
-    return () => window.removeEventListener('resize', setVH)
-  }, [])
 
-  const filteredProducts = useMemo(() => {
-    if (filter === 'all') return products
-    return products.filter(p => p.type === filter)
-  }, [filter])
+    return () => observer.disconnect()
+  }, [hasMore, isLoading, loadMore])
 
-  // Use stable count for SSR
-  const displayCount = mounted ? filteredProducts.length : products.length
-
-  const handleQuickAdd = (product: Product) => {
+  const handleQuickAdd = (product: typeof products[0]) => {
     dispatch({
       type: 'ADD_ITEM',
       payload: {
@@ -58,112 +79,74 @@ export default function Gallery() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      {/* Hero Header */}
-      <header className="pt-24 md:pt-32 pb-12 md:pb-20 px-4 md:px-12">
-        <div className="max-w-[1920px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="flex flex-col gap-6"
-          >
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs text-gray-500 uppercase tracking-wider">
+    <main className="h-screen bg-black text-white flex flex-col overflow-hidden">
+      {/* Header */}
+      <header className="flex-none px-6 py-4 border-b border-white/10 bg-black/50 backdrop-blur-md z-10">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-xs text-gray-500 uppercase tracking-wider mb-1">
               <Link href="/" className="hover:text-white transition-colors">Home</Link>
               <span>/</span>
               <span className="text-white">Archive</span>
             </div>
-
-            {/* Title Row */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
-              <div>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-xs md:text-sm text-gray-500 uppercase tracking-[0.3em] mb-4"
-                >
-                  [ {displayCount} pieces ]
-                </motion.p>
-                <h1 className="text-[clamp(3rem,12vw,9rem)] font-black tracking-tighter leading-[0.85]">
-                  CANVAS<br />
-                  <span className="text-gradient">COLLECTION</span>
-                </h1>
-              </div>
-
-              {/* Filter Pills */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-                className="flex gap-2 flex-wrap"
-              >
-                {(['all', 'canvas', 'experimental', 'limited'] as FilterType[]).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => {
-                      setFilter(type)
-                      triggerHaptic()
-                    }}
-                    className={`px-5 py-2.5 rounded-full text-xs uppercase tracking-wider font-medium transition-all duration-300 ${filter === type
-                      ? 'bg-white text-black'
-                      : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
-                      }`}
-                  >
-                    {type === 'all' ? 'All Works' : type}
-                  </button>
-                ))}
-              </motion.div>
-            </div>
-          </motion.div>
+            <h1 className="text-2xl font-black tracking-tight">
+              CANVAS <span className="text-indigo-400">COLLECTION</span>
+            </h1>
+          </div>
+          <p className="text-sm text-gray-400">
+            {mounted ? `${products.length} pieces` : 'Loading...'}
+          </p>
         </div>
       </header>
 
-      {/* Gallery Grid */}
-      <section className="px-4 md:px-12 pb-24 md:pb-32">
-        <div className="max-w-[1920px] mx-auto">
-          <div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-12"
-          >
+      {/* Infinite Scroll Container - Gemini Style */}
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto scrollbar-hide"
+        style={{ scrollBehavior: 'smooth' }}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {/* Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <AnimatePresence mode="popLayout">
-              {filteredProducts.map((product, index) => (
+              {displayedProducts.map((product, index) => (
                 <motion.article
                   key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ 
+                    duration: 0.4, 
+                    delay: (index % ITEMS_PER_BATCH) * 0.05,
+                    ease: [0.16, 1, 0.3, 1]
+                  }}
+                  layout
                   className="group relative"
                   onMouseEnter={() => setHoveredId(product.id)}
                   onMouseLeave={() => setHoveredId(null)}
                 >
-                  {/* Image Container */}
                   <Link href={`/product/${product.id}`} className="block">
-                    <div className="relative overflow-hidden aspect-4-5 bg-gradient-to-b from-gray-900 to-black rounded-lg md:rounded-xl mb-4">
-                      {/* Glow Effect */}
+                    <div className="relative overflow-hidden aspect-[4/5] bg-zinc-900 rounded-2xl">
+                      {/* Glow on hover */}
                       <div className={`absolute inset-0 bg-gradient-to-t from-indigo-600/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 z-10 pointer-events-none ${hoveredId === product.id ? 'opacity-100' : ''}`} />
 
-                      <div className="absolute inset-0">
-                        <Image
-                          src={product.image}
-                          alt={product.name}
-                          fill
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          priority={index < 2}
-                          loading={index < 2 ? undefined : 'lazy'}
-                        />
-                      </div>
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority={index < 6}
+                      />
 
                       {/* Edition Badge */}
-                      <div className="absolute top-3 left-3 glass px-3 py-1.5 rounded-full z-20">
-                        <span className="text-[10px] text-white/80 uppercase tracking-wider font-medium">
+                      <div className="absolute top-3 left-3 px-3 py-1.5 bg-black/50 backdrop-blur-md rounded-full z-20">
+                        <span className="text-[10px] text-white/90 uppercase tracking-wider font-medium">
                           № {product.id.padStart(2, '0')}
                         </span>
                       </div>
 
-                      {/* Quick Actions Overlay */}
+                      {/* Quick Actions */}
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-center gap-4 z-20">
                         <motion.span
                           initial={{ y: 20, opacity: 0 }}
@@ -190,10 +173,10 @@ export default function Gallery() {
                   </Link>
 
                   {/* Product Info */}
-                  <div className="px-1">
-                    <div className="flex justify-between items-start mb-2">
+                  <div className="mt-4 px-1">
+                    <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="text-lg md:text-xl font-semibold tracking-tight group-hover:text-gradient transition-all duration-300">
+                        <h3 className="text-lg font-semibold tracking-tight group-hover:text-indigo-400 transition-colors">
                           {product.name}
                         </h3>
                         <p className="text-xs text-gray-500 uppercase tracking-wider mt-1">
@@ -201,11 +184,11 @@ export default function Gallery() {
                         </p>
                       </div>
                       <span className="text-gray-400 font-mono text-sm">
-                        ${product.price}
+                        ${(product.price / 100).toFixed(0)}
                       </span>
                     </div>
 
-                    {/* Variants Pills */}
+                    {/* Variant Pills */}
                     <div className="flex gap-1.5 mt-3 flex-wrap">
                       {product.variants.slice(0, 3).map((v, i) => (
                         <span
@@ -227,57 +210,35 @@ export default function Gallery() {
             </AnimatePresence>
           </div>
 
-          {/* Empty State */}
-          {filteredProducts.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-24"
-            >
-              <p className="text-gray-500 text-lg">No pieces found in this category.</p>
-              <button
-                onClick={() => setFilter('all')}
-                className="mt-4 text-white underline underline-offset-4 hover:text-indigo-400 transition-colors"
-              >
-                View all works
-              </button>
-            </motion.div>
-          )}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="px-4 md:px-12 pb-24">
-        <div className="max-w-[1920px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-br from-gray-900 to-black border border-white/5 p-8 md:p-16 text-center"
+          {/* Loading Trigger & Indicator */}
+          <div 
+            ref={observerTargetRef}
+            className="py-12 flex flex-col items-center"
           >
-            {/* Background Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[60%] bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none" />
-
-            <div className="relative z-10">
-              <p className="text-xs text-gray-500 uppercase tracking-[0.3em] mb-4">
-                Custom Commissions
-              </p>
-              <h2 className="text-2xl md:text-4xl font-bold tracking-tight mb-4">
-                Want something unique?
-              </h2>
-              <p className="text-gray-400 max-w-md mx-auto mb-8">
-                We create custom pieces tailored to your space. From size adjustments to entirely new compositions.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-block px-8 py-4 bg-white text-black rounded-full font-medium uppercase tracking-wider text-sm hover:bg-indigo-500 hover:text-white transition-all duration-300 hover:scale-105"
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-3"
               >
-                Get in Touch
-              </Link>
-            </div>
-          </motion.div>
+                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="text-xs text-gray-500 uppercase tracking-wider ml-2">Loading more...</span>
+              </motion.div>
+            )}
+            {!hasMore && displayedProducts.length > 0 && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-xs text-gray-500 uppercase tracking-wider"
+              >
+                — All {products.length} pieces loaded —
+              </motion.p>
+            )}
+          </div>
         </div>
-      </section>
+      </div>
     </main>
   )
 }

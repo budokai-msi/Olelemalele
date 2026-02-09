@@ -170,7 +170,7 @@ export default function WishlistPage() {
                       </p>
                     </div>
                     <span className="font-mono text-gray-400">
-                      ${item.price.toLocaleString()}
+                      ${(item.price / 100).toFixed(0)}
                     </span>
                   </div>
                 </motion.div>

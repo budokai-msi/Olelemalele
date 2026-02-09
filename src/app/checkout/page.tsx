@@ -3,6 +3,7 @@
 import { useHaptic } from '@/hooks/useHaptic'
 import { useCart } from '@/lib/cartContext'
 import { AnimatePresence, motion } from 'framer-motion'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -272,9 +273,18 @@ export default function CheckoutPage() {
             <div className="space-y-6 max-h-[40vh] overflow-y-auto mb-8 pr-2 custom-scrollbar">
               {state.items.map((item) => (
                 <div key={item.id} className="flex gap-4">
-                  <div className="w-20 h-24 bg-zinc-900 rounded-lg overflow-hidden flex-shrink-0">
-                    {/* In a real app we'd have the product image here */}
-                    <div className="w-full h-full bg-gradient-to-br from-indigo-500/20 to-black/40" />
+                  <div className="w-20 h-24 bg-zinc-900 rounded-lg overflow-hidden flex-shrink-0 relative">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        sizes="80px"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-indigo-500/20 to-black/40" />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-bold truncate uppercase">{item.name}</h4>
