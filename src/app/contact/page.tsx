@@ -15,8 +15,12 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white pt-32 pb-24 px-4 md:px-12">
-      <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24">
+    <main className="min-h-screen bg-black text-white pt-32 pb-24 px-4 md:px-12 relative overflow-hidden">
+      {/* ═══ Ambient Glow Orbs ═══ */}
+      <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-white/[0.04] blur-[150px] rounded-full pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-white/[0.06] blur-[120px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
+
+      <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 relative z-10">
 
         {/* Left Side: Text */}
         <motion.div
@@ -54,14 +58,14 @@ export default function ContactPage() {
           transition={{ duration: 0.8 }}
           className="relative"
         >
-          <div className="glass p-8 md:p-12 rounded-[2.5rem] border border-white/5 shadow-2xl">
+          <div className="glass p-8 md:p-12 rounded-[2.5rem] glow-border shadow-2xl">
             {submitted ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="py-24 text-center"
               >
-                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 glow">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M20 6L9 17l-5-5" />
                   </svg>
@@ -104,7 +108,7 @@ export default function ContactPage() {
                 </div>
                 <button
                   type="submit"
-                  className="group relative w-full bg-white text-black py-5 rounded-full font-black uppercase tracking-[0.2em] text-xs overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 shadow-xl shadow-white/5 mt-4"
+                  className="group relative w-full bg-white text-black py-5 rounded-full font-black uppercase tracking-[0.2em] text-xs overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 glow-intense mt-4"
                 >
                   <span className="relative z-10">Send Message</span>
                   <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />
@@ -113,8 +117,9 @@ export default function ContactPage() {
             )}
           </div>
 
-          {/* Background Decorative Element */}
-          <div className="absolute -z-10 -bottom-10 -right-10 w-40 h-40 bg-white/5 blur-[80px] rounded-full pointer-events-none" />
+          {/* Background Decorative Glow */}
+          <div className="absolute -z-10 -bottom-16 -right-16 w-64 h-64 bg-white/[0.08] blur-[100px] rounded-full pointer-events-none animate-pulse-glow" />
+          <div className="absolute -z-10 -top-10 -left-10 w-48 h-48 bg-white/[0.06] blur-[80px] rounded-full pointer-events-none" />
         </motion.div>
       </div>
     </main>
