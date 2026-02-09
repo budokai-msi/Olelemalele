@@ -61,8 +61,8 @@ export default function AdminOrders() {
     : orders.filter(o => o.status === filter)
 
   const statusColors = {
-    pending: 'bg-yellow-500/20 text-yellow-400',
-    processing: 'bg-blue-500/20 text-blue-400',
+    pending: 'bg-gray-500/20 text-gray-400',
+    processing: 'bg-gray-400/20 text-gray-300',
     shipped: 'bg-gray-500/20 text-gray-400',
     delivered: 'bg-green-500/20 text-green-400',
     cancelled: 'bg-red-500/20 text-red-400'

@@ -50,8 +50,8 @@ export default function Dashboard() {
   }
 
   const statusColors: Record<string, string> = {
-    pending: 'text-yellow-400',
-    processing: 'text-blue-400',
+    pending: 'text-gray-400',
+    processing: 'text-gray-300',
     shipped: 'text-gray-400',
     delivered: 'text-green-400',
     cancelled: 'text-red-400'

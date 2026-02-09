@@ -12,11 +12,11 @@
   /* Dynamic viewport height fix for mobile browsers */
   --vh: 1vh;
 
-  /* Premium color tokens */
-  --accent-primary: 99 102 241;
-  /* Indigo */
-  --accent-glow: 139 92 246;
-  /* Violet */
+  /* Premium color tokens — Pure B&W */
+  --accent-primary: 255 255 255;
+  /* Pure White */
+  --accent-glow: 200 200 200;
+  /* Silver */
   --surface-dark: 10 10 10;
   --surface-elevated: 18 18 18;
 
@@ -54,8 +54,8 @@
 
   /* Selection styling */
   ::selection {
-    background: rgb(var(--accent-primary) / 0.4);
-    color: white;
+    background: rgba(255, 255, 255, 0.25);
+    color: black;
   }
 }
 
@@ -71,16 +71,16 @@
   .text-gradient {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg,
-        rgb(var(--accent-primary)) 0%,
-        rgb(var(--accent-glow)) 50%,
-        #fff 100%);
+        #ffffff 0%,
+        #d1d5db 40%,
+        #ffffff 100%);
   }
 
-  /* Glow effect */
+  /* Glow effect — white */
   .glow {
     box-shadow:
-      0 0 20px rgb(var(--accent-primary) / 0.3),
-      0 0 60px rgb(var(--accent-primary) / 0.1);
+      0 0 20px rgba(255, 255, 255, 0.15),
+      0 0 60px rgba(255, 255, 255, 0.05);
   }
 
   /* Glass morphism */
