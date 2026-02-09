@@ -275,7 +275,100 @@
   .animate-pulse-glow {
     animation: pulse-glow 4s ease-in-out infinite;
   }
+
+  /* ═══════════════════════════════════════════════════════════
+     ORBITING LASER BORDER — visible beam tracing element edges
+     ═══════════════════════════════════════════════════════════ */
 }
+
+/* @property must be at root level, not inside @layer */
+@property --laser-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes laser-spin {
+  to {
+    --laser-angle: 360deg;
+  }
+}
+
+/* Laser border for cards/boxes */
+.laser-border-orbit {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  isolation: isolate;
+}
+
+.laser-border-orbit::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--laser-angle),
+    transparent 0%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.8) 75%,
+    #ffffff 80%,
+    rgba(255, 255, 255, 0.8) 85%,
+    transparent 100%
+  );
+  animation: laser-spin 3s linear infinite;
+  z-index: -2;
+}
+
+.laser-border-orbit::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: #000;
+  z-index: -1;
+}
+
+/* Laser button — orbiting beam on rounded pill buttons */
+.laser-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.laser-btn::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--laser-angle),
+    transparent 0%,
+    transparent 55%,
+    rgba(255, 255, 255, 0.6) 70%,
+    #ffffff 78%,
+    rgba(255, 255, 255, 0.6) 86%,
+    transparent 100%
+  );
+  animation: laser-spin 2.5s linear infinite;
+  z-index: -2;
+}
+
+.laser-btn::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: #ffffff;
+  z-index: -1;
+}
+
+/* Dark variant for buttons with black bg fill */
+.laser-btn-dark::after {
+  background: #000;
+}
+
+@layer utilities {
 
 /* Smooth scrolling (Lenis removed — using native CSS scroll) */
 
@@ -331,4 +424,6 @@
 
 .swatch-gold {
   background-color: #1a1a1a;
+}
+
 }

@@ -563,21 +563,21 @@ export default function CustomUploadPage() {
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[300px] bg-white/[0.04] blur-[120px] rounded-full pointer-events-none animate-pulse-glow" />
 
         <div className="grid md:grid-cols-3 gap-8 relative z-10">
-          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border">
+          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border laser-border-orbit">
             <h3 className="text-lg font-bold mb-3">Image Quality</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
               For best results, upload high-resolution images (300 DPI minimum).
               We support JPEG, PNG, and WebP formats up to 10MB.
             </p>
           </div>
-          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border">
+          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border laser-border-orbit">
             <h3 className="text-lg font-bold mb-3">Color Accuracy</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
               Our 12-color giclée printing process ensures your artwork is reproduced
               with stunning color accuracy and detail.
             </p>
           </div>
-          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border">
+          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border laser-border-orbit">
             <h3 className="text-lg font-bold mb-3">Proofing</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
               Every custom order is reviewed by our team. We&apos;ll contact you if

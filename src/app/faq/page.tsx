@@ -177,7 +177,7 @@ export default function FAQPage() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 text-center p-8 md:p-12 rounded-2xl bg-white/[0.03] glow-border"
+          className="mt-20 text-center p-8 md:p-12 rounded-2xl bg-white/[0.03] glow-border laser-border-orbit"
         >
           <h3 className="text-2xl font-bold mb-4">Still have questions?</h3>
           <p className="text-gray-400 mb-8">
@@ -185,7 +185,7 @@ export default function FAQPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:scale-105 transition-all glow-intense"
+            className="inline-block px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:scale-105 transition-all glow-intense laser-btn"
           >
             Contact Us
           </Link>

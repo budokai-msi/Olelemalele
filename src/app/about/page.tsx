@@ -82,7 +82,7 @@ export default function AboutPage() {
             </div>
             <Link
               href="/gallery"
-              className="px-12 py-4 border border-white/20 rounded-full text-xs uppercase tracking-widest font-black hover:bg-white hover:text-black transition-all glow"
+              className="px-12 py-4 border border-white/20 rounded-full text-xs uppercase tracking-widest font-black hover:bg-white hover:text-black transition-all glow laser-btn laser-btn-dark"
             >
               Explore the Archive
             </Link>

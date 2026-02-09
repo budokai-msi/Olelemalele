@@ -58,7 +58,7 @@ export default function ContactPage() {
           transition={{ duration: 0.8 }}
           className="relative"
         >
-          <div className="glass p-8 md:p-12 rounded-[2.5rem] glow-border shadow-2xl">
+          <div className="glass p-8 md:p-12 rounded-[2.5rem] glow-border shadow-2xl laser-border-orbit">
             {submitted ? (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -108,7 +108,7 @@ export default function ContactPage() {
                 </div>
                 <button
                   type="submit"
-                  className="group relative w-full bg-white text-black py-5 rounded-full font-black uppercase tracking-[0.2em] text-xs overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 glow-intense mt-4"
+                  className="group relative w-full bg-white text-black py-5 rounded-full font-black uppercase tracking-[0.2em] text-xs overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 glow-intense mt-4 laser-btn"
                 >
                   <span className="relative z-10">Send Message</span>
                   <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />

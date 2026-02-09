@@ -181,7 +181,7 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <Link
               href="/gallery"
-              className="inline-block px-8 py-4 border border-white/20 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-black transition-all glow"
+              className="inline-block px-8 py-4 border border-white/20 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-black transition-all glow laser-btn laser-btn-dark"
             >
               View All Works
             </Link>

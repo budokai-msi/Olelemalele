@@ -248,7 +248,7 @@ export default function CheckoutPage() {
               <div className="flex flex-col md:flex-row gap-4 mt-16 pt-8 border-t border-white/5">
                 <button
                   onClick={handleNext}
-                  className="px-12 py-5 bg-white text-black rounded-full font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-95 transition-all glow-intense"
+                  className="px-12 py-5 bg-white text-black rounded-full font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-95 transition-all glow-intense laser-btn"
                 >
                   {step === 'payment' ? 'Complete Purchase' : 'Continue'}
                 </button>
@@ -270,7 +270,7 @@ export default function CheckoutPage() {
 
         {/* Right Side: Order Summary */}
         <div className="lg:col-span-5 xl:col-span-4">
-          <div className="sticky top-32 glass p-8 lg:p-10 rounded-[2rem] glow-border">
+          <div className="sticky top-32 glass p-8 lg:p-10 rounded-[2rem] glow-border laser-border-orbit">
             <h2 className="text-2xl font-black tracking-tighter mb-8 uppercase">ORDER SUMMARY</h2>
 
             <div className="space-y-6 max-h-[40vh] overflow-y-auto mb-8 pr-2 custom-scrollbar">
