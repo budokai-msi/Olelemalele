@@ -79,7 +79,9 @@ export default function Gallery() {
   }
 
   return (
-    <main className="h-screen bg-black text-white flex flex-col overflow-hidden">
+    <main className="h-screen bg-black text-white flex flex-col overflow-hidden relative">
+      {/* ═══ Ambient Glow ═══ */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/[0.03] blur-[200px] rounded-full pointer-events-none animate-pulse-glow z-0" />
       {/* Header */}
       <header className="flex-none px-6 py-4 border-b border-white/10 bg-black/50 backdrop-blur-md z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">

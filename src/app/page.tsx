@@ -113,7 +113,7 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
       className="group"
     >
       <Link href={`/product/${product.id}`}>
-        <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-white/5 hover:border-white/10 transition-colors duration-300">
+        <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-white/5 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,255,255,0.08)]">
           {/* Image */}
           <div className="relative aspect-[4/5] overflow-hidden">
             <Image
@@ -158,8 +158,11 @@ export default function HomePage() {
       <SimpleMarquee />
 
       {/* Featured Products */}
-      <section className="py-20 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-20 px-4 md:px-8 relative overflow-hidden">
+        {/* ═══ Ambient Glow ═══ */}
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-white/[0.03] blur-[180px] rounded-full pointer-events-none animate-pulse-glow" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-4">
               Featured <span className="text-white/70">Works</span>
@@ -178,7 +181,7 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <Link
               href="/gallery"
-              className="inline-block px-8 py-4 border border-white/20 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-black transition-colors"
+              className="inline-block px-8 py-4 border border-white/20 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-black transition-all glow"
             >
               View All Works
             </Link>

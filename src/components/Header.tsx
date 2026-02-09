@@ -97,7 +97,8 @@ export default function Header() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: hidden ? '-100%' : 0, opacity: 1 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-0 w-full bg-black/90 backdrop-blur-md text-white p-6 z-50 border-b border-white/5"
+      className="fixed top-0 w-full bg-black/90 backdrop-blur-md text-white p-6 z-50 border-b border-white/10"
+      style={{ boxShadow: '0 4px 30px rgba(255, 255, 255, 0.04)' }}
     >
       <nav className="flex justify-between items-center max-w-7xl mx-auto">
         {/* Logo */}

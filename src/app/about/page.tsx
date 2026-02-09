@@ -5,8 +5,12 @@ import Link from 'next/link'
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-black text-white pt-32 pb-24 px-4 md:px-12">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-black text-white pt-32 pb-24 px-4 md:px-12 relative overflow-hidden">
+      {/* ═══ Ambient Glow Orbs ═══ */}
+      <div className="absolute top-32 left-1/3 w-[600px] h-[600px] bg-white/[0.04] blur-[180px] rounded-full pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-40 right-1/4 w-[400px] h-[400px] bg-white/[0.05] blur-[140px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
+
+      <div className="max-w-4xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -57,28 +61,28 @@ export default function AboutPage() {
             </motion.div>
           </div>
 
-          {/* Full Width Quote */}
+          {/* Full Width Quote — vivid glow */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             className="relative py-24 md:py-40 text-center"
           >
-            <div className="absolute inset-0 bg-white/[0.03] blur-[120px] rounded-full" />
+            <div className="absolute inset-0 bg-white/[0.08] blur-[120px] rounded-full animate-pulse-glow" />
             <p className="relative text-2xl md:text-4xl font-light italic tracking-tight max-w-2xl mx-auto leading-tight">
               &ldquo;Canvas is dead. You are the gallery. Wear the void. Own the moment.&rdquo;
             </p>
           </motion.div>
 
           {/* Location / Origin */}
-          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
+          <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
             <div>
               <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Based in</p>
               <p className="text-sm font-bold uppercase tracking-tighter">Sofia, Bulgaria</p>
             </div>
             <Link
               href="/gallery"
-              className="px-12 py-4 border border-white/20 rounded-full text-xs uppercase tracking-widest font-black hover:bg-white hover:text-black transition-all"
+              className="px-12 py-4 border border-white/20 rounded-full text-xs uppercase tracking-widest font-black hover:bg-white hover:text-black transition-all glow"
             >
               Explore the Archive
             </Link>

@@ -127,8 +127,12 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
 export default function FAQPage() {
   return (
-    <main className="min-h-screen bg-black text-white pt-32 pb-24 px-4 md:px-12">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-black text-white pt-32 pb-24 px-4 md:px-12 relative overflow-hidden">
+      {/* ═══ Ambient Glow Orbs ═══ */}
+      <div className="absolute top-40 right-1/4 w-[500px] h-[500px] bg-white/[0.03] blur-[160px] rounded-full pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-60 left-1/4 w-[400px] h-[400px] bg-white/[0.04] blur-[130px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
+
+      <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -173,7 +177,7 @@ export default function FAQPage() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 text-center p-8 md:p-12 rounded-2xl bg-white/[0.02] border border-white/5"
+          className="mt-20 text-center p-8 md:p-12 rounded-2xl bg-white/[0.03] glow-border"
         >
           <h3 className="text-2xl font-bold mb-4">Still have questions?</h3>
           <p className="text-gray-400 mb-8">
@@ -181,7 +185,7 @@ export default function FAQPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-white transition-colors"
+            className="inline-block px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:scale-105 transition-all glow-intense"
           >
             Contact Us
           </Link>

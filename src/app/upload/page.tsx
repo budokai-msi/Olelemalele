@@ -251,7 +251,10 @@ export default function CustomUploadPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white pt-24 pb-20">
+    <main className="min-h-screen bg-black text-white pt-24 pb-20 relative overflow-hidden">
+      {/* ═══ Ambient Glow Orbs ═══ */}
+      <div className="absolute top-40 right-1/3 w-[500px] h-[500px] bg-white/[0.04] blur-[160px] rounded-full pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-40 left-1/4 w-[400px] h-[400px] bg-white/[0.05] blur-[140px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
       {/* Header */}
       <header className="px-4 md:px-12 py-12 border-b border-white/5">
         <div className="max-w-7xl mx-auto">
@@ -554,24 +557,27 @@ export default function CustomUploadPage() {
         </div>
       </div>
 
-      {/* Info Section */}
-      <section className="max-w-7xl mx-auto px-4 md:px-12 py-20 border-t border-white/5">
-        <div className="grid md:grid-cols-3 gap-8">
-          <div>
+      {/* Info Section — with animated glow */}
+      <section className="max-w-7xl mx-auto px-4 md:px-12 py-20 border-t border-white/10 relative">
+        {/* Animated glow behind info cards */}
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[300px] bg-white/[0.04] blur-[120px] rounded-full pointer-events-none animate-pulse-glow" />
+
+        <div className="grid md:grid-cols-3 gap-8 relative z-10">
+          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border">
             <h3 className="text-lg font-bold mb-3">Image Quality</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
               For best results, upload high-resolution images (300 DPI minimum).
               We support JPEG, PNG, and WebP formats up to 10MB.
             </p>
           </div>
-          <div>
+          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border">
             <h3 className="text-lg font-bold mb-3">Color Accuracy</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
               Our 12-color giclée printing process ensures your artwork is reproduced
               with stunning color accuracy and detail.
             </p>
           </div>
-          <div>
+          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border">
             <h3 className="text-lg font-bold mb-3">Proofing</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
               Every custom order is reviewed by our team. We&apos;ll contact you if

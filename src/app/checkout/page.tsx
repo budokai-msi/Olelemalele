@@ -153,8 +153,11 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white pt-24 pb-20 px-4 md:px-12">
-      <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-24">
+    <main className="min-h-screen bg-black text-white pt-24 pb-20 px-4 md:px-12 relative overflow-hidden">
+      {/* ═══ Ambient Glow ═══ */}
+      <div className="absolute top-40 right-1/4 w-[500px] h-[500px] bg-white/[0.04] blur-[160px] rounded-full pointer-events-none animate-pulse-glow" />
+
+      <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-24 relative z-10">
 
         {/* Left Side: Checkout Form */}
         <div className="lg:col-span-7 xl:col-span-8">
@@ -245,7 +248,7 @@ export default function CheckoutPage() {
               <div className="flex flex-col md:flex-row gap-4 mt-16 pt-8 border-t border-white/5">
                 <button
                   onClick={handleNext}
-                  className="px-12 py-5 bg-white text-black rounded-full font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-95 transition-all"
+                  className="px-12 py-5 bg-white text-black rounded-full font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-95 transition-all glow-intense"
                 >
                   {step === 'payment' ? 'Complete Purchase' : 'Continue'}
                 </button>
@@ -267,7 +270,7 @@ export default function CheckoutPage() {
 
         {/* Right Side: Order Summary */}
         <div className="lg:col-span-5 xl:col-span-4">
-          <div className="sticky top-32 glass p-8 lg:p-10 rounded-[2rem] border border-white/10">
+          <div className="sticky top-32 glass p-8 lg:p-10 rounded-[2rem] glow-border">
             <h2 className="text-2xl font-black tracking-tighter mb-8 uppercase">ORDER SUMMARY</h2>
 
             <div className="space-y-6 max-h-[40vh] overflow-y-auto mb-8 pr-2 custom-scrollbar">
