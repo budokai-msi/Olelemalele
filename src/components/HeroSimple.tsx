@@ -46,7 +46,7 @@ export default function HeroSimple() {
       {/* Layer 1: Gradient base */}
       <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/30 via-black to-black z-[1]" />
 
-      {/* Layer 2: Video fluid simulation — 30% opacity, blended */}
+      {/* Layer 2: Video fluid simulation — visible overlay, NO audio */}
       <motion.div className="absolute inset-0 z-[2]" style={{ y: videoY }}>
         <video
           autoPlay
@@ -54,7 +54,8 @@ export default function HeroSimple() {
           muted
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-screen"
+          className="absolute inset-0 w-full h-full object-cover opacity-50"
+          style={{ pointerEvents: 'none' }}
         >
           <source
             src="/WebGL_Fluid_Simulation_Video_Generation.mp4"
