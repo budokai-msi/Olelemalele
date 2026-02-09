@@ -291,13 +291,14 @@ export default function CustomUploadPage() {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 className={`relative aspect-[4/3] rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden ${isDragging
-                    ? 'border-white/40 bg-white/5'
-                    : 'border-white/20 hover:border-white/40 bg-zinc-900/50'
+                  ? 'border-white/40 bg-white/5'
+                  : 'border-white/20 hover:border-white/40 bg-zinc-900/50'
                   }`}
               >
                 <input
                   ref={fileInputRef}
                   type="file"
+                  title="Upload your image"
                   accept="image/jpeg,image/png,image/webp"
                   onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
                   className="hidden"
@@ -430,8 +431,8 @@ export default function CustomUploadPage() {
                       triggerHaptic()
                     }}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${sizeCategory === cat
-                        ? 'bg-white text-black'
-                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                      ? 'bg-white text-black'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
                       }`}
                   >
                     {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -453,8 +454,8 @@ export default function CustomUploadPage() {
                         onClick={() => handleSizeSelect(size)}
                         disabled={size.loading}
                         className={`flex-shrink-0 w-28 p-3 rounded-xl border text-center transition-all snap-start ${selectedSize.id === size.id
-                            ? 'border-white/40 bg-white/5'
-                            : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
+                          ? 'border-white/40 bg-white/5'
+                          : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
                           } ${size.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="font-bold text-sm">{size.name}</div>
@@ -486,8 +487,8 @@ export default function CustomUploadPage() {
                         triggerHaptic()
                       }}
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${selectedFrame === style
-                          ? 'border-white/40 bg-white/5'
-                          : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
+                        ? 'border-white/40 bg-white/5'
+                        : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
                         }`}
                     >
                       <span
