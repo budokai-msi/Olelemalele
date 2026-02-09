@@ -17,7 +17,7 @@ export default function SuccessPage() {
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
       {/* Decorative Glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-indigo-500/10 blur-[150px] rounded-full" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-white/5 blur-[150px] rounded-full" />
       </div>
 
       <motion.div

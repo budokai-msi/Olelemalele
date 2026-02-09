@@ -70,7 +70,7 @@ function SimpleMarquee() {
             {items.map((item, j) => (
               <span
                 key={j}
-                className={`text-[11px] md:text-sm uppercase tracking-[0.3em] ${item === '•' ? 'text-indigo-500' : 'text-white/40'} font-medium`}
+                className={`text-[11px] md:text-sm uppercase tracking-[0.3em] ${item === '•' ? 'text-white' : 'text-white/40'} font-medium`}
               >
                 {item}
               </span>
@@ -162,7 +162,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-4">
-              Featured <span className="text-indigo-400">Works</span>
+              Featured <span className="text-white/70">Works</span>
             </h2>
             <p className="text-gray-400 max-w-md mx-auto">
               Curated selection of our most celebrated pieces

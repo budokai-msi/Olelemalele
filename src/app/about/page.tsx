@@ -34,7 +34,7 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="space-y-6"
             >
-              <h3 className="text-xs uppercase tracking-[0.3em] text-indigo-400 font-bold">01 — The Vision</h3>
+              <h3 className="text-xs uppercase tracking-[0.3em] text-white/70 font-bold">01 — The Vision</h3>
               <p className="text-gray-400 leading-relaxed">
                 Olelemalele was born from the intersection of digital fluid dynamics and traditional canvas weight.
                 We believe that art shouldn&apos;t just hang on a wall—it should pulse with the room.
@@ -48,7 +48,7 @@ export default function AboutPage() {
               viewport={{ once: true }}
               className="space-y-6"
             >
-              <h3 className="text-xs uppercase tracking-[0.3em] text-indigo-400 font-bold">02 — The Craft</h3>
+              <h3 className="text-xs uppercase tracking-[0.3em] text-white/70 font-bold">02 — The Craft</h3>
               <p className="text-gray-400 leading-relaxed">
                 Every drop is printed on heavyweight, archival-grade canvas fibers using 12-color giclée processes.
                 These aren&apos;t just prints; they are statements that will outlast the trends.
@@ -64,7 +64,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="relative py-24 md:py-40 text-center"
           >
-            <div className="absolute inset-0 bg-indigo-500/5 blur-[120px] rounded-full" />
+            <div className="absolute inset-0 bg-white/[0.03] blur-[120px] rounded-full" />
             <p className="relative text-2xl md:text-4xl font-light italic tracking-tight max-w-2xl mx-auto leading-tight">
               &ldquo;Canvas is dead. You are the gallery. Wear the void. Own the moment.&rdquo;
             </p>

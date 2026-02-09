@@ -170,11 +170,11 @@ export default function MobileNav() {
                             }`}
                         >
                           <div className="flex items-center gap-3">
-                            <span className="text-indigo-400 text-lg">{link.icon}</span>
+                            <span className="text-white/70 text-lg">{link.icon}</span>
                             <span className="text-base font-medium">{link.label}</span>
                           </div>
                           {wishlistCount > 0 && (
-                            <span className="bg-indigo-500 text-white text-xs px-2.5 py-1 rounded-full font-medium">
+                            <span className="bg-white text-white text-xs px-2.5 py-1 rounded-full font-medium">
                               {wishlistCount}
                             </span>
                           )}
@@ -197,7 +197,7 @@ export default function MobileNav() {
                     className="flex items-center justify-between py-3.5 px-4 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-indigo-400 text-lg">⬡</span>
+                      <span className="text-white/70 text-lg">⬡</span>
                       <span className="text-base font-medium">Cart</span>
                     </div>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -245,7 +245,7 @@ export default function MobileNav() {
                       <Link
                         href="/register"
                         onClick={() => setIsOpen(false)}
-                        className="block w-full py-3.5 text-center bg-white text-black rounded-xl font-medium hover:bg-indigo-500 hover:text-white transition-colors"
+                        className="block w-full py-3.5 text-center bg-white text-black rounded-xl font-medium hover:bg-white hover:text-white transition-colors"
                       >
                         Create Account
                       </Link>

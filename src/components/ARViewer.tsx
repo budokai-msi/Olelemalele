@@ -190,7 +190,7 @@ export default function ARViewer({
         >
           {/* Header - Chrome style */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
-            <div className="w-5 h-5 rounded bg-indigo-500 flex items-center justify-center text-[10px] text-white font-bold">
+            <div className="w-5 h-5 rounded bg-white flex items-center justify-center text-[10px] text-white font-bold">
               AR
             </div>
             <span className="flex-1 text-sm font-medium">About AR Preview</span>
@@ -235,7 +235,7 @@ export default function ARViewer({
                 disabled={isLoading}
                 className="w-full flex items-center gap-3 px-3 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors group"
               >
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-indigo-500 transition-colors">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white transition-colors">
                   {isLoading ? (
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (

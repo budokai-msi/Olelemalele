@@ -109,7 +109,7 @@ export default function ShippingPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <span className="text-[10px] uppercase tracking-[0.4em] text-indigo-400 font-bold mb-4 block">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-white/70 font-bold mb-4 block">
             Delivery Info
           </span>
           <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
@@ -162,7 +162,7 @@ export default function ShippingPage() {
                   <tr key={row.region} className={index % 2 === 0 ? '' : 'bg-white/[0.02]'}>
                     <td className="py-4 px-6 font-medium">{row.region}</td>
                     <td className="py-4 px-6 text-gray-400">{row.standard}</td>
-                    <td className="py-4 px-6 text-indigo-400">{row.express}</td>
+                    <td className="py-4 px-6 text-white/70">{row.express}</td>
                   </tr>
                 ))}
               </tbody>
@@ -180,21 +180,21 @@ export default function ShippingPage() {
           <h2 className="text-2xl font-bold mb-8 text-center">Returns Policy</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="p-6 rounded-xl bg-white/[0.02] border border-white/5">
-              <div className="text-3xl font-black text-indigo-400 mb-2">30</div>
+              <div className="text-3xl font-black text-white/70 mb-2">30</div>
               <div className="text-xs uppercase tracking-wider text-gray-500 mb-4">Day Returns</div>
               <p className="text-sm text-gray-400">
                 Return any non-custom item within 30 days of delivery for a full refund.
               </p>
             </div>
             <div className="p-6 rounded-xl bg-white/[0.02] border border-white/5">
-              <div className="text-3xl font-black text-indigo-400 mb-2">100%</div>
+              <div className="text-3xl font-black text-white/70 mb-2">100%</div>
               <div className="text-xs uppercase tracking-wider text-gray-500 mb-4">Quality Guarantee</div>
               <p className="text-sm text-gray-400">
                 If your item arrives damaged or defective, we&apos;ll replace it at no cost.
               </p>
             </div>
             <div className="p-6 rounded-xl bg-white/[0.02] border border-white/5">
-              <div className="text-3xl font-black text-indigo-400 mb-2">Free</div>
+              <div className="text-3xl font-black text-white/70 mb-2">Free</div>
               <div className="text-xs uppercase tracking-wider text-gray-500 mb-4">Return Shipping</div>
               <p className="text-sm text-gray-400">
                 We cover return shipping for damaged items. Standard returns ship at buyer&apos;s expense.
@@ -227,7 +227,7 @@ export default function ShippingPage() {
                   transition={{ delay: index * 0.1 }}
                   className="flex gap-6 items-start"
                 >
-                  <span className="text-2xl font-black text-indigo-500 opacity-50">{item.step}</span>
+                  <span className="text-2xl font-black text-white opacity-50">{item.step}</span>
                   <div>
                     <h3 className="font-bold text-white mb-1">{item.title}</h3>
                     <p className="text-sm text-gray-400">{item.desc}</p>
@@ -243,7 +243,7 @@ export default function ShippingPage() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center p-8 md:p-12 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 border border-white/5"
+          className="text-center p-8 md:p-12 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.03] border border-white/5"
         >
           <h3 className="text-2xl font-bold mb-4">Need Help?</h3>
           <p className="text-gray-400 mb-8">
@@ -258,7 +258,7 @@ export default function ShippingPage() {
             </Link>
             <Link
               href="/contact"
-              className="px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:bg-indigo-500 hover:text-white transition-colors"
+              className="px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-white transition-colors"
             >
               Contact Us
             </Link>

@@ -6,7 +6,7 @@ import { products } from '@/lib/products'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 const ITEMS_PER_BATCH = 6
 
@@ -31,7 +31,7 @@ export default function Gallery() {
   const loadMore = useCallback(() => {
     if (isLoading || !hasMore) return
     setIsLoading(true)
-    
+
     // Simulate network delay for smooth feel
     setTimeout(() => {
       const newCount = Math.min(displayCount + ITEMS_PER_BATCH, products.length)
@@ -44,7 +44,7 @@ export default function Gallery() {
 
   // Intersection Observer for infinite scroll
   const observerTargetRef = useRef<HTMLDivElement>(null)
-  
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -90,7 +90,7 @@ export default function Gallery() {
               <span className="text-white">Archive</span>
             </div>
             <h1 className="text-2xl font-black tracking-tight">
-              CANVAS <span className="text-indigo-400">COLLECTION</span>
+              CANVAS <span className="text-white/70">COLLECTION</span>
             </h1>
           </div>
           <p className="text-sm text-gray-400">
@@ -100,7 +100,7 @@ export default function Gallery() {
       </header>
 
       {/* Infinite Scroll Container - Gemini Style */}
-      <div 
+      <div
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto scrollbar-hide"
         style={{ scrollBehavior: 'smooth' }}
@@ -115,8 +115,8 @@ export default function Gallery() {
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ 
-                    duration: 0.4, 
+                  transition={{
+                    duration: 0.4,
                     delay: (index % ITEMS_PER_BATCH) * 0.05,
                     ease: [0.16, 1, 0.3, 1]
                   }}
@@ -128,7 +128,7 @@ export default function Gallery() {
                   <Link href={`/product/${product.id}`} className="block">
                     <div className="relative overflow-hidden aspect-[4/5] bg-zinc-900 rounded-2xl">
                       {/* Glow on hover */}
-                      <div className={`absolute inset-0 bg-gradient-to-t from-indigo-600/30 via-transparent to-transparent opacity-0 transition-opacity duration-500 z-10 pointer-events-none ${hoveredId === product.id ? 'opacity-100' : ''}`} />
+                      <div className={`absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-transparent opacity-0 transition-opacity duration-500 z-10 pointer-events-none ${hoveredId === product.id ? 'opacity-100' : ''}`} />
 
                       <Image
                         src={product.image}
@@ -164,7 +164,7 @@ export default function Gallery() {
                             e.preventDefault()
                             handleQuickAdd(product)
                           }}
-                          className="px-6 py-2.5 bg-white text-black rounded-full text-xs uppercase tracking-widest font-medium hover:bg-indigo-500 hover:text-white transition-colors"
+                          className="px-6 py-2.5 bg-white text-black rounded-full text-xs uppercase tracking-widest font-medium hover:bg-white hover:text-white transition-colors"
                         >
                           Quick Add
                         </motion.button>
@@ -176,7 +176,7 @@ export default function Gallery() {
                   <div className="mt-4 px-1">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="text-lg font-semibold tracking-tight group-hover:text-indigo-400 transition-colors">
+                        <h3 className="text-lg font-semibold tracking-tight group-hover:text-white/70 transition-colors">
                           {product.name}
                         </h3>
                         <p className="text-xs text-gray-500 uppercase tracking-wider mt-1">
@@ -211,7 +211,7 @@ export default function Gallery() {
           </div>
 
           {/* Loading Trigger & Indicator */}
-          <div 
+          <div
             ref={observerTargetRef}
             className="py-12 flex flex-col items-center"
           >

@@ -22,7 +22,7 @@ export default function LoadingScreen() {
           animate={{ y: 0, opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          OLELE<span className="text-indigo-500">MALELE</span>
+          OLELE<span className="text-white">MALELE</span>
         </motion.div>
 
         {/* Loading bar */}
@@ -33,7 +33,7 @@ export default function LoadingScreen() {
           transition={{ delay: 0.3, duration: 0.5 }}
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-indigo-500"
+            className="h-full bg-gradient-to-r from-white/30 via-white/20 to-white/30"
             initial={{ x: '-100%' }}
             animate={{ x: '0%' }}
             transition={{ duration: 1.8, ease: 'easeInOut' }}

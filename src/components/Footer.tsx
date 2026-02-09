@@ -19,7 +19,7 @@ export default function Footer() {
   return (
     <footer className="relative bg-black text-white overflow-hidden">
       {/* Gradient Accent Line */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
       {/* Main Footer Content */}
       <div className="max-w-[1920px] mx-auto px-4 md:px-12 py-16 md:py-24">
@@ -98,12 +98,12 @@ export default function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-white/30 transition-colors"
                   required
                 />
                 <button
                   type="submit"
-                  className="w-full px-4 py-3 bg-white text-black rounded-lg text-sm font-medium uppercase tracking-wider hover:bg-indigo-500 hover:text-white transition-all duration-300"
+                  className="w-full px-4 py-3 bg-white text-black rounded-lg text-sm font-medium uppercase tracking-wider hover:bg-white hover:text-white transition-all duration-300"
                 >
                   Subscribe
                 </button>

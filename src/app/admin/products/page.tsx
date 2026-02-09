@@ -81,7 +81,7 @@ export default function AdminProducts() {
                 placeholder="Search products..."
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="px-4 py-2 bg-zinc-900 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-indigo-500"
+                className="px-4 py-2 bg-zinc-900 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-white/40"
               />
               <button
                 onClick={() => fetchProducts()}
@@ -126,7 +126,7 @@ export default function AdminProducts() {
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <Link
                       href={`/product/${product.id}`}
-                      className="px-3 py-1.5 bg-white text-black text-sm rounded-full hover:bg-indigo-500 hover:text-white transition-colors"
+                      className="px-3 py-1.5 bg-white text-black text-sm rounded-full hover:bg-white hover:text-white transition-colors"
                     >
                       View
                     </Link>
@@ -142,7 +142,7 @@ export default function AdminProducts() {
                   <h3 className="font-bold truncate">{product.name}</h3>
                   <p className="text-sm text-gray-500">{product.category}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-indigo-400 font-mono">
+                    <span className="text-white/70 font-mono">
                       ${(product.price / 100).toFixed(0)}
                     </span>
                     <span className={`text-xs px-2 py-1 rounded-full ${
@@ -164,7 +164,7 @@ export default function AdminProducts() {
             <p className="text-gray-400">No products found</p>
             <Link
               href="/admin/seed"
-              className="text-indigo-400 hover:text-indigo-300 underline mt-2 inline-block"
+              className="text-white/70 hover:text-white/60 underline mt-2 inline-block"
             >
               Seed database with products
             </Link>

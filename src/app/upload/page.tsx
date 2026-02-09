@@ -1,12 +1,12 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { GELATO_FRAME_OPTIONS, type FrameStyle } from '@/components/Product3D'
+import { useHaptic } from '@/hooks/useHaptic'
+import { useCart } from '@/lib/cartContext'
+import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useCallback, useRef, useEffect } from 'react'
-import { GELATO_FRAME_OPTIONS, type FrameStyle } from '@/components/Product3D'
-import { useCart } from '@/lib/cartContext'
-import { useHaptic } from '@/hooks/useHaptic'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface CanvasSize {
   id: string
@@ -30,15 +30,15 @@ const CANVAS_SIZES: CanvasSize[] = [
   { id: '20x20', name: '20" × 20"', width: 20, height: 20, price: null, loading: true, category: 'square' },
   { id: '24x24', name: '24" × 24"', width: 24, height: 24, price: null, loading: true, category: 'square' },
   { id: '30x30', name: '30" × 30"', width: 30, height: 30, price: null, loading: true, category: 'square' },
-  
+
   // Portrait - Best sellers
   { id: '12x16', name: '12" × 16"', width: 12, height: 16, price: null, loading: true, category: 'portrait' },
   { id: '16x20', name: '16" × 20"', width: 16, height: 20, price: null, loading: true, category: 'portrait' },
   { id: '18x24', name: '18" × 24"', width: 18, height: 24, price: null, loading: true, category: 'portrait' },
   { id: '24x36', name: '24" × 36"', width: 24, height: 36, price: null, loading: true, category: 'portrait' },
   { id: '30x40', name: '30" × 40"', width: 30, height: 40, price: null, loading: true, category: 'portrait' },
-  
-  // Landscape - Best sellers  
+
+  // Landscape - Best sellers
   { id: '16x12', name: '16" × 12"', width: 16, height: 12, price: null, loading: true, category: 'landscape' },
   { id: '20x16', name: '20" × 16"', width: 20, height: 16, price: null, loading: true, category: 'landscape' },
   { id: '24x18', name: '24" × 18"', width: 24, height: 18, price: null, loading: true, category: 'landscape' },
@@ -83,13 +83,13 @@ export default function CustomUploadPage() {
       if (response.ok) {
         const data = await response.json()
         const priceMap = new Map<string, number>(data.prices.map((p: any) => [p.size, Number(p.price) || 0]))
-        
+
         setSizes(prev => prev.map(size => ({
           ...size,
           price: priceMap.get(size.id) || getFallbackPrice(size.id),
           loading: false
         })))
-        
+
         // Update selected size with new price
         setSelectedSize(prev => ({
           ...prev,
@@ -135,14 +135,14 @@ export default function CustomUploadPage() {
       '20x20': 5800,
       '24x24': 7800,
       '30x30': 11600,
-      
+
       // Portrait
       '12x16': 4800,
       '16x20': 5800,
       '18x24': 7200,
       '24x36': 13000,
       '30x40': 17200,
-      
+
       // Landscape
       '16x12': 4800,
       '20x16': 5800,
@@ -152,11 +152,11 @@ export default function CustomUploadPage() {
       '32x48': 19600,
       '36x48': 22400,
       '40x60': 30400,
-      
+
       // Panoramic formats
       '20x60': 17200,
       '30x60': 24800,
-      
+
       // Additional sizes
       '28x40': 18400,
     }
@@ -220,7 +220,7 @@ export default function CustomUploadPage() {
     if (!uploadedImage || !selectedSize.price) return
 
     triggerHaptic()
-    
+
     dispatch({
       type: 'ADD_ITEM',
       payload: {
@@ -269,7 +269,7 @@ export default function CustomUploadPage() {
               <span className="text-gradient">OUR CANVAS.</span>
             </h1>
             <p className="text-gray-400 max-w-xl text-lg">
-              Transform your photos and artwork into museum-quality canvas prints. 
+              Transform your photos and artwork into museum-quality canvas prints.
               Upload your image and we&apos;ll handle the rest.
             </p>
           </motion.div>
@@ -290,11 +290,10 @@ export default function CustomUploadPage() {
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                className={`relative aspect-[4/3] rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden ${
-                  isDragging 
-                    ? 'border-indigo-500 bg-indigo-500/10' 
+                className={`relative aspect-[4/3] rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden ${isDragging
+                    ? 'border-white/40 bg-white/5'
                     : 'border-white/20 hover:border-white/40 bg-zinc-900/50'
-                }`}
+                  }`}
               >
                 <input
                   ref={fileInputRef}
@@ -303,7 +302,7 @@ export default function CustomUploadPage() {
                   onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
                   className="hidden"
                 />
-                
+
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
                   <motion.div
                     animate={{ y: isDragging ? -10 : 0 }}
@@ -315,7 +314,7 @@ export default function CustomUploadPage() {
                       <line x1="12" y1="3" x2="12" y2="15" />
                     </svg>
                   </motion.div>
-                  
+
                   <h3 className="text-xl font-bold mb-2">
                     {isDragging ? 'Drop your image here' : 'Upload your image'}
                   </h3>
@@ -323,17 +322,17 @@ export default function CustomUploadPage() {
                     Drag and drop or click to browse<br />
                     Supports JPEG, PNG, WebP up to 10MB
                   </p>
-                  
+
                   <span className="px-4 py-2 bg-white/5 rounded-full text-xs uppercase tracking-wider text-gray-500">
                     Recommended: 300 DPI minimum
                   </span>
                 </div>
 
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-violet-500/5 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-white/[0.02] pointer-events-none" />
               </div>
             ) : (
               <div className="relative">
-                <div 
+                <div
                   className="relative rounded-2xl overflow-hidden bg-zinc-900"
                   style={{ aspectRatio: getAspectRatio() }}
                 >
@@ -343,7 +342,7 @@ export default function CustomUploadPage() {
                     fill
                     className="object-contain p-4"
                   />
-                  <div 
+                  <div
                     className="absolute inset-4 pointer-events-none"
                     style={{
                       boxShadow: `inset 0 0 0 8px ${GELATO_FRAME_OPTIONS[selectedFrame].primary}`,
@@ -378,7 +377,7 @@ export default function CustomUploadPage() {
                   </div>
                   <div className="h-1 bg-white/10 rounded-full overflow-hidden">
                     <motion.div
-                      className="h-full bg-indigo-500"
+                      className="h-full bg-white"
                       initial={{ width: 0 }}
                       animate={{ width: `${uploadProgress}%` }}
                     />
@@ -405,7 +404,7 @@ export default function CustomUploadPage() {
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
                   placeholder="Name your creation"
-                  className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-white/40 transition-colors"
                 />
               </div>
             )}
@@ -420,7 +419,7 @@ export default function CustomUploadPage() {
                   {sizes.filter(s => sizeCategory === 'all' || s.category === sizeCategory).length} options
                 </span>
               </div>
-              
+
               {/* Category Tabs */}
               <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide pb-1">
                 {(['all', 'square', 'portrait', 'landscape'] as SizeCategory[]).map((cat) => (
@@ -430,43 +429,41 @@ export default function CustomUploadPage() {
                       setSizeCategory(cat)
                       triggerHaptic()
                     }}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                      sizeCategory === cat
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${sizeCategory === cat
                         ? 'bg-white text-black'
                         : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                    }`}
+                      }`}
                   >
                     {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
                   </button>
                 ))}
               </div>
-              
+
               {/* Horizontal Scroll Size List */}
               <div className="relative">
-                <div 
+                <div
                   className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1 snap-x snap-mandatory"
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                   {sizes
                     .filter(size => sizeCategory === 'all' || size.category === sizeCategory)
                     .map((size) => (
-                    <button
-                      key={size.id}
-                      onClick={() => handleSizeSelect(size)}
-                      disabled={size.loading}
-                      className={`flex-shrink-0 w-28 p-3 rounded-xl border text-center transition-all snap-start ${
-                        selectedSize.id === size.id
-                          ? 'border-indigo-500 bg-indigo-500/10'
-                          : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
-                      } ${size.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      <div className="font-bold text-sm">{size.name}</div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {size.loading ? '...' : formatPrice(size.price)}
-                      </div>
-                      <div className="text-[10px] text-gray-600 mt-0.5 capitalize">{size.category}</div>
-                    </button>
-                  ))}
+                      <button
+                        key={size.id}
+                        onClick={() => handleSizeSelect(size)}
+                        disabled={size.loading}
+                        className={`flex-shrink-0 w-28 p-3 rounded-xl border text-center transition-all snap-start ${selectedSize.id === size.id
+                            ? 'border-white/40 bg-white/5'
+                            : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
+                          } ${size.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        <div className="font-bold text-sm">{size.name}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {size.loading ? '...' : formatPrice(size.price)}
+                        </div>
+                        <div className="text-[10px] text-gray-600 mt-0.5 capitalize">{size.category}</div>
+                      </button>
+                    ))}
                 </div>
                 {/* Scroll hint */}
                 <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-black to-transparent pointer-events-none" />
@@ -488,11 +485,10 @@ export default function CustomUploadPage() {
                         setSelectedFrame(style)
                         triggerHaptic()
                       }}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
-                        selectedFrame === style
-                          ? 'border-indigo-500 bg-indigo-500/10'
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${selectedFrame === style
+                          ? 'border-white/40 bg-white/5'
                           : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
-                      }`}
+                        }`}
                     >
                       <span
                         className="w-6 h-6 rounded-full border border-white/20"
@@ -527,10 +523,10 @@ export default function CustomUploadPage() {
                 className="w-full py-5 bg-white text-black rounded-full font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed relative group"
               >
                 <span className="relative z-10">
-                  {!uploadedImage ? 'Upload an Image First' : 
-                   selectedSize.loading ? 'Loading Price...' : 'Add to Cart'}
+                  {!uploadedImage ? 'Upload an Image First' :
+                    selectedSize.loading ? 'Loading Price...' : 'Add to Cart'}
                 </span>
-                <div className="absolute inset-0 bg-indigo-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-0" />
+                <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-0" />
               </button>
 
               {uploadedImage && (
@@ -547,7 +543,7 @@ export default function CustomUploadPage() {
                 { icon: '◇', title: 'Ready to Hang', desc: 'Hardware included' },
               ].map((feature, i) => (
                 <div key={i} className="text-center">
-                  <div className="text-2xl text-indigo-400 mb-2">{feature.icon}</div>
+                  <div className="text-2xl text-white/70 mb-2">{feature.icon}</div>
                   <div className="text-xs font-bold uppercase tracking-wider mb-1">{feature.title}</div>
                   <div className="text-[10px] text-gray-500">{feature.desc}</div>
                 </div>
@@ -563,21 +559,21 @@ export default function CustomUploadPage() {
           <div>
             <h3 className="text-lg font-bold mb-3">Image Quality</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              For best results, upload high-resolution images (300 DPI minimum). 
+              For best results, upload high-resolution images (300 DPI minimum).
               We support JPEG, PNG, and WebP formats up to 10MB.
             </p>
           </div>
           <div>
             <h3 className="text-lg font-bold mb-3">Color Accuracy</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Our 12-color giclée printing process ensures your artwork is reproduced 
+              Our 12-color giclée printing process ensures your artwork is reproduced
               with stunning color accuracy and detail.
             </p>
           </div>
           <div>
             <h3 className="text-lg font-bold mb-3">Proofing</h3>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Every custom order is reviewed by our team. We&apos;ll contact you if 
+              Every custom order is reviewed by our team. We&apos;ll contact you if
               we detect any quality issues with your image.
             </p>
           </div>

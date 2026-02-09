@@ -95,7 +95,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         onClick={() => setIsOpen(!isOpen)}
         className="w-full py-6 flex items-center justify-between text-left group"
       >
-        <span className="text-white font-medium group-hover:text-indigo-400 transition-colors pr-8">
+        <span className="text-white font-medium group-hover:text-white/70 transition-colors pr-8">
           {question}
         </span>
         <motion.span
@@ -136,7 +136,7 @@ export default function FAQPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="text-[10px] uppercase tracking-[0.4em] text-indigo-400 font-bold mb-4 block">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-white/70 font-bold mb-4 block">
             Support
           </span>
           <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
@@ -181,7 +181,7 @@ export default function FAQPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:bg-indigo-500 hover:text-white transition-colors"
+            className="inline-block px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-white transition-colors"
           >
             Contact Us
           </Link>

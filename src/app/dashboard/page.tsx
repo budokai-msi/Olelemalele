@@ -1,7 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { useAuth } from '@/lib/useAuth'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -41,7 +41,7 @@ export default function Dashboard() {
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Access Denied</h1>
-          <Link href="/login" className="text-indigo-400 hover:underline">
+          <Link href="/login" className="text-white/70 hover:underline">
             Please login to continue
           </Link>
         </div>
@@ -52,7 +52,7 @@ export default function Dashboard() {
   const statusColors: Record<string, string> = {
     pending: 'text-yellow-400',
     processing: 'text-blue-400',
-    shipped: 'text-purple-400',
+    shipped: 'text-gray-400',
     delivered: 'text-green-400',
     cancelled: 'text-red-400'
   }
@@ -80,7 +80,7 @@ export default function Dashboard() {
             className="bg-zinc-900 border border-white/10 rounded-2xl p-6"
           >
             <h2 className="text-xl font-bold mb-4">Recent Orders</h2>
-            
+
             {loading ? (
               <div className="space-y-3">
                 {[...Array(2)].map((_, i) => (
@@ -90,8 +90,8 @@ export default function Dashboard() {
             ) : orders.length > 0 ? (
               <div className="space-y-3">
                 {orders.slice(0, 3).map((order) => (
-                  <div 
-                    key={order._id} 
+                  <div
+                    key={order._id}
                     className="bg-zinc-800/50 p-4 rounded-xl flex items-center justify-between"
                   >
                     <div>
@@ -114,9 +114,9 @@ export default function Dashboard() {
             ) : (
               <div className="text-center py-8">
                 <p className="text-gray-400 mb-4">No orders yet</p>
-                <Link 
-                  href="/gallery" 
-                  className="text-indigo-400 hover:text-indigo-300 underline"
+                <Link
+                  href="/gallery"
+                  className="text-white/70 hover:text-white/60 underline"
                 >
                   Start shopping
                 </Link>
@@ -148,7 +148,7 @@ export default function Dashboard() {
             </div>
             <Link
               href="/wishlist"
-              className="block w-full text-center py-3 bg-white text-black rounded-xl font-medium hover:bg-indigo-500 hover:text-white transition-colors mt-6"
+              className="block w-full text-center py-3 bg-white text-black rounded-xl font-medium hover:bg-white hover:text-white transition-colors mt-6"
             >
               View Wishlist
             </Link>

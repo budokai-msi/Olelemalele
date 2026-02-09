@@ -58,7 +58,7 @@ export default function WishlistPage() {
 
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
-              <span className="text-[10px] uppercase tracking-[0.4em] text-indigo-400 font-bold mb-4 block">
+              <span className="text-[10px] uppercase tracking-[0.4em] text-white/70 font-bold mb-4 block">
                 Your Favorites
               </span>
               <h1 className="text-5xl md:text-7xl font-black tracking-tight">
@@ -99,7 +99,7 @@ export default function WishlistPage() {
             </p>
             <Link
               href="/gallery"
-              className="inline-block px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:bg-indigo-500 hover:text-white transition-colors"
+              className="inline-block px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-white transition-colors"
             >
               Explore Gallery
             </Link>
@@ -152,7 +152,7 @@ export default function WishlistPage() {
                         }}
                         initial={{ y: 20, opacity: 0 }}
                         whileHover={{ scale: 1.02 }}
-                        className="absolute bottom-4 left-4 right-4 py-3 bg-white text-black rounded-full font-bold uppercase tracking-wider text-xs opacity-0 group-hover:opacity-100 transition-all hover:bg-indigo-500 hover:text-white"
+                        className="absolute bottom-4 left-4 right-4 py-3 bg-white text-black rounded-full font-bold uppercase tracking-wider text-xs opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:text-white"
                       >
                         Add to Cart
                       </motion.button>
@@ -162,7 +162,7 @@ export default function WishlistPage() {
                   {/* Product Info */}
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-bold text-white group-hover:text-indigo-400 transition-colors uppercase">
+                      <h3 className="font-bold text-white group-hover:text-white/70 transition-colors uppercase">
                         {item.name}
                       </h3>
                       <p className="text-xs text-gray-500 mt-1">

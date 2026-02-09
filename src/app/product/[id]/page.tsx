@@ -1,7 +1,7 @@
 'use client'
 
-import { GELATO_FRAME_OPTIONS, type FrameStyle } from '@/components/Product3D'
 import ARButton from '@/components/ARButton'
+import { GELATO_FRAME_OPTIONS, type FrameStyle } from '@/components/Product3D'
 import RelatedProducts from '@/components/RelatedProducts'
 import { useHaptic } from '@/hooks/useHaptic'
 import { useHardwareDetection } from '@/hooks/useHardwareDetection'
@@ -111,7 +111,7 @@ export default function ProductPage() {
       <div className="h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Drop not found.</h2>
-          <Link href="/gallery" className="text-indigo-400 hover:text-indigo-300 underline">Back to Archive</Link>
+          <Link href="/gallery" className="text-white/70 hover:text-white underline">Back to Archive</Link>
         </div>
       </div>
     )
@@ -139,7 +139,7 @@ export default function ProductPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white selection:bg-indigo-500/30">
+    <main className="min-h-screen bg-black text-white selection:bg-white/20">
       {/* Immersive Layout Container */}
       <div className="flex flex-col lg:flex-row min-h-screen">
 
@@ -154,7 +154,7 @@ export default function ProductPage() {
             onTouchEnd={handleDragEnd}
           >
             {/* Ambient Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/5 blur-[120px] rounded-full pointer-events-none" />
 
             {hardware.webGL ? (
               <Canvas
@@ -296,7 +296,7 @@ export default function ProductPage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <div className="absolute inset-0 border-2 border-indigo-500/30 rounded-lg m-4" />
+                <div className="absolute inset-0 border-2 border-white/20 rounded-lg m-4" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -320,7 +320,7 @@ export default function ProductPage() {
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                className="text-indigo-400"
+                className="text-white/70"
                 animate={{ x: [-2, 2, -2] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
               >
@@ -355,13 +355,13 @@ export default function ProductPage() {
                 <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
               </motion.svg>
 
-              <span className="text-[11px] uppercase tracking-[0.15em] font-medium bg-gradient-to-r from-white/60 to-indigo-400 bg-clip-text text-transparent">
+              <span className="text-[11px] uppercase tracking-[0.15em] font-medium bg-gradient-to-r from-white/60 to-white/30 bg-clip-text text-transparent">
                 Drag to Rotate
               </span>
 
               {/* Pulsing dot indicator */}
               <motion.div
-                className="w-2 h-2 rounded-full bg-indigo-500"
+                className="w-2 h-2 rounded-full bg-white"
                 animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               />
@@ -388,7 +388,7 @@ export default function ProductPage() {
             transition={{ duration: 0.8, ease: 'circOut' }}
           >
             <div className="flex items-start justify-between mb-4">
-              <p className="text-xs text-indigo-400 uppercase tracking-[0.3em] font-semibold font-sans">
+              <p className="text-xs text-white/70 uppercase tracking-[0.3em] font-semibold font-sans">
                 [ {product.category} ]
               </p>
 
@@ -513,7 +513,7 @@ export default function ProductPage() {
                     </motion.span>
                   )}
                 </AnimatePresence>
-                <div className="absolute inset-0 bg-indigo-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />
+                <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />
               </button>
 
               <div className="flex items-center justify-between text-[10px] text-gray-600 uppercase tracking-widest px-2">

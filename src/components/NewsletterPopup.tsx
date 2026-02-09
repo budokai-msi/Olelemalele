@@ -97,7 +97,7 @@ export default function NewsletterPopup() {
               </button>
 
               {/* Background Glow */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[50%] bg-indigo-500/20 blur-[80px] pointer-events-none" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-[50%] bg-white/10 blur-[80px] pointer-events-none" />
 
               {/* Content */}
               <div className="relative p-8 md:p-10">
@@ -117,7 +117,7 @@ export default function NewsletterPopup() {
                   <>
                     {/* Badge */}
                     <div className="flex justify-center mb-6">
-                      <span className="px-4 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs uppercase tracking-widest font-bold">
+                      <span className="px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/70 text-xs uppercase tracking-widest font-bold">
                         Exclusive Access
                       </span>
                     </div>
@@ -141,14 +141,14 @@ export default function NewsletterPopup() {
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="Enter your email"
                           required
-                          className="w-full bg-white/5 border border-white/10 rounded-full px-6 py-4 text-white placeholder:text-gray-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                          className="w-full bg-white/5 border border-white/10 rounded-full px-6 py-4 text-white placeholder:text-gray-500 focus:outline-none focus:border-white/30 transition-colors"
                         />
                       </div>
 
                       <button
                         type="submit"
                         disabled={status === 'loading'}
-                        className="w-full bg-white text-black py-4 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-indigo-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                        className="w-full bg-white text-black py-4 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                       >
                         {status === 'loading' ? (
                           <>
@@ -170,8 +170,8 @@ export default function NewsletterPopup() {
               </div>
 
               {/* Decorative Elements */}
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-violet-500/10 blur-[60px] pointer-events-none" />
-              <div className="absolute bottom-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[60px] pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 blur-[60px] pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/5 blur-[60px] pointer-events-none" />
             </div>
           </motion.div>
         </>

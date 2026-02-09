@@ -14,7 +14,7 @@ export default function PrivacyPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="text-[10px] uppercase tracking-[0.4em] text-indigo-400 font-bold mb-4 block">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-white/70 font-bold mb-4 block">
             Legal
           </span>
           <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-6">
@@ -43,19 +43,19 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-bold text-white mb-4">2. Information We Collect</h2>
             <div className="space-y-4">
               <div>
-                <h3 className="font-bold text-indigo-400 mb-2">Personal Information</h3>
+                <h3 className="font-bold text-white/70 mb-2">Personal Information</h3>
                 <p className="leading-relaxed text-gray-400">
                   When you make a purchase or create an account, we collect: name, email address, shipping address, billing address, phone number, and payment information.
                 </p>
               </div>
               <div>
-                <h3 className="font-bold text-indigo-400 mb-2">Automatically Collected Information</h3>
+                <h3 className="font-bold text-white/70 mb-2">Automatically Collected Information</h3>
                 <p className="leading-relaxed text-gray-400">
                   We automatically collect: IP address, browser type, device information, pages visited, time spent on pages, and referring website.
                 </p>
               </div>
               <div>
-                <h3 className="font-bold text-indigo-400 mb-2">Cookies</h3>
+                <h3 className="font-bold text-white/70 mb-2">Cookies</h3>
                 <p className="leading-relaxed text-gray-400">
                   We use cookies and similar technologies to enhance your experience, analyze traffic, and personalize content. You can manage cookie preferences through your browser settings.
                 </p>

@@ -25,7 +25,7 @@ export default function ContactPage() {
           transition={{ duration: 0.8 }}
           className="flex flex-col justify-center"
         >
-          <span className="text-xs uppercase tracking-[0.4em] text-indigo-400 font-bold mb-6">Connect</span>
+          <span className="text-xs uppercase tracking-[0.4em] text-white/70 font-bold mb-6">Connect</span>
           <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-8 leading-[0.85] uppercase">
             Let&apos;s build<br />
             <span className="text-gradient">the Void.</span>
@@ -37,7 +37,7 @@ export default function ContactPage() {
           <div className="space-y-8">
             <div>
               <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-2">Direct Mail</p>
-              <p className="text-xl font-bold border-b border-indigo-500/30 inline-block">studio@olelemalele.com</p>
+              <p className="text-xl font-bold border-b border-white/20 inline-block">studio@olelemalele.com</p>
             </div>
             <div className="flex gap-8">
               <SocialLink label="Instagram" href="https://instagram.com" />
@@ -85,7 +85,7 @@ export default function ContactPage() {
                   <label className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold px-1 italic">The Topic</label>
                   <select
                     title="Inquiry Topic"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-indigo-500/40 appearance-none transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-white/30 appearance-none transition-colors"
                   >
                     <option className="bg-black">General Inquiry</option>
                     <option className="bg-black">Commission Request</option>
@@ -98,7 +98,7 @@ export default function ContactPage() {
                   <textarea
                     rows={5}
                     placeholder="Tell us about your project..."
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-indigo-500/40 transition-colors placeholder:text-gray-700 resize-none"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-white/30 transition-colors placeholder:text-gray-700 resize-none"
                     required
                   />
                 </div>
@@ -107,14 +107,14 @@ export default function ContactPage() {
                   className="group relative w-full bg-white text-black py-5 rounded-full font-black uppercase tracking-[0.2em] text-xs overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 shadow-xl shadow-white/5 mt-4"
                 >
                   <span className="relative z-10">Send Message</span>
-                  <div className="absolute inset-0 bg-indigo-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />
+                  <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />
                 </button>
               </form>
             )}
           </div>
 
           {/* Background Decorative Element */}
-          <div className="absolute -z-10 -bottom-10 -right-10 w-40 h-40 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
+          <div className="absolute -z-10 -bottom-10 -right-10 w-40 h-40 bg-white/5 blur-[80px] rounded-full pointer-events-none" />
         </motion.div>
       </div>
     </main>
@@ -137,7 +137,7 @@ function InputField({ label, placeholder, type = 'text', required = false }: { l
         type={type}
         required={required}
         placeholder={placeholder}
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-indigo-500/40 transition-colors placeholder:text-gray-700"
+        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-white/30 transition-colors placeholder:text-gray-700"
       />
     </div>
   )

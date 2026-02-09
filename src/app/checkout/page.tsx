@@ -283,7 +283,7 @@ export default function CheckoutPage() {
                         sizes="80px"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-indigo-500/20 to-black/40" />
+                      <div className="w-full h-full bg-gradient-to-br from-white/10 to-black/40" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -305,7 +305,7 @@ export default function CheckoutPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Shipping</span>
-                <span className="font-mono text-indigo-400">{shipping === 0 ? 'FREE' : `$${(shipping / 100).toFixed(2)}`}</span>
+                <span className="font-mono text-white/70">{shipping === 0 ? 'FREE' : `$${(shipping / 100).toFixed(2)}`}</span>
               </div>
               <div className="flex justify-between text-lg font-black pt-4 border-t border-white/10">
                 <span className="tracking-tighter">TOTAL</span>
@@ -341,7 +341,7 @@ function InputField({ label, placeholder, type = 'text', name }: { label: string
         name={name}
         placeholder={placeholder}
         onChange={handleChange}
-        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-indigo-500/40 transition-colors placeholder:text-gray-700"
+        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-white/30 transition-colors placeholder:text-gray-700"
       />
     </div>
   )
@@ -355,7 +355,7 @@ function ShippingOption({ active, title, desc, price }: { active: boolean; title
           <h4 className="font-bold text-sm uppercase tracking-tight mb-1">{title}</h4>
           <p className="text-[10px] text-gray-500 uppercase tracking-wider">{desc}</p>
         </div>
-        <span className={`font-mono text-sm ${price === 'Free' ? 'text-indigo-400 font-bold' : ''}`}>{price}</span>
+        <span className={`font-mono text-sm ${price === 'Free' ? 'text-white/70 font-bold' : ''}`}>{price}</span>
       </div>
     </div>
   )

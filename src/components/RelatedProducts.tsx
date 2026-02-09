@@ -61,7 +61,7 @@ export default function RelatedProducts({ currentProductId, limit = 4 }: Related
           viewport={{ once: true }}
           className="mb-12"
         >
-          <span className="text-[10px] uppercase tracking-[0.4em] text-indigo-400 font-bold mb-3 block">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-white/70 font-bold mb-3 block">
             Curated For You
           </span>
           <h2 className="text-3xl md:text-4xl font-black tracking-tight text-white uppercase">
@@ -120,7 +120,7 @@ export default function RelatedProducts({ currentProductId, limit = 4 }: Related
                     onClick={(e) => handleQuickAdd(product, e)}
                     initial={{ opacity: 0, y: 10 }}
                     whileHover={{ scale: 1.05 }}
-                    className="absolute bottom-3 left-3 right-3 py-2.5 bg-white text-black rounded-full text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-all hover:bg-indigo-500 hover:text-white"
+                    className="absolute bottom-3 left-3 right-3 py-2.5 bg-white text-black rounded-full text-xs font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-all hover:bg-white hover:text-white"
                   >
                     Quick Add
                   </motion.button>
@@ -135,7 +135,7 @@ export default function RelatedProducts({ currentProductId, limit = 4 }: Related
 
                 {/* Product Info */}
                 <div>
-                  <h3 className="text-sm md:text-base font-bold tracking-tight text-white group-hover:text-indigo-400 transition-colors uppercase truncate">
+                  <h3 className="text-sm md:text-base font-bold tracking-tight text-white group-hover:text-white/70 transition-colors uppercase truncate">
                     {product.name}
                   </h3>
                   <div className="flex items-center justify-between mt-1">

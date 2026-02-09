@@ -100,7 +100,7 @@ export default function Cart() {
                     >
                       {/* Product Thumbnail */}
                       <div className="h-28 w-24 bg-zinc-900 rounded-xl flex-shrink-0 overflow-hidden relative border border-white/5">
-                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent z-10" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent z-10" />
                         <Image
                           src={item.image}
                           alt={item.name}
@@ -115,11 +115,11 @@ export default function Cart() {
                         <div>
                           <div className="flex justify-between items-start">
                             <div>
-                              <h3 className="text-white font-bold tracking-tight uppercase text-sm group-hover:text-indigo-400 transition-colors">
+                              <h3 className="text-white font-bold tracking-tight uppercase text-sm group-hover:text-white/70 transition-colors">
                                 {item.name}
                               </h3>
                               {'isCustom' in item && item.isCustom && (
-                                <span className="inline-block mt-1 px-2 py-0.5 bg-indigo-500/20 text-indigo-400 text-[9px] uppercase tracking-wider rounded-full">
+                                <span className="inline-block mt-1 px-2 py-0.5 bg-white/10 text-white/70 text-[9px] uppercase tracking-wider rounded-full">
                                   Custom Upload
                                 </span>
                               )}
@@ -138,8 +138,8 @@ export default function Cart() {
                             </button>
                           </div>
                           <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-1">
-                            {'isCustom' in item && item.isCustom 
-                              ? item.variant.split('-').join(' • ') 
+                            {'isCustom' in item && item.isCustom
+                              ? item.variant.split('-').join(' • ')
                               : item.variant}
                           </p>
                         </div>
@@ -179,7 +179,7 @@ export default function Cart() {
                   </div>
                   <div className="flex justify-between items-center text-xs uppercase tracking-widest text-gray-500">
                     <span>Shipping</span>
-                    <span className="text-indigo-400 font-bold italic text-[10px]">FREE ARCHIVAL DELIVERY</span>
+                    <span className="text-white/70 font-bold italic text-[10px]">FREE ARCHIVAL DELIVERY</span>
                   </div>
                   <div className="flex justify-between items-center pt-3 border-t border-white/5">
                     <span className="text-lg font-black tracking-tighter text-white">TOTAL</span>
@@ -193,7 +193,7 @@ export default function Cart() {
                   className="group relative block w-full bg-white text-black text-center py-5 rounded-full font-black uppercase tracking-[0.2em] text-xs overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 shadow-xl shadow-white/5"
                 >
                   <span className="relative z-10">Checkout Now</span>
-                  <div className="absolute inset-0 bg-indigo-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />
+                  <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />
                 </Link>
                 <p className="text-center text-[9px] text-gray-600 uppercase tracking-[0.2em] mt-6">
                   Secured & encrypted payment processing

@@ -58,23 +58,23 @@ export default function SeedPage() {
           <h2 className="text-lg font-bold mb-4">What this does:</h2>
           <ul className="space-y-2 text-gray-400 text-sm">
             <li className="flex items-start gap-2">
-              <span className="text-indigo-400">•</span>
+              <span className="text-white/70">•</span>
               Creates Product documents in MongoDB from static data
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-indigo-400">•</span>
+              <span className="text-white/70">•</span>
               Generates unique IDs and slugs for each product
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-indigo-400">•</span>
+              <span className="text-white/70">•</span>
               Sets default inventory (100 units per product)
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-indigo-400">•</span>
+              <span className="text-white/70">•</span>
               Adds SEO metadata and product specifications
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-indigo-400">•</span>
+              <span className="text-white/70">•</span>
               Skips existing products (no duplicates)
             </li>
           </ul>
@@ -90,7 +90,7 @@ export default function SeedPage() {
           <button
             onClick={handleSeed}
             disabled={seeding}
-            className="w-full py-4 bg-white text-black rounded-xl font-bold uppercase tracking-wider hover:bg-indigo-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 bg-white text-black rounded-xl font-bold uppercase tracking-wider hover:bg-white hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {seeding ? (
               <span className="flex items-center justify-center gap-2">

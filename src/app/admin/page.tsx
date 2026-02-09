@@ -141,17 +141,17 @@ export default function AdminDashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * index }}
-                className="bg-zinc-900 border border-white/10 rounded-2xl p-6 hover:border-indigo-500/50 transition-all group"
+                className="bg-zinc-900 border border-white/10 rounded-2xl p-6 hover:border-white/30 transition-all group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <span className="text-4xl">{link.icon}</span>
                   {link.count !== null && (
-                    <span className="bg-indigo-500 text-white text-sm px-3 py-1 rounded-full">
+                    <span className="bg-white text-white text-sm px-3 py-1 rounded-full">
                       {link.count}
                     </span>
                   )}
                 </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-indigo-400 transition-colors">
+                <h3 className="text-xl font-bold mb-2 group-hover:text-white/70 transition-colors">
                   {link.title}
                 </h3>
                 <p className="text-gray-400 text-sm">{link.description}</p>
@@ -171,7 +171,7 @@ export default function AdminDashboard() {
           <div className="flex flex-wrap gap-4">
             <Link
               href="/gallery"
-              className="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-indigo-500 hover:text-white transition-colors"
+              className="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-white hover:text-white transition-colors"
             >
               View Store
             </Link>

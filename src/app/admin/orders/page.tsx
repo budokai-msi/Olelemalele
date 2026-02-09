@@ -45,9 +45,9 @@ export default function AdminOrders() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       })
-      
+
       if (res.ok) {
-        setOrders(orders.map(o => 
+        setOrders(orders.map(o =>
           o._id === orderId ? { ...o, status: newStatus as Order['status'] } : o
         ))
       }
@@ -56,14 +56,14 @@ export default function AdminOrders() {
     }
   }
 
-  const filteredOrders = filter === 'all' 
-    ? orders 
+  const filteredOrders = filter === 'all'
+    ? orders
     : orders.filter(o => o.status === filter)
 
   const statusColors = {
     pending: 'bg-yellow-500/20 text-yellow-400',
     processing: 'bg-blue-500/20 text-blue-400',
-    shipped: 'bg-purple-500/20 text-purple-400',
+    shipped: 'bg-gray-500/20 text-gray-400',
     delivered: 'bg-green-500/20 text-green-400',
     cancelled: 'bg-red-500/20 text-red-400'
   }
@@ -89,9 +89,10 @@ export default function AdminOrders() {
             </div>
             <div className="flex gap-3">
               <select
+                title="Filter orders by status"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="px-4 py-2 bg-zinc-900 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-indigo-500"
+                className="px-4 py-2 bg-zinc-900 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-white/40"
               >
                 <option value="all">All Orders</option>
                 <option value="pending">Pending</option>
@@ -144,12 +145,13 @@ export default function AdminOrders() {
                       {new Date(order.createdAt).toLocaleDateString()} • {order.shippingAddress.city}
                     </p>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <select
+                      title="Update order status"
                       value={order.status}
                       onChange={(e) => updateOrderStatus(order._id, e.target.value)}
-                      className="px-3 py-1.5 bg-zinc-800 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-indigo-500"
+                      className="px-3 py-1.5 bg-zinc-800 border border-white/10 rounded-lg text-sm focus:outline-none focus:border-white/40"
                     >
                       <option value="pending">Pending</option>
                       <option value="processing">Processing</option>

@@ -31,7 +31,7 @@ function NavLink({ href, label }: { href: string; label: string }) {
       </motion.span>
       {/* Animated underline */}
       <motion.span
-        className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500"
+        className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-white/30 to-white/20"
         initial={{ width: isActive ? '100%' : '0%' }}
         animate={{ width: isActive ? '100%' : '0%' }}
         whileHover={{ width: '100%' }}
@@ -67,7 +67,7 @@ function WishlistButton() {
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-indigo-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center"
+            className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-white text-white text-[10px] font-bold rounded-full flex items-center justify-center"
           >
             {itemCount > 9 ? '9+' : itemCount}
           </motion.span>
@@ -145,7 +145,7 @@ export default function Header() {
                 >
                   {/* Shimmer effect — fixed: was using unicode minus U+2212 */}
                   <motion.span
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent -translate-x-full"
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full"
                     animate={{ translateX: ['-100%', '200%'] }}
                     transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                   />

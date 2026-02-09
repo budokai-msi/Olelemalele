@@ -14,7 +14,7 @@ export default function TermsPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="text-[10px] uppercase tracking-[0.4em] text-indigo-400 font-bold mb-4 block">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-white/70 font-bold mb-4 block">
             Legal
           </span>
           <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-6">
