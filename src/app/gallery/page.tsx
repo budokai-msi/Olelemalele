@@ -79,23 +79,23 @@ export default function Gallery() {
   }
 
   return (
-    <main className="h-screen bg-black text-white flex flex-col overflow-hidden relative">
+    <main className="h-screen bg-surface text-on-surface flex flex-col overflow-hidden relative">
       {/* ═══ Ambient Glow ═══ */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-white/[0.03] blur-[200px] rounded-full pointer-events-none animate-pulse-glow z-0" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-accent/[0.04] blur-[200px] rounded-full pointer-events-none animate-pulse-glow z-0" />
       {/* Header */}
-      <header className="flex-none px-6 py-4 border-b border-white/10 bg-black/50 backdrop-blur-md z-10">
+      <header className="flex-none px-6 py-4 border-b border-[rgb(var(--border))] bg-surface/80 backdrop-blur-md z-10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2 text-xs text-gray-500 uppercase tracking-wider mb-1">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <div className="flex items-center gap-2 text-xs text-on-faint uppercase tracking-wider mb-1">
+              <Link href="/" className="hover:text-accent transition-colors">Home</Link>
               <span>/</span>
-              <span className="text-white">Archive</span>
+              <span className="text-on-surface">Archive</span>
             </div>
             <h1 className="text-2xl font-black tracking-tight">
-              CANVAS <span className="text-white/70">COLLECTION</span>
+              CANVAS <span className="text-accent">COLLECTION</span>
             </h1>
           </div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-on-muted">
             {mounted ? `${products.length} pieces` : 'Loading...'}
           </p>
         </div>
@@ -128,9 +128,9 @@ export default function Gallery() {
                   onMouseLeave={() => setHoveredId(null)}
                 >
                   <Link href={`/product/${product.id}`} className="block">
-                    <div className="relative overflow-hidden aspect-[4/5] bg-zinc-900 rounded-2xl">
+                    <div className="relative overflow-hidden aspect-[4/5] bg-surface-raised rounded-2xl">
                       {/* Glow on hover */}
-                      <div className={`absolute inset-0 bg-gradient-to-t from-white/10 via-transparent to-transparent opacity-0 transition-opacity duration-500 z-10 pointer-events-none ${hoveredId === product.id ? 'opacity-100' : ''}`} />
+                      <div className={`absolute inset-0 bg-gradient-to-t from-accent/10 via-transparent to-transparent opacity-0 transition-opacity duration-500 z-10 pointer-events-none ${hoveredId === product.id ? 'opacity-100' : ''}`} />
 
                       <Image
                         src={product.image}
@@ -142,8 +142,8 @@ export default function Gallery() {
                       />
 
                       {/* Edition Badge */}
-                      <div className="absolute top-3 left-3 px-3 py-1.5 bg-black/50 backdrop-blur-md rounded-full z-20">
-                        <span className="text-[10px] text-white/90 uppercase tracking-wider font-medium">
+                      <div className="absolute top-3 left-3 px-3 py-1.5 bg-surface/60 backdrop-blur-md rounded-full z-20 border border-accent/20">
+                        <span className="text-[10px] text-accent uppercase tracking-wider font-medium">
                           № {product.id.padStart(2, '0')}
                         </span>
                       </div>
@@ -154,7 +154,7 @@ export default function Gallery() {
                           initial={{ y: 20, opacity: 0 }}
                           animate={hoveredId === product.id ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
                           transition={{ duration: 0.3 }}
-                          className="px-6 py-2.5 border border-white/50 rounded-full backdrop-blur-sm text-xs uppercase tracking-widest"
+                          className="px-6 py-2.5 border border-accent/50 rounded-full backdrop-blur-sm text-xs uppercase tracking-widest text-white"
                         >
                           View Details
                         </motion.span>
@@ -166,7 +166,7 @@ export default function Gallery() {
                             e.preventDefault()
                             handleQuickAdd(product)
                           }}
-                          className="px-6 py-2.5 bg-white text-black rounded-full text-xs uppercase tracking-widest font-medium hover:bg-white hover:text-white transition-colors"
+                          className="px-6 py-2.5 bg-accent text-white rounded-full text-xs uppercase tracking-widest font-medium hover:bg-accent-glow transition-colors"
                         >
                           Quick Add
                         </motion.button>
@@ -178,14 +178,14 @@ export default function Gallery() {
                   <div className="mt-4 px-1">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="text-lg font-semibold tracking-tight group-hover:text-white/70 transition-colors">
+                        <h3 className="text-lg font-semibold tracking-tight group-hover:text-accent transition-colors">
                           {product.name}
                         </h3>
-                        <p className="text-xs text-gray-500 uppercase tracking-wider mt-1">
+                        <p className="text-xs text-on-faint uppercase tracking-wider mt-1">
                           {product.category} — {product.type}
                         </p>
                       </div>
-                      <span className="text-gray-400 font-mono text-sm">
+                      <span className="text-accent font-mono text-sm">
                         ${(product.price / 100).toFixed(0)}
                       </span>
                     </div>
@@ -195,13 +195,13 @@ export default function Gallery() {
                       {product.variants.slice(0, 3).map((v, i) => (
                         <span
                           key={i}
-                          className="px-2 py-1 bg-white/5 rounded text-[10px] text-gray-400 uppercase tracking-wider"
+                          className="px-2 py-1 bg-accent/5 rounded text-[10px] text-on-muted uppercase tracking-wider"
                         >
                           {v.size}
                         </span>
                       ))}
                       {product.variants.length > 3 && (
-                        <span className="px-2 py-1 text-[10px] text-gray-500">
+                        <span className="px-2 py-1 text-[10px] text-on-faint">
                           +{product.variants.length - 3}
                         </span>
                       )}
@@ -223,17 +223,17 @@ export default function Gallery() {
                 animate={{ opacity: 1 }}
                 className="flex items-center gap-3"
               >
-                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                <span className="text-xs text-gray-500 uppercase tracking-wider ml-2">Loading more...</span>
+                <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="text-xs text-on-faint uppercase tracking-wider ml-2">Loading more...</span>
               </motion.div>
             )}
             {!hasMore && displayedProducts.length > 0 && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-xs text-gray-500 uppercase tracking-wider"
+                className="text-xs text-on-faint uppercase tracking-wider"
               >
                 — All {products.length} pieces loaded —
               </motion.p>

@@ -5,20 +5,34 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Olelemalele Design System — 9:16 Viewport Optimized
+   Olelemalele Design System — Turquoise Accent + Dark/Light Mode
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── LIGHT MODE (default) ── */
 :root {
   /* Dynamic viewport height fix for mobile browsers */
   --vh: 1vh;
 
-  /* Premium color tokens — Pure B&W */
-  --accent-primary: 255 255 255;
-  /* Pure White */
-  --accent-glow: 200 200 200;
-  /* Silver */
-  --surface-dark: 10 10 10;
-  --surface-elevated: 18 18 18;
+  /* Accent — luminous turquoise */
+  --accent: 45 212 191;          /* #2DD4BF teal-400 */
+  --accent-glow: 20 184 166;     /* #14B8A6 teal-500 */
+  --accent-muted: 94 234 212;    /* #5EEAD4 teal-300 */
+  --accent-hex: #2DD4BF;
+  --accent-glow-hex: #14B8A6;
+
+  /* Surfaces — warm off-white */
+  --surface: 250 250 248;        /* #FAFAF8 */
+  --surface-raised: 244 244 240; /* #F4F4F0 */
+  --surface-overlay: 255 255 255;/* #FFFFFF */
+
+  /* Text */
+  --on-surface: 23 23 23;        /* #171717 near-black */
+  --on-muted: 115 115 115;       /* #737373 */
+  --on-faint: 163 163 163;       /* #A3A3A3 */
+
+  /* Border */
+  --border: 229 229 229;         /* #E5E5E5 */
+  --border-accent: 45 212 191;
 
   /* Typography scale for 9:16 */
   --text-hero: clamp(3rem, 15vw, 8rem);
@@ -34,6 +48,30 @@
   --ease-in-out-smooth: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ── DARK MODE ── */
+.dark {
+  --accent: 45 212 191;
+  --accent-glow: 94 234 212;
+  --accent-muted: 20 184 166;
+  --accent-hex: #2DD4BF;
+  --accent-glow-hex: #5EEAD4;
+
+  --surface: 10 10 10;           /* #0A0A0A */
+  --surface-raised: 23 23 23;    /* #171717 */
+  --surface-overlay: 30 30 30;   /* #1E1E1E */
+
+  --on-surface: 245 245 245;     /* #F5F5F5 */
+  --on-muted: 163 163 163;       /* #A3A3A3 */
+  --on-faint: 82 82 82;          /* #525252 */
+
+  --border: 38 38 38;            /* #262626 */
+  --border-accent: 45 212 191;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════ */
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -42,8 +80,10 @@
   }
 
   body {
-    @apply bg-black text-white;
+    background-color: rgb(var(--surface));
+    color: rgb(var(--on-surface));
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   /* Mobile viewport height fix */
@@ -54,10 +94,14 @@
 
   /* Selection styling */
   ::selection {
-    background: rgba(255, 255, 255, 0.25);
-    color: black;
+    background: rgb(var(--accent) / 0.3);
+    color: rgb(var(--on-surface));
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   COMPONENTS
+   ═══════════════════════════════════════════════════════════ */
 
 @layer components {
 
@@ -67,50 +111,51 @@
     @apply relative overflow-hidden rounded-2xl;
   }
 
-  /* Premium gradient text */
+  /* Premium gradient text — turquoise */
   .text-gradient {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg,
-        #ffffff 0%,
-        #d1d5db 40%,
-        #ffffff 100%);
+        rgb(var(--accent)) 0%,
+        rgb(var(--accent-glow)) 40%,
+        rgb(var(--accent-muted)) 100%);
   }
 
-  /* Glow effect — white (visible on pure black) */
+  /* Glow effect — turquoise (both modes) */
   .glow {
     box-shadow:
-      0 0 15px rgba(255, 255, 255, 0.25),
-      0 0 40px rgba(255, 255, 255, 0.12),
-      0 0 80px rgba(255, 255, 255, 0.06);
+      0 0 15px rgb(var(--accent) / 0.25),
+      0 0 40px rgb(var(--accent) / 0.12),
+      0 0 80px rgb(var(--accent) / 0.06);
   }
 
   /* Intense glow — for hero elements and CTAs */
   .glow-intense {
     box-shadow:
-      0 0 20px rgba(255, 255, 255, 0.35),
-      0 0 60px rgba(255, 255, 255, 0.15),
-      0 0 120px rgba(255, 255, 255, 0.08);
+      0 0 20px rgb(var(--accent) / 0.35),
+      0 0 60px rgb(var(--accent) / 0.15),
+      0 0 120px rgb(var(--accent) / 0.08);
   }
 
   /* Glow border — subtle luminous outline */
   .glow-border {
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgb(var(--accent) / 0.2);
     box-shadow:
-      inset 0 0 20px rgba(255, 255, 255, 0.05),
-      0 0 15px rgba(255, 255, 255, 0.08);
+      inset 0 0 20px rgb(var(--accent) / 0.05),
+      0 0 15px rgb(var(--accent) / 0.1);
   }
 
-  /* Glass morphism — with luminous edge */
+  /* Glass morphism — with turquoise edge tint */
   .glass {
     @apply backdrop-blur-xl;
-    background: rgb(var(--surface-elevated) / 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.04);
+    background: rgb(var(--surface-overlay) / 0.6);
+    border: 1px solid rgb(var(--accent) / 0.1);
+    box-shadow: 0 0 30px rgb(var(--accent) / 0.04);
   }
 
   /* Premium Skeleton Loading */
   .skeleton {
-    @apply relative overflow-hidden bg-zinc-800/50;
+    @apply relative overflow-hidden;
+    background: rgb(var(--on-faint) / 0.15);
   }
 
   .skeleton::after {
@@ -118,7 +163,7 @@
     @apply absolute inset-0;
     background: linear-gradient(90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.08) 50%,
+        rgb(var(--accent) / 0.08) 50%,
         transparent 100%);
     animation: skeleton-shimmer 1.5s ease-in-out infinite;
   }
@@ -128,6 +173,10 @@
     animation: content-fade-in 0.5s var(--ease-out-expo) forwards;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════ */
 
 @layer utilities {
 
@@ -260,7 +309,7 @@
     }
   }
 
-  /* Ambient glow pulse — breathing white light */
+  /* Ambient glow pulse — turquoise breathing */
   @keyframes pulse-glow {
     0%, 100% {
       opacity: 0.4;
@@ -277,7 +326,7 @@
   }
 
   /* ═══════════════════════════════════════════════════════════
-     ORBITING LASER BORDER — visible beam tracing element edges
+     ORBITING LASER BORDER — turquoise beam
      ═══════════════════════════════════════════════════════════ */
 }
 
@@ -294,7 +343,7 @@
   }
 }
 
-/* Laser border for cards/boxes */
+/* Laser border for cards/boxes — turquoise beam */
 .laser-border-orbit {
   position: relative;
   overflow: hidden;
@@ -311,9 +360,9 @@
     from var(--laser-angle),
     transparent 0%,
     transparent 60%,
-    rgba(255, 255, 255, 0.8) 75%,
-    #ffffff 80%,
-    rgba(255, 255, 255, 0.8) 85%,
+    rgb(var(--accent) / 0.8) 75%,
+    var(--accent-hex) 80%,
+    rgb(var(--accent) / 0.8) 85%,
     transparent 100%
   );
   animation: laser-spin 3s linear infinite;
@@ -325,11 +374,11 @@
   position: absolute;
   inset: 2px;
   border-radius: inherit;
-  background: #000;
+  background: rgb(var(--surface));
   z-index: -1;
 }
 
-/* Laser button — orbiting beam on rounded pill buttons */
+/* Laser button — orbiting turquoise beam on rounded pill buttons */
 .laser-btn {
   position: relative;
   overflow: hidden;
@@ -345,9 +394,9 @@
     from var(--laser-angle),
     transparent 0%,
     transparent 55%,
-    rgba(255, 255, 255, 0.6) 70%,
-    #ffffff 78%,
-    rgba(255, 255, 255, 0.6) 86%,
+    rgb(var(--accent) / 0.6) 70%,
+    var(--accent-hex) 78%,
+    rgb(var(--accent) / 0.6) 86%,
     transparent 100%
   );
   animation: laser-spin 2.5s linear infinite;
@@ -359,13 +408,13 @@
   position: absolute;
   inset: 2px;
   border-radius: inherit;
-  background: #ffffff;
+  background: rgb(var(--accent));
   z-index: -1;
 }
 
-/* Dark variant for buttons with black bg fill */
+/* Dark variant for laser buttons */
 .laser-btn-dark::after {
-  background: #000;
+  background: rgb(var(--surface));
 }
 
 @layer utilities {
@@ -392,7 +441,7 @@
   animation: marquee 30s linear infinite;
 }
 
-/* Custom scrollbar hiding */
+/* Custom scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 2px;
 }
@@ -402,28 +451,249 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(var(--accent) / 0.2);
 }
 
-/* Frame color swatches - Gelato-style frame options */
-.swatch-black {
-  background-color: #1a1a1a;
-}
-
+/* Frame color swatches — matches Gelato's actual framed canvas catalog */
 .swatch-white {
-  background-color: #f5f5f5;
+  background-color: #f5f5f0;
+}
+
+.swatch-black {
+  background-color: #000000;
 }
 
 .swatch-natural {
-  background-color: #c4a574;
+  background-color: #9D6C3C;
 }
 
-.swatch-walnut {
-  background-color: #5c4033;
+.swatch-darkbrown {
+  background-color: #5C4033;
 }
 
-.swatch-gold {
-  background-color: #1a1a1a;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Theme Toggle Pill
+   ═══════════════════════════════════════════════════════════ */
+
+.theme-toggle-pill {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 2px;
+}
+
+.theme-toggle-track {
+  display: flex;
+  align-items: center;
+  width: 48px;
+  height: 28px;
+  border-radius: 9999px;
+  padding: 3px;
+  background: rgb(var(--on-faint) / 0.2);
+  border: 1px solid rgb(var(--border));
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.theme-toggle-track:hover {
+  border-color: rgb(var(--accent) / 0.5);
+  background: rgb(var(--accent) / 0.1);
+}
+
+.theme-toggle-knob {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: rgb(var(--accent));
+  box-shadow: 0 0 8px rgb(var(--accent) / 0.4);
+  position: relative;
+}
+
+.theme-toggle-icon {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GeminiSparkle Component Styles
+   ═══════════════════════════════════════════════════════════ */
+
+.gemini-sparkle-glow-conic {
+  background: conic-gradient(from 0deg, #4285F4, #EA4335, #FBBC05, #34A853, #4285F4);
+  filter: blur(8px);
+  opacity: 0.6;
+  transform: scale(1.5);
+}
+
+.gemini-sparkle-glow-radial {
+  background: radial-gradient(
+    circle,
+    rgba(66, 133, 244, 0.4) 0%,
+    rgba(234, 67, 53, 0.3) 25%,
+    rgba(251, 188, 5, 0.3) 50%,
+    rgba(52, 168, 83, 0.4) 75%,
+    transparent 100%
+  );
+  filter: blur(4px);
+  transform: scale(1.2);
+}
+
+.gemini-sparkle-star {
+  animation-duration: 3s;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Upload Page Styles
+   ═══════════════════════════════════════════════════════════ */
+
+.upload-glow-delayed {
+  animation-delay: 2s;
+}
+
+.upload-size-scroller {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.upload-size-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ARViewer Frame Styles
+   ═══════════════════════════════════════════════════════════ */
+
+.ar-frame-shadow-inset {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.ar-mat-shadow {
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Upload page — dynamic custom property classes */
+
+.upload-preview-aspect {
+  aspect-ratio: var(--aspect);
+}
+
+.upload-frame-border {
+  box-shadow: inset 0 0 0 8px var(--frame-color);
+  border-radius: 4px;
+}
+
+.upload-frame-swatch {
+  background-color: var(--swatch-color);
+}
+
+/* ARViewer — dynamic custom property classes */
+
+.ar-draggable-overlay {
+  left: 50%;
+  top: 50%;
+  transform: translate(calc(-50% + var(--pos-x)), calc(-50% + var(--pos-y))) scale(var(--overlay-scale));
+  width: var(--base-w);
+  height: var(--base-h);
+}
+
+.ar-frame-shadow {
+  box-shadow:
+    8px 8px 24px var(--shadow-color),
+    2px 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.ar-outer-frame {
+  inset: var(--frame-inset);
+  background-color: var(--frame-bg);
+}
+
+.ar-inner-mat {
+  inset: -3px;
+  background-color: var(--mat-bg);
+}
+
+.ar-size-label {
+  transform: translateX(-50%) scale(var(--label-scale));
+}
+
+/* ── Wall preview background (static fallback when camera unavailable) ── */
+.ar-wall-bg {
+  background:
+    /* subtle plaster texture */
+    radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 30%, rgba(0,0,0,0.03) 0%, transparent 50%),
+    /* base wall color — warm off-white */
+    linear-gradient(180deg, #e8e4df 0%, #ddd8d2 70%, #c8c2bc 100%);
+}
+
+.ar-wall-light {
+  background: radial-gradient(
+    ellipse at 30% 40%,
+    rgba(255, 248, 230, 0.18) 0%,
+    transparent 60%
+  );
+}
+
+.ar-wall-floor {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(80, 70, 60, 0.25) 40%,
+    rgba(60, 52, 44, 0.5) 100%
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Themed utility classes for common patterns
+   ═══════════════════════════════════════════════════════════ */
+
+/* Themed card surface */
+.card-themed {
+  background: rgb(var(--surface-raised));
+  border: 1px solid rgb(var(--border));
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.card-themed:hover {
+  border-color: rgb(var(--accent) / 0.3);
+  box-shadow: 0 0 25px rgb(var(--accent) / 0.08);
+}
+
+/* Themed section background */
+.section-themed {
+  background: rgb(var(--surface));
+  color: rgb(var(--on-surface));
+}
+
+/* Accent button */
+.btn-accent {
+  background: rgb(var(--accent));
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-accent:hover {
+  background: rgb(var(--accent-glow));
+  box-shadow: 0 0 20px rgb(var(--accent) / 0.3);
+}
+
+/* Ghost button */
+.btn-ghost {
+  background: transparent;
+  border: 1px solid rgb(var(--border));
+  color: rgb(var(--on-surface));
+  transition: all 0.3s ease;
+}
+
+.btn-ghost:hover {
+  border-color: rgb(var(--accent) / 0.5);
+  color: rgb(var(--accent));
+  box-shadow: 0 0 15px rgb(var(--accent) / 0.1);
 }

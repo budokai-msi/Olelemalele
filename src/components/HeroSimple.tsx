@@ -4,7 +4,7 @@ import { motion, useScroll, useSpring, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { useRef } from 'react'
 
-// Premium cinematic hero — black & white with video background
+// Premium cinematic hero — turquoise accent with video background
 export default function HeroSimple() {
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -41,7 +41,7 @@ export default function HeroSimple() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen w-full flex items-center justify-center bg-black overflow-hidden"
+      className="relative h-screen w-full flex items-center justify-center bg-surface dark:bg-black overflow-hidden"
     >
       {/* Layer 1: Video background — NO audio */}
       <motion.div className="absolute inset-0 z-[1]" style={{ y: videoY }}>
@@ -51,23 +51,23 @@ export default function HeroSimple() {
           muted
           playsInline
           preload="auto"
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
+          className="absolute inset-0 w-full h-full object-cover opacity-30 dark:opacity-40"
         >
           <source
             src="/WebGL_Fluid_Simulation_Video_Generation.mp4"
             type="video/mp4"
           />
         </video>
-        {/* Dark vignette over video */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black" />
+        {/* Vignette over video */}
+        <div className="absolute inset-0 bg-gradient-to-b from-surface/40 via-transparent to-surface dark:from-black/40 dark:via-transparent dark:to-black" />
       </motion.div>
 
-      {/* Layer 2: Subtle white glow orbs */}
+      {/* Layer 2: Turquoise glow orbs */}
       <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full opacity-[0.06] blur-3xl z-[2]"
+        className="absolute w-[600px] h-[600px] rounded-full opacity-[0.08] dark:opacity-[0.06] blur-3xl z-[2]"
         style={{
           background:
-            'radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, transparent 70%)',
+            'radial-gradient(circle, rgba(45, 212, 191, 0.6) 0%, transparent 70%)',
           left: '10%',
           top: '20%',
         }}
@@ -82,10 +82,10 @@ export default function HeroSimple() {
         }}
       />
       <motion.div
-        className="absolute w-[400px] h-[400px] rounded-full opacity-[0.04] blur-3xl z-[2]"
+        className="absolute w-[400px] h-[400px] rounded-full opacity-[0.06] dark:opacity-[0.04] blur-3xl z-[2]"
         style={{
           background:
-            'radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%)',
+            'radial-gradient(circle, rgba(20, 184, 166, 0.5) 0%, transparent 70%)',
           right: '15%',
           bottom: '25%',
         }}
@@ -108,56 +108,56 @@ export default function HeroSimple() {
         initial="hidden"
         animate="visible"
       >
-        {/* Brand Name — OLELE / MALELE — pure white */}
+        {/* Brand Name — OLELE / MALELE */}
         <motion.h1
-          className="text-[14vw] md:text-[10vw] leading-[0.85] font-black text-white tracking-[-0.04em] uppercase mb-6"
+          className="text-[14vw] md:text-[10vw] leading-[0.85] font-black tracking-[-0.04em] uppercase mb-6"
           variants={fadeUp}
         >
-          <span className="block">OLELE</span>
-          <span className="block text-gray-300">MALELE</span>
+          <span className="block text-on-surface">OLELE</span>
+          <span className="block text-accent">MALELE</span>
         </motion.h1>
 
         {/* Tagline */}
         <motion.p
-          className="text-lg md:text-xl text-gray-400 max-w-md mx-auto mb-10 tracking-wide"
+          className="text-lg md:text-xl text-on-muted max-w-md mx-auto mb-10 tracking-wide"
           variants={fadeUp}
         >
           Premium canvas art for the modern collector
         </motion.p>
 
-        {/* CTA buttons with white halo glow */}
+        {/* CTA buttons with turquoise glow */}
         <motion.div
           className="flex flex-col sm:flex-row gap-4 justify-center"
           variants={fadeUp}
         >
           <Link
             href="/gallery"
-            className="group relative px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]"
+            className="group relative px-8 py-4 bg-accent text-white rounded-full font-bold uppercase tracking-wider text-sm transition-all duration-300 hover:shadow-[0_0_30px_rgba(45,212,191,0.4)]"
           >
             <span className="relative z-10">View Collection</span>
             {/* Halo glow ring */}
-            <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_20px_4px_rgba(255,255,255,0.15)]" />
+            <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_20px_4px_rgba(45,212,191,0.2)]" />
           </Link>
           <Link
             href="/upload"
-            className="group relative px-8 py-4 border border-white/30 text-white rounded-full font-bold uppercase tracking-wider text-sm transition-all duration-300 hover:border-white/60 hover:shadow-[0_0_25px_rgba(255,255,255,0.15)]"
+            className="group relative px-8 py-4 border border-accent/30 text-on-surface rounded-full font-bold uppercase tracking-wider text-sm transition-all duration-300 hover:border-accent/60 hover:shadow-[0_0_25px_rgba(45,212,191,0.15)]"
           >
             <span className="relative z-10">Custom Print</span>
-            <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_3px_rgba(255,255,255,0.1)]" />
+            <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_3px_rgba(45,212,191,0.12)]" />
           </Link>
         </motion.div>
       </motion.div>
 
       {/* Layer 4: Animated scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500 z-10"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-on-faint z-10"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.5, duration: 0.6 }}
       >
         <span className="text-xs uppercase tracking-widest">Scroll</span>
         <motion.div
-          className="w-px h-8 bg-gradient-to-b from-gray-500 to-transparent origin-top"
+          className="w-px h-8 bg-gradient-to-b from-accent/50 to-transparent origin-top"
           animate={{ scaleY: [0, 1, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         />

@@ -17,9 +17,9 @@ export default function Footer() {
   }
 
   return (
-    <footer className="relative bg-black text-white overflow-hidden">
-      {/* Gradient Accent Line */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+    <footer className="relative bg-surface-raised dark:bg-black text-on-surface overflow-hidden">
+      {/* Gradient Accent Line — turquoise */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
 
       {/* Main Footer Content */}
       <div className="max-w-[1920px] mx-auto px-4 md:px-12 py-16 md:py-24">
@@ -32,10 +32,10 @@ export default function Footer() {
                 <h3 className="text-3xl md:text-4xl font-black tracking-tighter hover:text-gradient transition-all duration-500">
                   Olelemalele
                 </h3>
-                <span className="text-[10px] font-mono text-white/30 tracking-[0.2em] relative top-1">CANVAS</span>
+                <span className="text-[10px] font-mono text-on-faint tracking-[0.2em] relative top-1">CANVAS</span>
               </div>
             </Link>
-            <p className="text-gray-400 text-sm md:text-base leading-relaxed max-w-md mb-8">
+            <p className="text-on-muted text-sm md:text-base leading-relaxed max-w-md mb-8">
               Premium canvas art for the modern collector.
               Each piece is a statement. Every wall deserves a story.
             </p>
@@ -67,7 +67,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-6">Navigate</h4>
+            <h4 className="text-xs uppercase tracking-[0.2em] text-on-faint mb-6">Navigate</h4>
             <nav className="flex flex-col gap-4">
               <FooterLink href="/">Home</FooterLink>
               <FooterLink href="/gallery">Gallery</FooterLink>
@@ -78,8 +78,8 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h4 className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-6">Stay Updated</h4>
-            <p className="text-gray-400 text-sm mb-4">
+            <h4 className="text-xs uppercase tracking-[0.2em] text-on-faint mb-6">Stay Updated</h4>
+            <p className="text-on-muted text-sm mb-4">
               Get notified when new drops land.
             </p>
 
@@ -89,7 +89,7 @@ export default function Footer() {
                 animate={{ opacity: 1, y: 0 }}
                 className="glass px-4 py-3 rounded-lg"
               >
-                <p className="text-sm text-white/90">✓ You&apos;re on the list</p>
+                <p className="text-sm text-accent">✓ You&apos;re on the list</p>
               </motion.div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
@@ -98,12 +98,12 @@ export default function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-white/30 transition-colors"
+                  className="w-full px-4 py-3 bg-surface/50 dark:bg-white/5 border border-[rgb(var(--border))] rounded-lg text-sm text-on-surface placeholder:text-on-faint focus:outline-none focus:border-accent/40 transition-colors"
                   required
                 />
                 <button
                   type="submit"
-                  className="w-full px-4 py-3 bg-white text-black rounded-lg text-sm font-medium uppercase tracking-wider hover:bg-white hover:text-white transition-all duration-300"
+                  className="w-full px-4 py-3 btn-accent rounded-lg text-sm font-medium uppercase tracking-wider"
                 >
                   Subscribe
                 </button>
@@ -113,20 +113,20 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-500 text-xs md:text-sm">
+        <div className="mt-16 pt-8 border-t border-[rgb(var(--border))] flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-on-faint text-xs md:text-sm">
             © 2026 Olelemalele. All rights reserved.
           </p>
-          <div className="flex gap-6 text-xs md:text-sm text-gray-500">
-            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="/shipping" className="hover:text-white transition-colors">Shipping</Link>
+          <div className="flex gap-6 text-xs md:text-sm text-on-faint">
+            <Link href="/privacy" className="hover:text-accent transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-accent transition-colors">Terms</Link>
+            <Link href="/shipping" className="hover:text-accent transition-colors">Shipping</Link>
           </div>
         </div>
       </div>
 
       {/* Large Background Text */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[20vw] font-black text-white/[0.02] tracking-tighter pointer-events-none select-none whitespace-nowrap">
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[20vw] font-black text-accent/[0.03] tracking-tighter pointer-events-none select-none whitespace-nowrap">
         OLELEMALELE
       </div>
     </footer>
@@ -140,7 +140,7 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:scale-110"
+      className="w-10 h-10 flex items-center justify-center rounded-full bg-accent/5 border border-[rgb(var(--border))] text-on-muted hover:text-accent hover:bg-accent/10 hover:border-accent/30 transition-all duration-300 hover:scale-110"
     >
       {children}
     </a>
@@ -151,7 +151,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
   return (
     <Link
       href={href}
-      className="text-gray-400 hover:text-white transition-colors duration-300 text-sm"
+      className="text-on-muted hover:text-accent transition-colors duration-300 text-sm"
     >
       {children}
     </Link>

@@ -35,7 +35,7 @@ export default function ProductPage() {
   const product = products.find(p => p.id === productId)
 
   const [selectedSize, setSelectedSize] = useState(product?.variants[0]?.size || '')
-  const [selectedFrame, setSelectedFrame] = useState<FrameStyle>('black')
+  const [selectedFrame, setSelectedFrame] = useState<FrameStyle>('white')
   const [isAdding, setIsAdding] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [flowingTexts, setFlowingTexts] = useState<{ id: number; text: string; x: number; y: number; direction: number }[]>([])
@@ -108,10 +108,10 @@ export default function ProductPage() {
 
   if (!product) {
     return (
-      <div className="h-screen flex items-center justify-center bg-black text-white">
+      <div className="h-screen flex items-center justify-center bg-surface text-on-surface">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Drop not found.</h2>
-          <Link href="/gallery" className="text-white/70 hover:text-white underline">Back to Archive</Link>
+          <Link href="/gallery" className="text-accent hover:text-accent-glow underline">Back to Archive</Link>
         </div>
       </div>
     )
@@ -139,12 +139,12 @@ export default function ProductPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white selection:bg-white/20">
+    <main className="min-h-screen bg-surface text-on-surface selection:bg-accent/20">
       {/* Immersive Layout Container */}
       <div className="flex flex-col lg:flex-row min-h-screen">
 
         {/* Left Side: 3D Immersive Viewer */}
-        <div className="relative w-full lg:w-[60%] h-[60vh] lg:h-screen bg-[#0a0a0a] overflow-hidden">
+        <div className="relative w-full lg:w-[60%] h-[60vh] lg:h-screen bg-surface-raised dark:bg-[#0a0a0a] overflow-hidden">
           <div
             className="absolute inset-0 z-0"
             onMouseDown={handleDragStart}
@@ -154,7 +154,7 @@ export default function ProductPage() {
             onTouchEnd={handleDragEnd}
           >
             {/* Ambient Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-white/5 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-accent/5 blur-[120px] rounded-full pointer-events-none" />
 
             {hardware.webGL ? (
               <Canvas
@@ -223,9 +223,9 @@ export default function ProductPage() {
               </Canvas>
             ) : (
               // Fallback for systems without WebGL
-              <div className="w-full h-full flex items-center justify-center bg-gray-900">
+              <div className="w-full h-full flex items-center justify-center bg-surface-raised">
                 <div className="text-center p-4">
-                  <div className="text-white text-lg mb-4">3D Preview Unavailable</div>
+                  <div className="text-on-surface text-lg mb-4">3D Preview Unavailable</div>
                   <Image
                     src={product.image}
                     alt={product.name}
@@ -234,7 +234,7 @@ export default function ProductPage() {
                     className="mx-auto rounded-lg"
                     priority
                   />
-                  <p className="text-gray-400 mt-4 text-sm">
+                  <p className="text-on-muted mt-4 text-sm">
                     Your device may not support 3D graphics.
                     Image preview shown instead.
                   </p>
@@ -274,11 +274,11 @@ export default function ProductPage() {
                 <span
                   className="text-2xl md:text-4xl font-black tracking-wider uppercase"
                   style={{
-                    background: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 50%, #818cf8 100%)',
+                    background: 'linear-gradient(135deg, var(--accent-glow-hex, #5EEAD4) 0%, var(--accent-hex, #2DD4BF) 50%, var(--accent-glow-hex, #5EEAD4) 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                    textShadow: '0 0 40px rgba(99, 102, 241, 0.5)',
-                    filter: 'drop-shadow(0 0 20px rgba(167, 139, 250, 0.4))',
+                    textShadow: '0 0 40px rgba(45, 212, 191, 0.5)',
+                    filter: 'drop-shadow(0 0 20px rgba(94, 234, 212, 0.4))',
                   }}
                 >
                   {flowText.text}
@@ -296,7 +296,7 @@ export default function ProductPage() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <div className="absolute inset-0 border-2 border-white/20 rounded-lg m-4" />
+                <div className="absolute inset-0 border-2 border-accent/20 rounded-lg m-4" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -355,13 +355,14 @@ export default function ProductPage() {
                 <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
               </motion.svg>
 
-              <span className="text-[11px] uppercase tracking-[0.15em] font-medium bg-gradient-to-r from-white/60 to-white/30 bg-clip-text text-transparent">
+              <span
+                className="text-[11px] uppercase tracking-[0.15em] font-medium bg-gradient-to-r from-accent/80 to-accent/40 bg-clip-text text-transparent">
                 Drag to Rotate
               </span>
 
               {/* Pulsing dot indicator */}
               <motion.div
-                className="w-2 h-2 rounded-full bg-white"
+                className="w-2 h-2 rounded-full bg-accent"
                 animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               />
@@ -375,20 +376,20 @@ export default function ProductPage() {
               animate={{ opacity: 1, x: 0 }}
               className="glass px-4 py-2 rounded-full"
             >
-              <span className="text-[10px] font-mono tracking-widest text-white/50">EDITION № {product.id.padStart(3, '0')}</span>
+              <span className="text-[10px] font-mono tracking-widest text-on-faint">EDITION № {product.id.padStart(3, '0')}</span>
             </motion.div>
           </div>
         </div>
 
         {/* Right Side: Product Details */}
-        <div className="w-full lg:w-[40%] flex flex-col p-8 lg:p-16 xl:p-24 lg:justify-center bg-black border-l border-white/5">
+        <div className="w-full lg:w-[40%] flex flex-col p-8 lg:p-16 xl:p-24 lg:justify-center bg-surface border-l border-[rgb(var(--border))]">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: 'circOut' }}
           >
             <div className="flex items-start justify-between mb-4">
-              <p className="text-xs text-white/70 uppercase tracking-[0.3em] font-semibold font-sans">
+              <p className="text-xs text-accent uppercase tracking-[0.3em] font-semibold font-sans">
                 [ {product.category} ]
               </p>
 
@@ -406,7 +407,7 @@ export default function ProductPage() {
                   fill={productInWishlist ? 'currentColor' : 'none'}
                   stroke="currentColor"
                   strokeWidth="1.5"
-                  className={`transition-colors                  ${productInWishlist ? 'text-red-500' : 'text-gray-400 group-hover:text-white'}`}
+                  className={`transition-colors                  ${productInWishlist ? 'text-red-500' : 'text-on-muted group-hover:text-accent'}`}
                   animate={productInWishlist ? { scale: [1, 1.2, 1] } : {}}
                   transition={{ duration: 0.3 }}
                 >
@@ -418,26 +419,26 @@ export default function ProductPage() {
             <h1 className="text-4xl lg:text-6xl font-black tracking-tighter mb-4 leading-tight">
               {product.name}
             </h1>
-            <p className="text-2xl font-mono text-white/80 mb-8 tracking-tight">
+            <p className="text-2xl font-mono text-on-muted mb-8 tracking-tight">
               ${(product.price / 100).toFixed(0)}
             </p>
 
             <div className="space-y-8 mb-12">
-              <p className="text-gray-400 leading-relaxed text-sm lg:text-base max-w-md">
+              <p className="text-on-muted leading-relaxed text-sm lg:text-base max-w-md">
                 {product.description || "Experimental visual statement. Part of the first Olelemalele drop cycle. High-density pigments on archival-grade canvas fibers. Built to endure, designed to provoke."}
               </p>
 
               {/* Variant Selection */}
               <div className="space-y-4">
-                <span className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">Select Size</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-on-faint font-bold">Select Size</span>
                 <div className="flex flex-wrap gap-3">
                   {product.variants.map((v) => (
                     <button
                       key={v.size}
                       onClick={() => { setSelectedSize(v.size); triggerHaptic(); }}
                       className={`px-6 py-2.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${selectedSize === v.size
-                        ? 'bg-white text-black border-white'
-                        : 'bg-transparent text-white/60 border-white/10 hover:border-white/30 hover:text-white'
+                        ? 'bg-accent text-white border-accent'
+                        : 'bg-transparent text-on-muted border-[rgb(var(--border))] hover:border-accent/40 hover:text-on-surface'
                         }`}
                     >
                       {v.size}
@@ -448,7 +449,7 @@ export default function ProductPage() {
 
               {/* Frame Style Selection - Gelato Options */}
               <div className="space-y-4">
-                <span className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">Frame Style</span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-on-faint font-bold">Frame Style</span>
                 <div className="flex flex-wrap gap-3">
                   {(Object.keys(GELATO_FRAME_OPTIONS) as FrameStyle[]).map((style) => {
                     const frame = GELATO_FRAME_OPTIONS[style]
@@ -457,15 +458,15 @@ export default function ProductPage() {
                         key={style}
                         onClick={() => { setSelectedFrame(style); triggerHaptic(); }}
                         className={`group flex items-center gap-2 px-4 py-2.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${selectedFrame === style
-                          ? 'bg-white/10 border-white/50'
-                          : 'bg-transparent border-white/10 hover:border-white/30'
+                          ? 'bg-accent/10 border-accent/50'
+                          : 'bg-transparent border-[rgb(var(--border))] hover:border-accent/30'
                           }`}
                       >
                         {/* Color swatch */}
                         <span
-                          className={`w-4 h-4 rounded-full border border-white/20 shadow-inner swatch-${style}`}
+                          className={`w-4 h-4 rounded-full border border-accent/20 shadow-inner swatch-${style}`}
                         />
-                        <span className={`transition-colors ${selectedFrame === style ? 'text-white' : 'text-white/50 group-hover:text-white/80'}`}>
+                        <span className={`transition-colors ${selectedFrame === style ? 'text-accent' : 'text-on-muted group-hover:text-on-surface'}`}>
                           {frame.name}
                         </span>
                       </button>
@@ -488,7 +489,7 @@ export default function ProductPage() {
               <button
                 disabled={isAdding}
                 onClick={addToCart}
-                className="group relative w-full bg-white text-black py-5 rounded-full font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                className="group relative w-full bg-accent text-white py-5 rounded-full font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 disabled:opacity-50 hover:shadow-[0_0_30px_rgba(45,212,191,0.3)]"
               >
                 <AnimatePresence mode="wait">
                   {isAdding ? (
@@ -513,10 +514,10 @@ export default function ProductPage() {
                     </motion.span>
                   )}
                 </AnimatePresence>
-                <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />
+                <div className="absolute inset-0 bg-accent-glow scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-10" />
               </button>
 
-              <div className="flex items-center justify-between text-[10px] text-gray-600 uppercase tracking-widest px-2">
+              <div className="flex items-center justify-between text-[10px] text-on-faint uppercase tracking-widest px-2">
                 <span>Free global delivery</span>
                 <span>•</span>
                 <span>Archival quality</span>

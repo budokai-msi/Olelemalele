@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import MobileNav from './MobileNav'
+import ThemeToggle from './ThemeToggle'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -22,16 +23,16 @@ function NavLink({ href, label }: { href: string; label: string }) {
   return (
     <Link href={href} className="relative group">
       <motion.span
-        className={`inline-block transition-colors ${isActive ? 'text-white' : 'text-gray-400 hover:text-white'
+        className={`inline-block transition-colors ${isActive ? 'text-accent' : 'text-on-muted hover:text-on-surface'
           }`}
         whileHover={{ y: -2 }}
         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       >
         {label}
       </motion.span>
-      {/* Animated underline */}
+      {/* Animated underline — turquoise */}
       <motion.span
-        className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-white/30 to-white/20"
+        className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-accent/60 to-accent/30"
         initial={{ width: isActive ? '100%' : '0%' }}
         animate={{ width: isActive ? '100%' : '0%' }}
         whileHover={{ width: '100%' }}
@@ -59,7 +60,7 @@ function WishlistButton() {
           fill="none"
           stroke="currentColor"
           strokeWidth="1.5"
-          className="text-gray-400 group-hover:text-white transition-colors"
+          className="text-on-muted group-hover:text-accent transition-colors"
         >
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
@@ -67,7 +68,7 @@ function WishlistButton() {
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-white text-white text-[10px] font-bold rounded-full flex items-center justify-center"
+            className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center"
           >
             {itemCount > 9 ? '9+' : itemCount}
           </motion.span>
@@ -97,8 +98,7 @@ export default function Header() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: hidden ? '-100%' : 0, opacity: 1 }}
       transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-0 w-full bg-black/90 backdrop-blur-md text-white p-6 z-50 border-b border-white/10"
-      style={{ boxShadow: '0 4px 30px rgba(255, 255, 255, 0.04)' }}
+      className="fixed top-0 w-full bg-surface/90 dark:bg-black/90 backdrop-blur-md text-on-surface p-6 z-50 border-b border-[rgb(var(--border))]"
     >
       <nav className="flex justify-between items-center max-w-7xl mx-auto">
         {/* Logo */}
@@ -108,7 +108,7 @@ export default function Header() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            OLELE<span className="text-gray-500">MALELE</span>
+            OLELE<span className="text-accent">MALELE</span>
           </motion.span>
         </Link>
 
@@ -117,6 +117,9 @@ export default function Header() {
           {navLinks.map((link) => (
             <NavLink key={link.href} {...link} />
           ))}
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
           {/* Wishlist */}
           <WishlistButton />
@@ -127,7 +130,7 @@ export default function Header() {
               <NavLink href="/admin" label="Admin" />
               <motion.button
                 onClick={logout}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="text-on-muted hover:text-accent transition-colors"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -139,12 +142,12 @@ export default function Header() {
               <NavLink href="/login" label="Login" />
               <Link href="/register">
                 <motion.span
-                  className="relative overflow-hidden bg-white text-black px-6 py-2 rounded-full text-sm font-medium inline-block"
+                  className="relative overflow-hidden bg-accent text-white px-6 py-2 rounded-full text-sm font-medium inline-block"
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 >
-                  {/* Shimmer effect — fixed: was using unicode minus U+2212 */}
+                  {/* Shimmer effect */}
                   <motion.span
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full"
                     animate={{ translateX: ['-100%', '200%'] }}
@@ -159,6 +162,7 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         <div className="flex items-center gap-4 md:hidden">
+          <ThemeToggle />
           <WishlistButton />
           <MobileNav />
         </div>

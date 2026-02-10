@@ -13,8 +13,8 @@ const GlobeIcon = () => (
     <path d="M6 28 Q20 26 34 28" stroke="url(#globe-gradient)" strokeWidth="1" fill="none" />
     <defs>
       <linearGradient id="globe-gradient" x1="0" y1="0" x2="40" y2="40">
-        <stop offset="0%" stopColor="#818cf8" />
-        <stop offset="100%" stopColor="#6366f1" />
+        <stop offset="0%" stopColor="#5EEAD4" />
+        <stop offset="100%" stopColor="#2DD4BF" />
       </linearGradient>
     </defs>
   </svg>
@@ -29,8 +29,8 @@ const PackageIcon = () => (
     <path d="M12 8L28 16" stroke="url(#package-gradient)" strokeWidth="1" opacity="0.5" />
     <defs>
       <linearGradient id="package-gradient" x1="4" y1="4" x2="36" y2="36">
-        <stop offset="0%" stopColor="#a78bfa" />
-        <stop offset="100%" stopColor="#6366f1" />
+        <stop offset="0%" stopColor="#5EEAD4" />
+        <stop offset="100%" stopColor="#2DD4BF" />
       </linearGradient>
     </defs>
   </svg>
@@ -45,8 +45,8 @@ const TruckIcon = () => (
     <line x1="14" y1="28" x2="26" y2="28" stroke="url(#truck-gradient)" strokeWidth="2" />
     <defs>
       <linearGradient id="truck-gradient" x1="2" y1="12" x2="38" y2="34">
-        <stop offset="0%" stopColor="#818cf8" />
-        <stop offset="100%" stopColor="#4f46e5" />
+        <stop offset="0%" stopColor="#5EEAD4" />
+        <stop offset="100%" stopColor="#14B8A6" />
       </linearGradient>
     </defs>
   </svg>
@@ -60,7 +60,7 @@ const LeafIcon = () => (
     <defs>
       <linearGradient id="leaf-gradient" x1="8" y1="32" x2="32" y2="6">
         <stop offset="0%" stopColor="#34d399" />
-        <stop offset="100%" stopColor="#6366f1" />
+        <stop offset="100%" stopColor="#2DD4BF" />
       </linearGradient>
     </defs>
   </svg>
@@ -100,7 +100,7 @@ const shippingTimes = [
 
 export default function ShippingPage() {
   return (
-    <main className="min-h-screen bg-black text-white pt-32 pb-24 px-4 md:px-12">
+    <main className="min-h-screen bg-surface text-on-surface pt-32 pb-24 px-4 md:px-12">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
@@ -109,13 +109,13 @@ export default function ShippingPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <span className="text-[10px] uppercase tracking-[0.4em] text-white/70 font-bold mb-4 block">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold mb-4 block">
             Delivery Info
           </span>
           <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
             Shipping & Returns
           </h1>
-          <p className="text-gray-400 max-w-lg mx-auto">
+          <p className="text-on-muted max-w-lg mx-auto">
             We produce locally and ship globally to get museum-quality art to your walls as fast as possible.
           </p>
         </motion.div>
@@ -128,11 +128,11 @@ export default function ShippingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="text-center p-6 rounded-2xl bg-white/[0.02] border border-white/5"
+              className="text-center p-6 rounded-2xl bg-accent/[0.02] border border-[rgb(var(--border))]"
             >
               <div className="mb-4"><item.icon /></div>
-              <h3 className="font-bold text-white mb-2">{item.title}</h3>
-              <p className="text-sm text-gray-500">{item.description}</p>
+              <h3 className="font-bold text-on-surface mb-2">{item.title}</h3>
+              <p className="text-sm text-on-faint">{item.description}</p>
             </motion.div>
           ))}
         </div>
@@ -145,24 +145,24 @@ export default function ShippingPage() {
           className="mb-20"
         >
           <h2 className="text-2xl font-bold mb-8 text-center">Estimated Delivery Times</h2>
-          <p className="text-gray-400 text-center mb-8 max-w-md mx-auto text-sm">
+          <p className="text-on-muted text-center mb-8 max-w-md mx-auto text-sm">
             Production time is 2-5 business days before shipping begins.
           </p>
-          <div className="overflow-hidden rounded-xl border border-white/10">
+          <div className="overflow-hidden rounded-xl border border-[rgb(var(--border))]">
             <table className="w-full">
               <thead>
-                <tr className="bg-white/5">
-                  <th className="text-left py-4 px-6 text-xs uppercase tracking-wider text-gray-400 font-bold">Region</th>
-                  <th className="text-left py-4 px-6 text-xs uppercase tracking-wider text-gray-400 font-bold">Standard</th>
-                  <th className="text-left py-4 px-6 text-xs uppercase tracking-wider text-gray-400 font-bold">Express</th>
+                <tr className="bg-accent/5">
+                  <th className="text-left py-4 px-6 text-xs uppercase tracking-wider text-on-muted font-bold">Region</th>
+                  <th className="text-left py-4 px-6 text-xs uppercase tracking-wider text-on-muted font-bold">Standard</th>
+                  <th className="text-left py-4 px-6 text-xs uppercase tracking-wider text-on-muted font-bold">Express</th>
                 </tr>
               </thead>
               <tbody>
                 {shippingTimes.map((row, index) => (
-                  <tr key={row.region} className={index % 2 === 0 ? '' : 'bg-white/[0.02]'}>
+                  <tr key={row.region} className={index % 2 === 0 ? '' : 'bg-accent/[0.02]'}>
                     <td className="py-4 px-6 font-medium">{row.region}</td>
-                    <td className="py-4 px-6 text-gray-400">{row.standard}</td>
-                    <td className="py-4 px-6 text-white/70">{row.express}</td>
+                    <td className="py-4 px-6 text-on-muted">{row.standard}</td>
+                    <td className="py-4 px-6 text-accent">{row.express}</td>
                   </tr>
                 ))}
               </tbody>
@@ -179,24 +179,24 @@ export default function ShippingPage() {
         >
           <h2 className="text-2xl font-bold mb-8 text-center">Returns Policy</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-xl bg-white/[0.02] border border-white/5">
-              <div className="text-3xl font-black text-white/70 mb-2">30</div>
-              <div className="text-xs uppercase tracking-wider text-gray-500 mb-4">Day Returns</div>
-              <p className="text-sm text-gray-400">
+            <div className="p-6 rounded-xl bg-accent/[0.02] border border-[rgb(var(--border))]">
+              <div className="text-3xl font-black text-accent mb-2">30</div>
+              <div className="text-xs uppercase tracking-wider text-on-faint mb-4">Day Returns</div>
+              <p className="text-sm text-on-muted">
                 Return any non-custom item within 30 days of delivery for a full refund.
               </p>
             </div>
-            <div className="p-6 rounded-xl bg-white/[0.02] border border-white/5">
-              <div className="text-3xl font-black text-white/70 mb-2">100%</div>
-              <div className="text-xs uppercase tracking-wider text-gray-500 mb-4">Quality Guarantee</div>
-              <p className="text-sm text-gray-400">
+            <div className="p-6 rounded-xl bg-accent/[0.02] border border-[rgb(var(--border))]">
+              <div className="text-3xl font-black text-accent mb-2">100%</div>
+              <div className="text-xs uppercase tracking-wider text-on-faint mb-4">Quality Guarantee</div>
+              <p className="text-sm text-on-muted">
                 If your item arrives damaged or defective, we&apos;ll replace it at no cost.
               </p>
             </div>
-            <div className="p-6 rounded-xl bg-white/[0.02] border border-white/5">
-              <div className="text-3xl font-black text-white/70 mb-2">Free</div>
-              <div className="text-xs uppercase tracking-wider text-gray-500 mb-4">Return Shipping</div>
-              <p className="text-sm text-gray-400">
+            <div className="p-6 rounded-xl bg-accent/[0.02] border border-[rgb(var(--border))]">
+              <div className="text-3xl font-black text-accent mb-2">Free</div>
+              <div className="text-xs uppercase tracking-wider text-on-faint mb-4">Return Shipping</div>
+              <p className="text-sm text-on-muted">
                 We cover return shipping for damaged items. Standard returns ship at buyer&apos;s expense.
               </p>
             </div>
@@ -227,10 +227,10 @@ export default function ShippingPage() {
                   transition={{ delay: index * 0.1 }}
                   className="flex gap-6 items-start"
                 >
-                  <span className="text-2xl font-black text-white opacity-50">{item.step}</span>
+                  <span className="text-2xl font-black text-accent opacity-50">{item.step}</span>
                   <div>
-                    <h3 className="font-bold text-white mb-1">{item.title}</h3>
-                    <p className="text-sm text-gray-400">{item.desc}</p>
+                    <h3 className="font-bold text-on-surface mb-1">{item.title}</h3>
+                    <p className="text-sm text-on-muted">{item.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -243,22 +243,22 @@ export default function ShippingPage() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center p-8 md:p-12 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.03] border border-white/5"
+          className="text-center p-8 md:p-12 rounded-2xl bg-gradient-to-br from-accent/5 to-accent/[0.03] border border-[rgb(var(--border))]"
         >
           <h3 className="text-2xl font-bold mb-4">Need Help?</h3>
-          <p className="text-gray-400 mb-8">
+          <p className="text-on-muted mb-8">
             Questions about shipping or returns? We&apos;re here to help.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/faq"
-              className="px-8 py-4 border border-white/20 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white/10 transition-colors"
+              className="px-8 py-4 border border-accent/30 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-accent/10 transition-colors"
             >
               View FAQ
             </Link>
             <Link
               href="/contact"
-              className="px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-white transition-colors"
+              className="px-8 py-4 bg-accent text-white rounded-full font-bold uppercase tracking-wider text-sm hover:shadow-[0_0_30px_rgba(45,212,191,0.3)] transition-all"
             >
               Contact Us
             </Link>

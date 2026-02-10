@@ -7,27 +7,24 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 interface ARViewerProps {
   productImage: string
   productName: string
-  frameStyle: 'black' | 'white' | 'natural' | 'walnut' | 'gold'
+  frameStyle: 'white' | 'black' | 'natural' | 'darkbrown'
   size: string
-  mode: 'idle' | 'camera' | 'fallback'
   onClose: () => void
-  onRetryCamera: () => void
 }
 
-/* ── Frame color map ── */
+/* ── Frame color map — matches Gelato's actual framed canvas catalog ── */
 const FRAME_COLORS: Record<string, { border: string; shadow: string; label: string }> = {
-  black: { border: '#1a1a1a', shadow: 'rgba(0,0,0,0.6)', label: 'Black' },
-  white: { border: '#f5f5f0', shadow: 'rgba(200,200,200,0.4)', label: 'White' },
-  natural: { border: '#c4a574', shadow: 'rgba(140,110,60,0.4)', label: 'Natural Wood' },
-  walnut: { border: '#5c4033', shadow: 'rgba(60,40,25,0.5)', label: 'Dark Walnut' },
-  gold: { border: '#b8972e', shadow: 'rgba(160,130,30,0.4)', label: 'Gold Accent' },
+  white: { border: '#f5f5f0', shadow: 'rgba(200,200,200,0.4)', label: 'Gallery Wrap' },
+  black: { border: '#000000', shadow: 'rgba(0,0,0,0.6)', label: 'Black' },
+  natural: { border: '#9D6C3C', shadow: 'rgba(140,100,50,0.4)', label: 'Natural Wood' },
+  darkbrown: { border: '#5C4033', shadow: 'rgba(60,40,25,0.5)', label: 'Dark Brown' },
 }
 
 /* ── Parse "12x16" → { w, h } ── */
 function parseSize(size: string): { w: number; h: number } {
   const match = size.match(/(\d+)\s*[x×]\s*(\d+)/i)
   if (match) return { w: parseInt(match[1]), h: parseInt(match[2]) }
-  return { w: 12, h: 16 } // fallback
+  return { w: 12, h: 16 }
 }
 
 export default function ARViewer({
@@ -35,19 +32,15 @@ export default function ARViewer({
   productName,
   frameStyle,
   size,
-  mode,
   onClose,
-  onRetryCamera,
 }: ARViewerProps) {
   /* ── State ── */
-  const [cameraActive, setCameraActive] = useState(false)
+  const [mode, setMode] = useState<'loading' | 'camera' | 'wall'>('loading')
   const [showGuide, setShowGuide] = useState(true)
-  const [showQRCode, setShowQRCode] = useState(false)
   const [captured, setCaptured] = useState(false)
 
   /* ── Refs ── */
   const videoRef = useRef<HTMLVideoElement>(null)
-  const overlayRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   /* ── Touch state for drag + pinch ── */
@@ -63,61 +56,76 @@ export default function ARViewer({
 
   /* ── Derived values ── */
   const { w, h } = parseSize(size)
-  const frame = FRAME_COLORS[frameStyle] || FRAME_COLORS.black
+  const frame = FRAME_COLORS[frameStyle] || FRAME_COLORS.white
   const aspectRatio = w / h
-  // Base overlay size (in viewport units, will be scaled by pinch)
   const baseHeight = 240
   const baseWidth = baseHeight * aspectRatio
   const frameBorderWidth = 12
 
-  /* ── Start camera when mode = 'camera' ── */
-  useEffect(() => {
-    if (mode !== 'camera') return
-    let cancelled = false
+  /* ── Try camera, fall back to wall preview ── */
+  const requestCamera = useCallback(async () => {
+    setMode('loading')
 
-    const start = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: 'environment' },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
-          },
-          audio: false,
-        })
-        if (cancelled) {
-          stream.getTracks().forEach(t => t.stop())
-          return
-        }
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-          setCameraActive(true)
-          setShowGuide(true)
-          setPosition({ x: 0, y: 0 })
-          setScale(1)
-          // Auto-hide guide after 3 seconds
-          setTimeout(() => setShowGuide(false), 3000)
-        }
-      } catch (err) {
-        console.error('Camera start failed:', err)
-      }
+    // Skip camera on non-HTTPS
+    if (
+      typeof window !== 'undefined' &&
+      window.location.protocol !== 'https:' &&
+      window.location.hostname !== 'localhost'
+    ) {
+      setMode('wall')
+      return
     }
 
-    start()
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+        },
+        audio: false,
+      })
 
-    return () => {
-      cancelled = true
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        await videoRef.current.play().catch(() => { })
+        setMode('camera')
+        setShowGuide(true)
+        setPosition({ x: 0, y: 0 })
+        setScale(1)
+        setTimeout(() => setShowGuide(false), 3000)
+      } else {
+        stream.getTracks().forEach(t => t.stop())
+        setMode('wall')
+      }
+    } catch {
+      // Camera denied/unavailable → wall preview (no popup!)
+      setMode('wall')
+    }
+  }, [])
+
+  // Auto-request on mount
+  useEffect(() => {
+    requestCamera()
+  }, [requestCamera])
+
+  // When entering wall mode, reset position and show guide
+  useEffect(() => {
+    if (mode === 'wall') {
+      setPosition({ x: 0, y: 0 })
+      setScale(1)
+      setShowGuide(true)
+      setTimeout(() => setShowGuide(false), 3000)
     }
   }, [mode])
 
-  /* ── Stop camera on close ── */
+  /* ── Stop camera + close ── */
   const stopCamera = useCallback(() => {
     if (videoRef.current?.srcObject) {
       const tracks = (videoRef.current.srcObject as MediaStream).getTracks()
       tracks.forEach(track => track.stop())
       videoRef.current.srcObject = null
     }
-    setCameraActive(false)
     setCaptured(false)
     onClose()
   }, [onClose])
@@ -127,8 +135,7 @@ export default function ARViewer({
     const videoEl = videoRef.current
     return () => {
       if (videoEl?.srcObject) {
-        const tracks = (videoEl.srcObject as MediaStream).getTracks()
-        tracks.forEach(track => track.stop())
+        (videoEl.srcObject as MediaStream).getTracks().forEach(t => t.stop())
       }
     }
   }, [])
@@ -174,7 +181,7 @@ export default function ARViewer({
     touchState.current.pinching = false
   }, [])
 
-  /* ── Mouse drag for desktop ── */
+  /* ── Mouse drag (desktop) ── */
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     touchState.current.dragging = true
     touchState.current.lastX = e.clientX
@@ -194,7 +201,7 @@ export default function ARViewer({
     touchState.current.dragging = false
   }, [])
 
-  /* ── Mouse wheel zoom for desktop ── */
+  /* ── Mouse wheel zoom (desktop) ── */
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault()
     const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05
@@ -203,25 +210,36 @@ export default function ARViewer({
 
   /* ── Capture screenshot ── */
   const captureScreenshot = useCallback(async () => {
-    if (!videoRef.current || !containerRef.current) return
+    const container = containerRef.current
+    if (!container) return
 
     try {
       const canvas = document.createElement('canvas')
-      const video = videoRef.current
-      canvas.width = video.videoWidth || 1920
-      canvas.height = video.videoHeight || 1080
+      const cw = container.offsetWidth * 2
+      const ch = container.offsetHeight * 2
+      canvas.width = cw
+      canvas.height = ch
       const ctx = canvas.getContext('2d')
       if (!ctx) return
 
-      // Draw camera frame
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+      // Draw background
+      if (mode === 'camera' && videoRef.current) {
+        ctx.drawImage(videoRef.current, 0, 0, cw, ch)
+      } else {
+        // Draw wall gradient
+        const wallGrad = ctx.createLinearGradient(0, 0, 0, ch)
+        wallGrad.addColorStop(0, '#e8e4df')
+        wallGrad.addColorStop(0.7, '#d8d4cf')
+        wallGrad.addColorStop(1, '#8b8070')
+        ctx.fillStyle = wallGrad
+        ctx.fillRect(0, 0, cw, ch)
+      }
 
-      // Draw the artwork overlay (simplified composite)
-      const centerX = canvas.width / 2 + (position.x / window.innerWidth) * canvas.width
-      const centerY = canvas.height / 2 + (position.y / window.innerHeight) * canvas.height
-      const overlayW = (baseWidth / window.innerWidth) * canvas.width * scale
-      const overlayH = (baseHeight / window.innerHeight) * canvas.height * scale
-      const frameW = (frameBorderWidth / window.innerWidth) * canvas.width * scale
+      const centerX = cw / 2 + (position.x / container.offsetWidth) * cw
+      const centerY = ch / 2 + (position.y / container.offsetHeight) * ch
+      const overlayW = (baseWidth / container.offsetWidth) * cw * scale
+      const overlayH = (baseHeight / container.offsetHeight) * ch * scale
+      const frameW = (frameBorderWidth / container.offsetWidth) * cw * scale
 
       // Draw frame
       ctx.fillStyle = frame.border
@@ -240,13 +258,12 @@ export default function ARViewer({
         img.onerror = () => resolve()
       })
 
-      // Download
       canvas.toBlob((blob) => {
         if (!blob) return
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `${productName.replace(/\s+/g, '_')}_AR_preview.jpg`
+        a.download = `${productName.replace(/\s+/g, '_')}_wall_preview.jpg`
         a.click()
         URL.revokeObjectURL(url)
         setCaptured(true)
@@ -255,304 +272,245 @@ export default function ARViewer({
     } catch (err) {
       console.error('Capture failed:', err)
     }
-  }, [position, scale, baseWidth, baseHeight, frameBorderWidth, frame.border, productImage, productName])
+  }, [position, scale, baseWidth, baseHeight, frameBorderWidth, frame.border, productImage, productName, mode])
 
-  /* ── QR code URL ── */
-  const generateQRCode = useCallback(() => {
-    const url = typeof window !== 'undefined' ? window.location.href : ''
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url + '?ar=true')}`
-  }, [])
+  /* ── Shared artwork overlay (used in both camera + wall modes) ── */
+  const artworkOverlay = (
+    <div
+      className="absolute z-40 cursor-grab active:cursor-grabbing ar-draggable-overlay"
+      style={{ '--pos-x': `${position.x}px`, '--pos-y': `${position.y}px`, '--overlay-scale': scale, '--base-w': `${baseWidth}px`, '--base-h': `${baseHeight}px` } as React.CSSProperties}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+    >
+      {/* Frame shadow */}
+      <div
+        className="absolute -inset-1 rounded-sm ar-frame-shadow"
+        style={{ '--shadow-color': frame.shadow } as React.CSSProperties}
+      />
 
-  /* ═══════ CAMERA ACTIVE VIEW ═══════ */
-  if (mode === 'camera' && cameraActive) {
-    return (
-      <motion.div
-        ref={containerRef}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[300] bg-black touch-none select-none"
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-      >
-        {/* Camera feed */}
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="absolute inset-0 w-full h-full object-cover"
+      {/* Outer frame */}
+      <div
+        className="absolute rounded-sm ar-frame-shadow-inset ar-outer-frame"
+        style={{ '--frame-inset': `${-frameBorderWidth}px`, '--frame-bg': frame.border } as React.CSSProperties}
+      />
+
+      {/* Inner mat */}
+      <div
+        className="absolute rounded-[1px] ar-mat-shadow ar-inner-mat"
+        style={{ '--mat-bg': frameStyle === 'white' ? '#e8e8e4' : '#faf8f5' } as React.CSSProperties}
+      />
+
+      {/* Artwork */}
+      <div className="relative w-full h-full overflow-hidden">
+        <Image
+          src={productImage}
+          alt={productName}
+          fill
+          className="object-cover"
+          sizes="300px"
+          unoptimized
         />
+      </div>
 
-        {/* Wall placement guide */}
-        <AnimatePresence>
-          {showGuide && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="absolute top-16 left-0 right-0 flex justify-center z-50 pointer-events-none"
-            >
-              <div className="px-6 py-3 bg-black/70 backdrop-blur-md rounded-full border border-white/20">
-                <p className="text-white text-sm font-medium text-center">
-                  📐 Point at a wall • Drag to position • Pinch to resize
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {/* Size label */}
+      <div
+        className="absolute -bottom-10 left-1/2 whitespace-nowrap pointer-events-none ar-size-label"
+        style={{ '--label-scale': 1 / scale } as React.CSSProperties}
+      >
+        <span className="text-[11px] text-white/70 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10 font-medium tracking-wider">
+          {size}&quot; — {frame.label}
+        </span>
+      </div>
+    </div>
+  )
 
-        {/* Draggable artwork overlay */}
-        <div
-          ref={overlayRef}
-          className="absolute z-40 cursor-grab active:cursor-grabbing"
-          style={{
-            left: '50%',
-            top: '50%',
-            transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px)) scale(${scale})`,
-            width: baseWidth,
-            height: baseHeight,
-          }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleMouseDown}
-        >
-          {/* Frame shadow (wall depth effect) */}
-          <div
-            className="absolute -inset-1 rounded-sm"
-            style={{
-              boxShadow: `
-                8px 8px 24px ${frame.shadow},
-                2px 2px 8px rgba(0,0,0,0.3),
-                inset 0 0 0 1px rgba(255,255,255,0.05)
-              `,
-            }}
-          />
-
-          {/* Outer frame border */}
-          <div
-            className="absolute rounded-sm"
-            style={{
-              inset: -frameBorderWidth,
-              backgroundColor: frame.border,
-              boxShadow: `inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.3)`,
-            }}
-          />
-
-          {/* Inner mat (thin white border inside the frame) */}
-          <div
-            className="absolute rounded-[1px]"
-            style={{
-              inset: -3,
-              backgroundColor: frameStyle === 'white' ? '#e8e8e4' : '#faf8f5',
-              boxShadow: 'inset 0 0 2px rgba(0,0,0,0.1)',
-            }}
-          />
-
-          {/* Artwork itself */}
-          <div className="relative w-full h-full overflow-hidden">
-            <Image
-              src={productImage}
-              alt={productName}
-              fill
-              className="object-cover"
-              sizes="300px"
-              unoptimized
-            />
+  /* ── Shared bottom control bar ── */
+  const controlBar = (
+    <div className="absolute bottom-0 left-0 right-0 z-50">
+      <div className="bg-black/60 backdrop-blur-xl border-t border-white/10 px-4 py-4 pb-safe">
+        <div className="flex items-center justify-between max-w-lg mx-auto">
+          <div className="flex-1 min-w-0 mr-4">
+            <p className="text-white text-xs font-bold uppercase tracking-wider truncate">{productName}</p>
+            <p className="text-white/50 text-[10px] mt-0.5">{size}&quot; • {frame.label} Frame</p>
           </div>
 
-          {/* Size label below frame */}
-          <div
-            className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
-            style={{ transform: `translateX(-50%) scale(${1 / scale})` }}
+          <button
+            onClick={captureScreenshot}
+            className="w-14 h-14 rounded-full border-4 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0 mx-4 group"
+            aria-label="Capture wall preview"
+            title="Save screenshot"
           >
-            <span className="text-[11px] text-white/70 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10 font-medium tracking-wider">
-              {size}&quot; — {frame.label}
-            </span>
-          </div>
-        </div>
-
-        {/* Captured flash */}
-        <AnimatePresence>
-          {captured && (
-            <motion.div
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="fixed inset-0 bg-white z-[500] pointer-events-none"
-            />
-          )}
-        </AnimatePresence>
-
-        {/* Bottom control bar */}
-        <div className="absolute bottom-0 left-0 right-0 z-50">
-          <div className="bg-black/60 backdrop-blur-xl border-t border-white/10 px-4 py-4 pb-safe">
-            <div className="flex items-center justify-between max-w-lg mx-auto">
-              {/* Product info */}
-              <div className="flex-1 min-w-0 mr-4">
-                <p className="text-white text-xs font-bold uppercase tracking-wider truncate">{productName}</p>
-                <p className="text-white/50 text-[10px] mt-0.5">{size}&quot; • {frame.label} Frame</p>
-              </div>
-
-              {/* Capture button */}
-              <button
-                onClick={captureScreenshot}
-                className="w-14 h-14 rounded-full border-4 border-white/80 flex items-center justify-center hover:border-white transition-colors flex-shrink-0 mx-4 group"
-                aria-label="Capture AR view"
-                title="Capture screenshot"
-              >
-                <div className="w-10 h-10 rounded-full bg-white/90 group-hover:bg-white group-active:bg-white/60 transition-colors flex items-center justify-center">
-                  <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-              </button>
-
-              {/* Close button */}
-              <button
-                onClick={stopCamera}
-                className="px-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white text-xs font-bold uppercase tracking-wider border border-white/20 transition-all flex-shrink-0"
-              >
-                Close
-              </button>
+            <div className="w-10 h-10 rounded-full bg-white/90 group-hover:bg-white group-active:bg-white/60 transition-colors flex items-center justify-center">
+              <svg className="w-5 h-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
             </div>
-          </div>
-        </div>
-      </motion.div>
-    )
-  }
+          </button>
 
-  /* ═══════ FALLBACK MODAL (camera denied) ═══════ */
-  if (mode === 'fallback') {
-    return (
-      <AnimatePresence>
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200]"
-          />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-sm max-h-[80vh] bg-[#1a1a1a] rounded-2xl z-[201] shadow-2xl overflow-hidden border border-white/10 flex flex-col"
+          <button
+            onClick={stopCamera}
+            className="px-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white text-xs font-bold uppercase tracking-wider border border-white/20 transition-all flex-shrink-0"
           >
-            {/* Header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center text-[10px] font-bold text-white/80">
-                AR
-              </div>
-              <span className="flex-1 text-sm font-medium">AR Wall Preview</span>
-              <button onClick={onClose} aria-label="Close" title="Close" className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-full transition-colors">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 
-            {/* Content */}
-            <div className="p-4 overflow-y-auto flex-1">
-              {/* Error banner */}
-              <div className="mb-4 p-3 bg-amber-500/20 rounded-xl text-xs text-amber-200 text-center leading-relaxed">
-                <p className="font-bold mb-1">📷 Camera access needed</p>
-                <p>Click the <strong>lock icon</strong> in your address bar → Allow camera access → then try again.</p>
-              </div>
-
-              {/* Product preview */}
-              <div className="flex items-center gap-3 mb-4 p-3 bg-white/5 rounded-xl">
-                <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-zinc-800 flex-shrink-0">
-                  <Image src={productImage} alt={productName} fill className="object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{productName}</p>
-                  <p className="text-xs text-gray-500">{size} • {frame.label}</p>
-                </div>
-              </div>
-
-              {/* Retry camera */}
-              <button
-                onClick={onRetryCamera}
-                className="w-full flex items-center gap-3 px-3 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors group mb-2"
-              >
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white transition-colors">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="text-sm font-medium">Try Camera Again</p>
-                  <p className="text-xs text-gray-500">After allowing access in browser</p>
-                </div>
-                <span className="text-xs text-green-400 font-medium">Retry</span>
-              </button>
-
-              {/* QR Code option */}
-              <div className="relative py-2">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10" /></div>
-                <div className="relative flex justify-center"><span className="px-2 bg-[#1a1a1a] text-xs text-gray-500">or use your phone</span></div>
-              </div>
-
-              <button
-                onClick={() => setShowQRCode(!showQRCode)}
-                className="w-full flex items-center gap-3 px-3 py-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors"
-              >
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="text-sm font-medium">Open on Phone</p>
-                  <p className="text-xs text-gray-500">Scan QR code with your phone camera</p>
-                </div>
-                <svg className={`w-4 h-4 text-gray-500 transition-transform ${showQRCode ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {showQRCode && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="flex flex-col items-center py-4 gap-2"
-                >
-                  <div className="w-44 h-44 bg-white rounded-xl p-2.5 relative">
-                    <Image src={generateQRCode()} alt="Scan to open AR on phone" fill className="object-contain" unoptimized />
-                  </div>
-                  <p className="text-[10px] text-gray-500 text-center">Scan with your phone camera to preview in AR</p>
-                </motion.div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="px-4 py-3 bg-white/5 border-t border-white/10 text-xs text-gray-500 text-center">
-              Point your camera at a wall to preview canvas placement
-            </div>
-          </motion.div>
-        </>
-      </AnimatePresence>
-    )
-  }
-
-  /* ═══════ IDLE / HIDDEN ═══════ */
-
-  // Hidden video element — always rendered so ref is ready
+  /* ═══════════════════════════════════════════════════════
+     RENDER
+     ═══════════════════════════════════════════════════════ */
   return (
-    <video
-      ref={videoRef}
-      autoPlay
-      playsInline
-      muted
-      className="hidden"
-    />
+    <>
+      {/* Always-mounted video for camera mode */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        className={mode === 'camera' ? 'fixed inset-0 w-full h-full object-cover z-[299]' : 'fixed top-0 left-0 w-0 h-0 opacity-0 pointer-events-none'}
+      />
+
+      {/* ═══════ LOADING (brief spinner) ═══════ */}
+      {mode === 'loading' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[300] bg-black flex items-center justify-center"
+        >
+          <div className="text-center">
+            <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-6" />
+            <p className="text-white/70 text-sm uppercase tracking-wider font-bold">Setting up preview...</p>
+          </div>
+          <button
+            onClick={stopCamera}
+            className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+            aria-label="Close"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </motion.div>
+      )}
+
+      {/* ═══════ CAMERA MODE (live camera feed + artwork) ═══════ */}
+      {mode === 'camera' && (
+        <motion.div
+          ref={containerRef}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[300] touch-none select-none"
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onWheel={handleWheel}
+        >
+          {/* Guide toast */}
+          <AnimatePresence>
+            {showGuide && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="absolute top-16 left-0 right-0 flex justify-center z-50 pointer-events-none"
+              >
+                <div className="px-6 py-3 bg-black/70 backdrop-blur-md rounded-full border border-white/20">
+                  <p className="text-white text-sm font-medium text-center">
+                    📐 Point at a wall • Drag to position • Pinch to resize
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {artworkOverlay}
+
+          {/* Capture flash */}
+          <AnimatePresence>
+            {captured && (
+              <motion.div
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="fixed inset-0 bg-white z-[500] pointer-events-none"
+              />
+            )}
+          </AnimatePresence>
+
+          {controlBar}
+        </motion.div>
+      )}
+
+      {/* ═══════ WALL MODE (static wall background + artwork) ═══════ */}
+      {mode === 'wall' && (
+        <motion.div
+          ref={containerRef}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[300] touch-none select-none ar-wall-bg"
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onWheel={handleWheel}
+        >
+          {/* Ambient lighting overlay */}
+          <div className="absolute inset-0 ar-wall-light pointer-events-none" />
+          {/* Floor gradient */}
+          <div className="absolute bottom-0 left-0 right-0 h-[30%] ar-wall-floor pointer-events-none" />
+
+          {/* Use Camera button — lets user retry browser permission */}
+          <button
+            onClick={requestCamera}
+            className="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full border border-white/20 transition-all"
+            title="Switch to live camera"
+          >
+            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span className="text-white text-xs font-bold uppercase tracking-wider">Use Camera</span>
+          </button>
+
+          {/* Guide toast */}
+          <AnimatePresence>
+            {showGuide && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="absolute top-16 left-0 right-0 flex justify-center z-50 pointer-events-none"
+              >
+                <div className="px-6 py-3 bg-black/70 backdrop-blur-md rounded-full border border-white/20">
+                  <p className="text-white text-sm font-medium text-center">
+                    🖼️ Drag to reposition • Scroll to resize
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {artworkOverlay}
+
+          {/* Capture flash */}
+          <AnimatePresence>
+            {captured && (
+              <motion.div
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="fixed inset-0 bg-white z-[500] pointer-events-none"
+              />
+            )}
+          </AnimatePresence>
+
+          {controlBar}
+        </motion.div>
+      )}
+    </>
   )
 }

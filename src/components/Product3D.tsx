@@ -5,37 +5,32 @@ import { useFrame } from '@react-three/fiber'
 import { useRef, useState } from 'react'
 import * as THREE from 'three'
 
-// Gelato-style frame color options
+// Gelato frame color options — matches Gelato's actual framed canvas catalog
+// White = gallery-wrapped canvas (no frame). The 3 framed options are Black, Natural Wood, Dark Brown.
 export const GELATO_FRAME_OPTIONS = {
-  black: {
-    name: 'Classic Black',
-    primary: '#1a1a1a',
-    secondary: '#0a0a0a',
-    accent: '#333333',
-  },
   white: {
-    name: 'Modern White',
-    primary: '#f5f5f5',
-    secondary: '#e8e8e8',
+    name: 'Gallery Wrap',
+    primary: '#f5f5f0',
+    secondary: '#e8e8e4',
     accent: '#ffffff',
   },
-  natural: {
-    name: 'Natural Oak',
-    primary: '#c4a574',
-    secondary: '#a68b5b',
-    accent: '#d4b584',
+  black: {
+    name: 'Black',
+    primary: '#000000',
+    secondary: '#0a0a0a',
+    accent: '#1a1a1a',
   },
-  walnut: {
-    name: 'Dark Walnut',
-    primary: '#5c4033',
+  natural: {
+    name: 'Natural Wood',
+    primary: '#9D6C3C',
+    secondary: '#7a5430',
+    accent: '#b07d4a',
+  },
+  darkbrown: {
+    name: 'Dark Brown',
+    primary: '#5C4033',
     secondary: '#3d2817',
     accent: '#6d4c3d',
-  },
-  gold: {
-    name: 'Gold Accent',
-    primary: '#1a1a1a',
-    secondary: '#0a0a0a',
-    accent: '#b8860b',
   },
 } as const
 
@@ -125,7 +120,7 @@ function GelatoFrame({
         <meshStandardMaterial
           color={colors.primary}
           roughness={frameStyle === 'white' ? 0.4 : 0.3}
-          metalness={frameStyle === 'gold' ? 0.3 : 0.1}
+          metalness={0.1}
         />
       </mesh>
       {/* Bottom */}
@@ -134,7 +129,7 @@ function GelatoFrame({
         <meshStandardMaterial
           color={colors.primary}
           roughness={frameStyle === 'white' ? 0.4 : 0.3}
-          metalness={frameStyle === 'gold' ? 0.3 : 0.1}
+          metalness={0.1}
         />
       </mesh>
       {/* Left */}
@@ -143,7 +138,7 @@ function GelatoFrame({
         <meshStandardMaterial
           color={colors.primary}
           roughness={frameStyle === 'white' ? 0.4 : 0.3}
-          metalness={frameStyle === 'gold' ? 0.3 : 0.1}
+          metalness={0.1}
         />
       </mesh>
       {/* Right */}
@@ -152,7 +147,7 @@ function GelatoFrame({
         <meshStandardMaterial
           color={colors.primary}
           roughness={frameStyle === 'white' ? 0.4 : 0.3}
-          metalness={frameStyle === 'gold' ? 0.3 : 0.1}
+          metalness={0.1}
         />
       </mesh>
 
@@ -162,9 +157,9 @@ function GelatoFrame({
         <meshStandardMaterial
           color={colors.accent}
           roughness={0.2}
-          metalness={frameStyle === 'gold' ? 0.9 : 0.1}
-          emissive={frameStyle === 'gold' ? colors.accent : '#000000'}
-          emissiveIntensity={frameStyle === 'gold' ? 0.1 : 0}
+          metalness={0.1}
+          emissive={'#000000'}
+          emissiveIntensity={0}
         />
       </mesh>
       <mesh position={[0, -height / 2 + innerBevelThickness / 2, depth / 2 - 0.008]}>
@@ -172,9 +167,9 @@ function GelatoFrame({
         <meshStandardMaterial
           color={colors.accent}
           roughness={0.2}
-          metalness={frameStyle === 'gold' ? 0.9 : 0.1}
-          emissive={frameStyle === 'gold' ? colors.accent : '#000000'}
-          emissiveIntensity={frameStyle === 'gold' ? 0.1 : 0}
+          metalness={0.1}
+          emissive={'#000000'}
+          emissiveIntensity={0}
         />
       </mesh>
       <mesh position={[-width / 2 + innerBevelThickness / 2, 0, depth / 2 - 0.008]}>
@@ -182,9 +177,9 @@ function GelatoFrame({
         <meshStandardMaterial
           color={colors.accent}
           roughness={0.2}
-          metalness={frameStyle === 'gold' ? 0.9 : 0.1}
-          emissive={frameStyle === 'gold' ? colors.accent : '#000000'}
-          emissiveIntensity={frameStyle === 'gold' ? 0.1 : 0}
+          metalness={0.1}
+          emissive={'#000000'}
+          emissiveIntensity={0}
         />
       </mesh>
       <mesh position={[width / 2 - innerBevelThickness / 2, 0, depth / 2 - 0.008]}>
@@ -192,9 +187,9 @@ function GelatoFrame({
         <meshStandardMaterial
           color={colors.accent}
           roughness={0.2}
-          metalness={frameStyle === 'gold' ? 0.9 : 0.1}
-          emissive={frameStyle === 'gold' ? colors.accent : '#000000'}
-          emissiveIntensity={frameStyle === 'gold' ? 0.1 : 0}
+          metalness={0.1}
+          emissive={'#000000'}
+          emissiveIntensity={0}
         />
       </mesh>
     </group>
@@ -208,7 +203,7 @@ export default function Product3D({
   scale = [1, 1, 1],
   onClick,
   disableAnimation = false,
-  frameStyle = 'black'
+  frameStyle = 'white'
 }: Product3DProps) {
   const groupRef = useRef<THREE.Group>(null)
   const [hovered, setHovered] = useState(false)

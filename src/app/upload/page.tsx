@@ -20,25 +20,22 @@ interface CanvasSize {
 
 type SizeCategory = 'all' | 'square' | 'portrait' | 'landscape'
 
-// Popular Gelato canvas sizes - curated for best seller availability
-// Square, Portrait, Landscape formats (most commonly available)
-
 const CANVAS_SIZES: CanvasSize[] = [
-  // Square - Most popular
+  // Square
   { id: '12x12', name: '12" × 12"', width: 12, height: 12, price: null, loading: true, category: 'square' },
   { id: '16x16', name: '16" × 16"', width: 16, height: 16, price: null, loading: true, category: 'square' },
   { id: '20x20', name: '20" × 20"', width: 20, height: 20, price: null, loading: true, category: 'square' },
   { id: '24x24', name: '24" × 24"', width: 24, height: 24, price: null, loading: true, category: 'square' },
   { id: '30x30', name: '30" × 30"', width: 30, height: 30, price: null, loading: true, category: 'square' },
 
-  // Portrait - Best sellers
+  // Portrait
   { id: '12x16', name: '12" × 16"', width: 12, height: 16, price: null, loading: true, category: 'portrait' },
   { id: '16x20', name: '16" × 20"', width: 16, height: 20, price: null, loading: true, category: 'portrait' },
   { id: '18x24', name: '18" × 24"', width: 18, height: 24, price: null, loading: true, category: 'portrait' },
   { id: '24x36', name: '24" × 36"', width: 24, height: 36, price: null, loading: true, category: 'portrait' },
   { id: '30x40', name: '30" × 40"', width: 30, height: 40, price: null, loading: true, category: 'portrait' },
 
-  // Landscape - Best sellers
+  // Landscape
   { id: '16x12', name: '16" × 12"', width: 16, height: 12, price: null, loading: true, category: 'landscape' },
   { id: '20x16', name: '20" × 16"', width: 20, height: 16, price: null, loading: true, category: 'landscape' },
   { id: '24x18', name: '24" × 18"', width: 24, height: 18, price: null, loading: true, category: 'landscape' },
@@ -50,7 +47,7 @@ export default function CustomUploadPage() {
   const [sizes, setSizes] = useState<CanvasSize[]>(CANVAS_SIZES)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [selectedSize, setSelectedSize] = useState<CanvasSize>(CANVAS_SIZES[4])
-  const [selectedFrame, setSelectedFrame] = useState<FrameStyle>('black')
+  const [selectedFrame, setSelectedFrame] = useState<FrameStyle>('white')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -61,7 +58,6 @@ export default function CustomUploadPage() {
   const { dispatch } = useCart()
   const triggerHaptic = useHaptic()
 
-  // Fetch prices from Gelato API on mount
   useEffect(() => {
     fetchPrices()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,75 +86,40 @@ export default function CustomUploadPage() {
           loading: false
         })))
 
-        // Update selected size with new price
         setSelectedSize(prev => ({
           ...prev,
           price: priceMap.get(prev.id) || getFallbackPrice(prev.id),
           loading: false
         }))
       } else {
-        // Use fallback prices
-        setSizes(prev => prev.map(size => ({
-          ...size,
-          price: getFallbackPrice(size.id),
-          loading: false
-        })))
-        setSelectedSize(prev => ({
-          ...prev,
-          price: getFallbackPrice(prev.id),
-          loading: false
-        }))
+        applyFallbackPrices()
       }
     } catch (error) {
       console.error('Error fetching prices:', error)
-      // Use fallback prices
-      setSizes(prev => prev.map(size => ({
-        ...size,
-        price: getFallbackPrice(size.id),
-        loading: false
-      })))
-      setSelectedSize(prev => ({
-        ...prev,
-        price: getFallbackPrice(prev.id),
-        loading: false
-      }))
+      applyFallbackPrices()
     } finally {
       setIsLoadingPrices(false)
     }
   }
 
+  const applyFallbackPrices = () => {
+    setSizes(prev => prev.map(size => ({
+      ...size,
+      price: getFallbackPrice(size.id),
+      loading: false
+    })))
+    setSelectedSize(prev => ({
+      ...prev,
+      price: getFallbackPrice(prev.id),
+      loading: false
+    }))
+  }
+
   const getFallbackPrice = (sizeId: string): number => {
     const fallbackPrices: Record<string, number> = {
-      // Square formats (2x Gelato cost)
-      '12x12': 3200,
-      '16x16': 4400,
-      '20x20': 5800,
-      '24x24': 7800,
-      '30x30': 11600,
-
-      // Portrait
-      '12x16': 4800,
-      '16x20': 5800,
-      '18x24': 7200,
-      '24x36': 13000,
-      '30x40': 17200,
-
-      // Landscape
-      '16x12': 4800,
-      '20x16': 5800,
-      '24x18': 7200,
-      '36x24': 13000,
-      '40x30': 17200,
-      '32x48': 19600,
-      '36x48': 22400,
-      '40x60': 30400,
-
-      // Panoramic formats
-      '20x60': 17200,
-      '30x60': 24800,
-
-      // Additional sizes
-      '28x40': 18400,
+      '12x12': 3200, '16x16': 4400, '20x20': 5800, '24x24': 7800, '30x30': 11600,
+      '12x16': 4800, '16x20': 5800, '18x24': 7200, '24x36': 13000, '30x40': 17200,
+      '16x12': 4800, '20x16': 5800, '24x18': 7200, '36x24': 13000, '40x30': 17200,
     }
     return fallbackPrices[sizeId] || 13000
   }
@@ -253,337 +214,347 @@ export default function CustomUploadPage() {
   return (
     <main className="min-h-screen bg-black text-white pt-24 pb-20 relative overflow-hidden">
       {/* ═══ Ambient Glow Orbs ═══ */}
-      <div className="absolute top-40 right-1/3 w-[500px] h-[500px] bg-white/[0.04] blur-[160px] rounded-full pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-40 left-1/4 w-[400px] h-[400px] bg-white/[0.05] blur-[140px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
-      {/* Header */}
-      <header className="px-4 md:px-12 py-12 border-b border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <span>/</span>
-              <span className="text-white">Custom Print</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tight mb-4">
-              YOUR ART.<br />
-              <span className="text-gradient">OUR CANVAS.</span>
-            </h1>
-            <p className="text-gray-400 max-w-xl text-lg">
-              Transform your photos and artwork into museum-quality canvas prints.
-              Upload your image and we&apos;ll handle the rest.
-            </p>
-          </motion.div>
-        </div>
-      </header>
+      <div className="absolute top-40 right-1/4 w-[500px] h-[500px] bg-white/[0.04] blur-[160px] rounded-full pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-40 left-1/4 w-[400px] h-[400px] bg-white/[0.05] blur-[140px] rounded-full pointer-events-none animate-pulse-glow upload-glow-delayed" />
 
-      <div className="max-w-7xl mx-auto px-4 md:px-12 py-12">
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Left: Upload & Preview */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            {!uploadedImage ? (
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                className={`relative aspect-[4/3] rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden ${isDragging
-                  ? 'border-white/40 bg-white/5'
-                  : 'border-white/20 hover:border-white/40 bg-zinc-900/50'
-                  }`}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  title="Upload your image"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
-                  className="hidden"
-                />
+      <div className="max-w-[1400px] mx-auto px-4 md:px-12 relative z-10">
 
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
-                  <motion.div
-                    animate={{ y: isDragging ? -10 : 0 }}
-                    className="w-20 h-20 mb-6 rounded-2xl bg-white/5 flex items-center justify-center"
-                  >
-                    <svg className="w-10 h-10 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17,8 12,3 7,8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                  </motion.div>
+        {/* ═══ Header (checkout-style) ═══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-16"
+        >
+          <div className="flex items-center gap-4 mb-8 text-[10px] uppercase tracking-[0.3em] font-bold">
+            <Link href="/" className="text-gray-600 hover:text-white transition-colors">Home</Link>
+            <span className="text-gray-800">/</span>
+            <span className="text-white">Custom Print</span>
+          </div>
+          <h1 className="text-4xl lg:text-7xl font-black tracking-tighter mb-4 uppercase">
+            Your Art.{' '}
+            <span className="text-gradient">Our Canvas.</span>
+          </h1>
+          <p className="text-gray-400 max-w-xl text-lg">
+            Transform your photos and artwork into museum-quality canvas prints.
+            Upload your image and we&apos;ll handle the rest.
+          </p>
+        </motion.div>
 
-                  <h3 className="text-xl font-bold mb-2">
-                    {isDragging ? 'Drop your image here' : 'Upload your image'}
-                  </h3>
-                  <p className="text-gray-400 text-sm mb-4">
-                    Drag and drop or click to browse<br />
-                    Supports JPEG, PNG, WebP up to 10MB
-                  </p>
+        {/* ═══ Main Grid (checkout-style 12-col) ═══ */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-24">
 
-                  <span className="px-4 py-2 bg-white/5 rounded-full text-xs uppercase tracking-wider text-gray-500">
-                    Recommended: 300 DPI minimum
-                  </span>
-                </div>
-
-                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-white/[0.02] pointer-events-none" />
-              </div>
-            ) : (
-              <div className="relative">
-                <div
-                  className="relative rounded-2xl overflow-hidden bg-zinc-900"
-                  style={{ aspectRatio: getAspectRatio() }}
-                >
-                  <Image
-                    src={uploadedImage}
-                    alt="Your upload"
-                    fill
-                    className="object-contain p-4"
-                  />
-                  <div
-                    className="absolute inset-4 pointer-events-none"
-                    style={{
-                      boxShadow: `inset 0 0 0 8px ${GELATO_FRAME_OPTIONS[selectedFrame].primary}`,
-                      borderRadius: '4px'
-                    }}
-                  />
-                </div>
-
-                <button
-                  onClick={() => {
-                    setUploadedImage(null)
-                    setCustomName('')
-                  }}
-                  className="mt-4 w-full py-3 border border-white/20 rounded-xl text-sm uppercase tracking-wider hover:bg-white/5 transition-colors"
-                >
-                  Change Image
-                </button>
-              </div>
-            )}
-
-            <AnimatePresence>
-              {isUploading && (
+          {/* ━━━ Left Side: Upload & Preview ━━━ */}
+          <div className="lg:col-span-7 xl:col-span-8">
+            <AnimatePresence mode="wait">
+              {!uploadedImage ? (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="mt-4 p-4 bg-zinc-900 rounded-xl"
+                  key="dropzone"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.4, ease: 'circOut' }}
                 >
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-gray-400">Uploading...</span>
-                    <span className="text-white">{uploadProgress}%</span>
-                  </div>
-                  <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-white"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${uploadProgress}%` }}
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    className={`relative aspect-[4/3] rounded-[2rem] border-2 border-dashed transition-all cursor-pointer overflow-hidden glass ${isDragging
+                      ? 'border-white/40 bg-white/[0.06]'
+                      : 'border-white/20 hover:border-white/40'
+                      }`}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      title="Upload your image"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
+                      className="hidden"
                     />
+
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center">
+                      <motion.div
+                        animate={{ y: isDragging ? -10 : 0, scale: isDragging ? 1.1 : 1 }}
+                        className="w-24 h-24 mb-8 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center"
+                      >
+                        <svg className="w-10 h-10 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="17,8 12,3 7,8" />
+                          <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                      </motion.div>
+
+                      <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">
+                        {isDragging ? 'Drop it here' : 'Upload Your Image'}
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-6 max-w-xs">
+                        Drag and drop or click to browse.
+                        Supports JPEG, PNG, WebP up to 10MB.
+                      </p>
+
+                      <span className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-full text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold">
+                        Recommended: 300 DPI minimum
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Upload progress */}
+                  <AnimatePresence>
+                    {isUploading && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="mt-6 glass p-6 rounded-2xl border border-white/10"
+                      >
+                        <div className="flex items-center justify-between text-sm mb-3">
+                          <span className="text-gray-400 text-xs uppercase tracking-wider font-bold">Uploading...</span>
+                          <span className="text-white font-mono">{uploadProgress}%</span>
+                        </div>
+                        <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <motion.div
+                            className="h-full bg-white rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="preview"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.4, ease: 'circOut' }}
+                >
+                  <div className="glass p-6 rounded-[2rem] border border-white/10 glow-border">
+                    <div
+                      className="relative rounded-xl overflow-hidden bg-black/40 upload-preview-aspect"
+                      style={{ '--aspect': getAspectRatio() } as React.CSSProperties}
+                    >
+                      <Image
+                        src={uploadedImage}
+                        alt="Your upload"
+                        fill
+                        className="object-contain p-4"
+                      />
+                      <div
+                        className="absolute inset-4 pointer-events-none upload-frame-border"
+                        style={{ '--frame-color': GELATO_FRAME_OPTIONS[selectedFrame].primary } as React.CSSProperties}
+                      />
+                    </div>
+
+                    {/* Print title input */}
+                    <div className="mt-6">
+                      <label className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold mb-2 block px-1">
+                        Print Title
+                      </label>
+                      <input
+                        type="text"
+                        value={customName}
+                        onChange={(e) => setCustomName(e.target.value)}
+                        placeholder="Name your creation"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-white/30 transition-colors placeholder:text-gray-700"
+                      />
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setUploadedImage(null)
+                        setCustomName('')
+                      }}
+                      className="mt-4 w-full py-3 border border-white/20 rounded-xl text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-white/5 transition-colors"
+                    >
+                      Change Image
+                    </button>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </div>
 
-          {/* Right: Configuration */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-8"
-          >
-            {uploadedImage && (
-              <div>
-                <label className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold mb-3 block">
-                  Print Title
-                </label>
-                <input
-                  type="text"
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value)}
-                  placeholder="Name your creation"
-                  className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-600 focus:outline-none focus:border-white/40 transition-colors"
-                />
-              </div>
-            )}
+          {/* ━━━ Right Side: Configuration (sticky like checkout) ━━━ */}
+          <div className="lg:col-span-5 xl:col-span-4">
+            <div className="sticky top-32 glass p-8 lg:p-10 rounded-[2rem] glow-border laser-border-orbit">
+              <h2 className="text-2xl font-black tracking-tighter mb-8 uppercase">Configure</h2>
 
-            {/* Size Selection */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <label className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">
-                  Select Size {isLoadingPrices && '(Loading...)'}
-                </label>
-                <span className="text-xs text-gray-400">
-                  {sizes.filter(s => sizeCategory === 'all' || s.category === sizeCategory).length} options
-                </span>
-              </div>
-
-              {/* Category Tabs */}
-              <div className="flex gap-2 mb-3 overflow-x-auto scrollbar-hide pb-1">
-                {(['all', 'square', 'portrait', 'landscape'] as SizeCategory[]).map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => {
-                      setSizeCategory(cat)
-                      triggerHaptic()
-                    }}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${sizeCategory === cat
-                      ? 'bg-white text-black'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                      }`}
-                  >
-                    {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </button>
-                ))}
-              </div>
-
-              {/* Horizontal Scroll Size List */}
-              <div className="relative">
-                <div
-                  className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-1 px-1 snap-x snap-mandatory"
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                  {sizes
-                    .filter(size => sizeCategory === 'all' || size.category === sizeCategory)
-                    .map((size) => (
-                      <button
-                        key={size.id}
-                        onClick={() => handleSizeSelect(size)}
-                        disabled={size.loading}
-                        className={`flex-shrink-0 w-28 p-3 rounded-xl border text-center transition-all snap-start ${selectedSize.id === size.id
-                          ? 'border-white/40 bg-white/5'
-                          : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
-                          } ${size.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        <div className="font-bold text-sm">{size.name}</div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {size.loading ? '...' : formatPrice(size.price)}
-                        </div>
-                        <div className="text-[10px] text-gray-600 mt-0.5 capitalize">{size.category}</div>
-                      </button>
-                    ))}
+              {/* Size Selection */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">
+                    Select Size {isLoadingPrices && '(Loading...)'}
+                  </label>
+                  <span className="text-[10px] text-gray-500 uppercase tracking-wider">
+                    {sizes.filter(s => sizeCategory === 'all' || s.category === sizeCategory).length} options
+                  </span>
                 </div>
-                {/* Scroll hint */}
-                <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-black to-transparent pointer-events-none" />
-              </div>
-            </div>
 
-            {/* Frame Selection */}
-            <div>
-              <label className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold mb-3 block">
-                Frame Style
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {(Object.keys(GELATO_FRAME_OPTIONS) as FrameStyle[]).map((style) => {
-                  const frame = GELATO_FRAME_OPTIONS[style]
-                  return (
+                {/* Category Tabs */}
+                <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-1">
+                  {(['all', 'square', 'portrait', 'landscape'] as SizeCategory[]).map((cat) => (
                     <button
-                      key={style}
+                      key={cat}
                       onClick={() => {
-                        setSelectedFrame(style)
+                        setSizeCategory(cat)
                         triggerHaptic()
                       }}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${selectedFrame === style
-                        ? 'border-white/40 bg-white/5'
-                        : 'border-white/10 hover:border-white/30 bg-zinc-900/50'
+                      className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-all ${sizeCategory === cat
+                        ? 'bg-white text-black'
+                        : 'bg-white/5 text-gray-500 hover:bg-white/10'
                         }`}
                     >
-                      <span
-                        className="w-6 h-6 rounded-full border border-white/20"
-                        style={{ backgroundColor: frame.primary }}
-                      />
-                      <span className="text-sm">{frame.name}</span>
+                      {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
                     </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="pt-8 border-t border-white/10">
-              <div className="flex items-end justify-between mb-6">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold mb-1">
-                    Total Price
-                  </p>
-                  <p className="text-3xl font-black">
-                    {selectedSize.loading ? 'Loading...' : formatPrice(selectedSize.price)}
-                  </p>
+                  ))}
                 </div>
-                <div className="text-right text-sm text-gray-400">
-                  <p>Free shipping</p>
-                  <p>5-7 business days</p>
+
+                {/* Scrollable Size List */}
+                <div className="relative">
+                  <div
+                    className="flex gap-3 overflow-x-auto scrollbar-hide upload-size-scroller pb-2 -mx-1 px-1 snap-x snap-mandatory"
+                  >
+                    {sizes
+                      .filter(size => sizeCategory === 'all' || size.category === sizeCategory)
+                      .map((size) => (
+                        <button
+                          key={size.id}
+                          onClick={() => handleSizeSelect(size)}
+                          disabled={size.loading}
+                          className={`flex-shrink-0 w-28 p-3 rounded-xl border text-center transition-all snap-start ${selectedSize.id === size.id
+                            ? 'border-white bg-white/5'
+                            : 'border-white/10 hover:border-white/30'
+                            } ${size.loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          <div className="font-bold text-sm">{size.name}</div>
+                          <div className="text-xs text-gray-500 mt-1 font-mono">
+                            {size.loading ? '...' : formatPrice(size.price)}
+                          </div>
+                          <div className="text-[10px] text-gray-600 mt-0.5 capitalize">{size.category}</div>
+                        </button>
+                      ))}
+                  </div>
+                  <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-black/70 to-transparent pointer-events-none" />
                 </div>
               </div>
 
-              <button
-                onClick={handleAddToCart}
-                disabled={!uploadedImage || selectedSize.loading || !selectedSize.price}
-                className="w-full py-5 bg-white text-black rounded-full font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed relative group"
-              >
-                <span className="relative z-10">
+              {/* Frame Selection */}
+              <div className="mb-8 pt-6 border-t border-white/5">
+                <label className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold mb-3 block">
+                  Frame Style
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {(Object.keys(GELATO_FRAME_OPTIONS) as FrameStyle[]).map((style) => {
+                    const frame = GELATO_FRAME_OPTIONS[style]
+                    return (
+                      <button
+                        key={style}
+                        onClick={() => {
+                          setSelectedFrame(style)
+                          triggerHaptic()
+                        }}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${selectedFrame === style
+                          ? 'border-white bg-white/5'
+                          : 'border-white/10 hover:border-white/30'
+                          }`}
+                      >
+                        <span
+                          className="w-5 h-5 rounded-full border border-white/20 flex-shrink-0 upload-frame-swatch"
+                          style={{ '--swatch-color': frame.primary } as React.CSSProperties}
+                        />
+                        <span className="text-xs font-bold uppercase tracking-tight">{frame.name}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Price + CTA */}
+              <div className="pt-6 border-t border-white/5">
+                <div className="flex items-end justify-between mb-6">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold mb-1">Total Price</p>
+                    <p className="text-4xl font-black font-mono">
+                      {selectedSize.loading ? '...' : formatPrice(selectedSize.price)}
+                    </p>
+                  </div>
+                  <div className="text-right text-[10px] text-gray-500 uppercase tracking-widest">
+                    <p>Free shipping</p>
+                    <p>5-7 business days</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!uploadedImage || selectedSize.loading || !selectedSize.price}
+                  className="w-full py-5 bg-white text-black rounded-full font-black uppercase tracking-[0.2em] text-sm overflow-hidden transition-all duration-500 hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed glow-intense laser-btn"
+                >
                   {!uploadedImage ? 'Upload an Image First' :
                     selectedSize.loading ? 'Loading Price...' : 'Add to Cart'}
-                </span>
-                <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left -z-0" />
-              </button>
+                </button>
 
-              {uploadedImage && (
-                <p className="text-center text-xs text-gray-500 mt-4">
-                  Your custom print will be reviewed by our team before printing
-                </p>
-              )}
-            </div>
+                {uploadedImage && (
+                  <p className="text-center text-[10px] text-gray-600 mt-4 uppercase tracking-widest">
+                    Your custom print will be reviewed before printing
+                  </p>
+                )}
+              </div>
 
-            <div className="grid grid-cols-3 gap-4 pt-8 border-t border-white/10">
-              {[
-                { icon: '◈', title: 'Archival Ink', desc: '100+ year fade resistance' },
-                { icon: '◆', title: 'Handcrafted', desc: 'Gallery-wrapped canvas' },
-                { icon: '◇', title: 'Ready to Hang', desc: 'Hardware included' },
-              ].map((feature, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-2xl text-white/70 mb-2">{feature.icon}</div>
-                  <div className="text-xs font-bold uppercase tracking-wider mb-1">{feature.title}</div>
-                  <div className="text-[10px] text-gray-500">{feature.desc}</div>
-                </div>
-              ))}
+              {/* Micro-Copy */}
+              <div className="mt-8 flex items-center gap-3 text-[10px] text-gray-500 uppercase tracking-widest justify-center">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Museum-Quality Guaranteed
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      {/* Info Section — with animated glow */}
-      <section className="max-w-7xl mx-auto px-4 md:px-12 py-20 border-t border-white/10 relative">
-        {/* Animated glow behind info cards */}
+      {/* ═══ Info Section — with laser glow ═══ */}
+      <section className="max-w-[1400px] mx-auto px-4 md:px-12 py-20 mt-20 border-t border-white/10 relative">
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[300px] bg-white/[0.04] blur-[120px] rounded-full pointer-events-none animate-pulse-glow" />
 
         <div className="grid md:grid-cols-3 gap-8 relative z-10">
-          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border laser-border-orbit">
-            <h3 className="text-lg font-bold mb-3">Image Quality</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              For best results, upload high-resolution images (300 DPI minimum).
-              We support JPEG, PNG, and WebP formats up to 10MB.
-            </p>
-          </div>
-          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border laser-border-orbit">
-            <h3 className="text-lg font-bold mb-3">Color Accuracy</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Our 12-color giclée printing process ensures your artwork is reproduced
-              with stunning color accuracy and detail.
-            </p>
-          </div>
-          <div className="p-6 rounded-2xl bg-white/[0.02] glow-border laser-border-orbit">
-            <h3 className="text-lg font-bold mb-3">Proofing</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Every custom order is reviewed by our team. We&apos;ll contact you if
-              we detect any quality issues with your image.
-            </p>
-          </div>
+          {[
+            { icon: '◈', title: 'Image Quality', desc: 'For best results, upload high-resolution images (300 DPI minimum). We support JPEG, PNG, and WebP formats up to 10MB.' },
+            { icon: '◆', title: 'Color Accuracy', desc: 'Our 12-color giclée printing process ensures your artwork is reproduced with stunning color accuracy and detail.' },
+            { icon: '◇', title: 'Proofing', desc: 'Every custom order is reviewed by our team. We\'ll contact you if we detect any quality issues with your image.' },
+          ].map((feature, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              viewport={{ once: true }}
+              className="glass p-8 rounded-[2rem] border border-white/10 glow-border laser-border-orbit"
+            >
+              <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-white/70 mb-4">{feature.icon}</div>
+              <h3 className="text-base font-black uppercase tracking-tight mb-3">{feature.title}</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">{feature.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══ Feature Strip ═══ */}
+      <section className="max-w-[1400px] mx-auto px-4 md:px-12 pb-12">
+        <div className="grid grid-cols-3 gap-8">
+          {[
+            { icon: '🎨', title: 'Archival Ink', desc: '100+ year fade resistance' },
+            { icon: '🖼️', title: 'Handcrafted', desc: 'Gallery-wrapped canvas' },
+            { icon: '📦', title: 'Ready to Hang', desc: 'Hardware included' },
+          ].map((feature, i) => (
+            <div key={i} className="text-center py-6">
+              <div className="text-2xl mb-2">{feature.icon}</div>
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] mb-1">{feature.title}</div>
+              <div className="text-[10px] text-gray-500">{feature.desc}</div>
+            </div>
+          ))}
         </div>
       </section>
     </main>

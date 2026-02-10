@@ -4,6 +4,7 @@ import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import NewsletterPopup from '@/components/NewsletterPopup'
 import { CartProvider } from '@/lib/cartContext'
+import { ThemeProvider } from '@/lib/ThemeProvider'
 import { WishlistProvider } from '@/lib/wishlistContext'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Outfit } from 'next/font/google'
@@ -82,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${inter.variable} dark`}>
       <head>
         {/* Preconnect to critical origins */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -92,19 +93,21 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://printify.com" />
       </head>
       <body className="font-sans antialiased">
-        <LoadingScreenWrapper />
-        <WishlistProvider>
-          <CartProvider>
-            <Header />
-            <main id="main">
-              {children}
-            </main>
-            <Footer />
-            <Cart />
-            <CookieConsent />
-            <NewsletterPopup />
-          </CartProvider>
-        </WishlistProvider>
+        <ThemeProvider>
+          <LoadingScreenWrapper />
+          <WishlistProvider>
+            <CartProvider>
+              <Header />
+              <main id="main">
+                {children}
+              </main>
+              <Footer />
+              <Cart />
+              <CookieConsent />
+              <NewsletterPopup />
+            </CartProvider>
+          </WishlistProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

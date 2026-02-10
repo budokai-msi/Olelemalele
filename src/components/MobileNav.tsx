@@ -35,21 +35,19 @@ export default function MobileNav() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
-      
-      // Always show at top
+
       if (currentScrollY < 100) {
         setIsVisible(true)
         setLastScrollY(currentScrollY)
         return
       }
-      
-      // Show when scrolling up, hide when scrolling down
+
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
         setIsVisible(false)
       } else {
         setIsVisible(true)
       }
-      
+
       setLastScrollY(currentScrollY)
     }
 
@@ -66,7 +64,7 @@ export default function MobileNav() {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
-      setIsVisible(true) // Keep header visible when menu is open
+      setIsVisible(true)
     } else {
       document.body.style.overflow = ''
     }
@@ -77,14 +75,14 @@ export default function MobileNav() {
 
   return (
     <>
-      {/* Hamburger Button - Fixed position with proper z-index */}
+      {/* Hamburger Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden fixed top-6 right-6 z-[100] w-12 h-12 flex items-center justify-center bg-black/50 backdrop-blur-md rounded-full border border-white/10"
+        className="md:hidden fixed top-6 right-6 z-[100] w-12 h-12 flex items-center justify-center bg-surface/60 dark:bg-black/50 backdrop-blur-md rounded-full border border-[rgb(var(--border))]"
         whileTap={{ scale: 0.95 }}
-        animate={{ 
+        animate={{
           y: isVisible ? 0 : -100,
-          opacity: isVisible ? 1 : 0 
+          opacity: isVisible ? 1 : 0
         }}
         transition={{ duration: 0.3 }}
         aria-label="Toggle menu"
@@ -92,17 +90,17 @@ export default function MobileNav() {
         <div className="relative w-5 h-4 flex flex-col justify-between">
           <motion.span
             animate={isOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-            className="w-full h-0.5 bg-white origin-center block"
+            className="w-full h-0.5 bg-on-surface origin-center block"
             transition={{ duration: 0.3 }}
           />
           <motion.span
             animate={isOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
-            className="w-full h-0.5 bg-white block"
+            className="w-full h-0.5 bg-on-surface block"
             transition={{ duration: 0.2 }}
           />
           <motion.span
             animate={isOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-            className="w-full h-0.5 bg-white origin-center block"
+            className="w-full h-0.5 bg-on-surface origin-center block"
             transition={{ duration: 0.3 }}
           />
         </div>
@@ -112,34 +110,34 @@ export default function MobileNav() {
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop - Higher z-index to cover everything */}
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/90 backdrop-blur-md z-[90] md:hidden"
+              className="fixed inset-0 bg-surface/90 dark:bg-black/90 backdrop-blur-md z-[90] md:hidden"
             />
 
-            {/* Menu Panel - Slide from right */}
+            {/* Menu Panel */}
             <motion.nav
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed top-0 right-0 bottom-0 w-[80%] max-w-[320px] bg-zinc-950 z-[95] md:hidden flex flex-col border-l border-white/10"
+              className="fixed top-0 right-0 bottom-0 w-[80%] max-w-[320px] bg-surface-raised dark:bg-zinc-950 z-[95] md:hidden flex flex-col border-l border-[rgb(var(--border))]"
             >
               {/* Header with Close */}
-              <div className="p-6 border-b border-white/5 flex items-center justify-between">
+              <div className="p-6 border-b border-[rgb(var(--border))] flex items-center justify-between">
                 <Link href="/" onClick={() => setIsOpen(false)}>
-                  <span className="text-xl font-extrabold tracking-tight">
-                    OLELE<span className="text-gray-500">MALELE</span>
+                  <span className="text-xl font-extrabold tracking-tight text-on-surface">
+                    OLELE<span className="text-accent">MALELE</span>
                   </span>
                 </Link>
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white relative z-10"
+                  className="w-8 h-8 flex items-center justify-center text-on-muted hover:text-on-surface relative z-10"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M18 6L6 18M6 6l12 12" />
@@ -165,16 +163,16 @@ export default function MobileNav() {
                           href={link.href}
                           onClick={() => setIsOpen(false)}
                           className={`flex items-center justify-between py-3.5 px-4 rounded-xl transition-all ${isActive
-                              ? 'bg-white/10 text-white'
-                              : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                            ? 'bg-accent/10 text-accent'
+                            : 'text-on-muted hover:bg-accent/5 hover:text-on-surface'
                             }`}
                         >
                           <div className="flex items-center gap-3">
-                            <span className="text-white/70 text-lg">{link.icon}</span>
+                            <span className="text-accent/60 text-lg">{link.icon}</span>
                             <span className="text-base font-medium">{link.label}</span>
                           </div>
                           {wishlistCount > 0 && (
-                            <span className="bg-white text-white text-xs px-2.5 py-1 rounded-full font-medium">
+                            <span className="bg-accent text-white text-xs px-2.5 py-1 rounded-full font-medium">
                               {wishlistCount}
                             </span>
                           )}
@@ -194,10 +192,10 @@ export default function MobileNav() {
                   <Link
                     href="/checkout"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-between py-3.5 px-4 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all"
+                    className="flex items-center justify-between py-3.5 px-4 rounded-xl text-on-muted hover:bg-accent/5 hover:text-on-surface transition-all"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-white/70 text-lg">⬡</span>
+                      <span className="text-accent/60 text-lg">⬡</span>
                       <span className="text-base font-medium">Cart</span>
                     </div>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -207,17 +205,17 @@ export default function MobileNav() {
                 </motion.div>
 
                 {/* Auth Section */}
-                <div className="mt-6 pt-6 border-t border-white/5">
+                <div className="mt-6 pt-6 border-t border-[rgb(var(--border))]">
                   {user ? (
                     <div className="space-y-1">
                       <div className="px-4 py-3 mb-2">
-                        <p className="text-xs text-gray-500 uppercase tracking-wider">Signed in as</p>
-                        <p className="text-white font-medium truncate">{user.email}</p>
+                        <p className="text-xs text-on-faint uppercase tracking-wider">Signed in as</p>
+                        <p className="text-on-surface font-medium truncate">{user.email}</p>
                       </div>
                       <Link
                         href="/dashboard"
                         onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-3 py-3.5 px-4 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all"
+                        className="flex items-center gap-3 py-3.5 px-4 rounded-xl text-on-muted hover:bg-accent/5 hover:text-on-surface transition-all"
                       >
                         <span className="text-lg">◉</span>
                         <span className="text-base">Dashboard</span>
@@ -238,14 +236,14 @@ export default function MobileNav() {
                       <Link
                         href="/login"
                         onClick={() => setIsOpen(false)}
-                        className="block w-full py-3.5 text-center border border-white/20 rounded-xl text-white font-medium hover:bg-white/5 transition-colors"
+                        className="block w-full py-3.5 text-center border border-accent/20 rounded-xl text-on-surface font-medium hover:bg-accent/5 transition-colors"
                       >
                         Login
                       </Link>
                       <Link
                         href="/register"
                         onClick={() => setIsOpen(false)}
-                        className="block w-full py-3.5 text-center bg-white text-black rounded-xl font-medium hover:bg-white hover:text-white transition-colors"
+                        className="block w-full py-3.5 text-center btn-accent rounded-xl font-medium"
                       >
                         Create Account
                       </Link>
@@ -255,14 +253,14 @@ export default function MobileNav() {
               </div>
 
               {/* Footer Links */}
-              <div className="p-4 border-t border-white/5">
-                <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500">
+              <div className="p-4 border-t border-[rgb(var(--border))]">
+                <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-on-faint">
                   {footerLinks.map(link => (
                     <Link
                       key={link.href}
                       href={link.href}
                       onClick={() => setIsOpen(false)}
-                      className="hover:text-white transition-colors"
+                      className="hover:text-accent transition-colors"
                     >
                       {link.label}
                     </Link>

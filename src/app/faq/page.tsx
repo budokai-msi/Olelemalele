@@ -88,20 +88,20 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
   return (
     <motion.div
-      className="border-b border-white/5 last:border-0"
+      className="border-b border-[rgb(var(--border))] last:border-0"
       initial={false}
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full py-6 flex items-center justify-between text-left group"
       >
-        <span className="text-white font-medium group-hover:text-white/70 transition-colors pr-8">
+        <span className="text-on-surface font-medium group-hover:text-accent transition-colors pr-8">
           {question}
         </span>
         <motion.span
           animate={{ rotate: isOpen ? 45 : 0 }}
           transition={{ duration: 0.2 }}
-          className="text-gray-500 text-xl flex-shrink-0"
+          className="text-accent text-xl flex-shrink-0"
         >
           +
         </motion.span>
@@ -115,7 +115,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <p className="pb-6 text-gray-400 leading-relaxed">
+            <p className="pb-6 text-on-muted leading-relaxed">
               {answer}
             </p>
           </motion.div>
@@ -127,10 +127,10 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
 export default function FAQPage() {
   return (
-    <main className="min-h-screen bg-black text-white pt-32 pb-24 px-4 md:px-12 relative overflow-hidden">
+    <main className="min-h-screen bg-surface text-on-surface pt-32 pb-24 px-4 md:px-12 relative overflow-hidden">
       {/* ═══ Ambient Glow Orbs ═══ */}
-      <div className="absolute top-40 right-1/4 w-[500px] h-[500px] bg-white/[0.03] blur-[160px] rounded-full pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-60 left-1/4 w-[400px] h-[400px] bg-white/[0.04] blur-[130px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-40 right-1/4 w-[500px] h-[500px] bg-accent/[0.03] blur-[160px] rounded-full pointer-events-none animate-pulse-glow" />
+      <div className="absolute bottom-60 left-1/4 w-[400px] h-[400px] bg-accent/[0.04] blur-[130px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
 
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
@@ -140,13 +140,13 @@ export default function FAQPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="text-[10px] uppercase tracking-[0.4em] text-white/70 font-bold mb-4 block">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-accent font-bold mb-4 block">
             Support
           </span>
           <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6">
             FAQ
           </h1>
-          <p className="text-gray-400 max-w-md mx-auto">
+          <p className="text-on-muted max-w-md mx-auto">
             Find answers to common questions about orders, shipping, and our products.
           </p>
         </motion.div>
@@ -160,7 +160,7 @@ export default function FAQPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: sectionIndex * 0.1 }}
             >
-              <h2 className="text-xs uppercase tracking-[0.3em] text-gray-500 font-bold mb-6 pb-4 border-b border-white/10">
+              <h2 className="text-xs uppercase tracking-[0.3em] text-on-faint font-bold mb-6 pb-4 border-b border-[rgb(var(--border))]">
                 {section.category}
               </h2>
               <div>
@@ -177,15 +177,15 @@ export default function FAQPage() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 text-center p-8 md:p-12 rounded-2xl bg-white/[0.03] glow-border laser-border-orbit"
+          className="mt-20 text-center p-8 md:p-12 rounded-2xl bg-accent/[0.03] glow-border laser-border-orbit"
         >
           <h3 className="text-2xl font-bold mb-4">Still have questions?</h3>
-          <p className="text-gray-400 mb-8">
+          <p className="text-on-muted mb-8">
             Our team is here to help. Reach out and we&apos;ll get back to you within 24 hours.
           </p>
           <Link
             href="/contact"
-            className="inline-block px-8 py-4 bg-white text-black rounded-full font-bold uppercase tracking-wider text-sm hover:scale-105 transition-all glow-intense laser-btn"
+            className="inline-block px-8 py-4 bg-accent text-white rounded-full font-bold uppercase tracking-wider text-sm hover:scale-105 transition-all glow-intense laser-btn hover:shadow-[0_0_30px_rgba(45,212,191,0.3)]"
           >
             Contact Us
           </Link>

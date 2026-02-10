@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
 
 // AR Model Generation API
 // This endpoint returns AR-compatible model URLs and configuration
@@ -6,19 +6,17 @@ import { NextRequest, NextResponse } from 'next/server'
 const AR_MODELS = {
   // Pre-generated USDZ models for iOS AR Quick Look
   usdz: {
-    black: 'https://cdn.example.com/ar/canvas-black.usdz',
     white: 'https://cdn.example.com/ar/canvas-white.usdz',
+    black: 'https://cdn.example.com/ar/canvas-black.usdz',
     natural: 'https://cdn.example.com/ar/canvas-natural.usdz',
-    walnut: 'https://cdn.example.com/ar/canvas-walnut.usdz',
-    gold: 'https://cdn.example.com/ar/canvas-gold.usdz',
+    darkbrown: 'https://cdn.example.com/ar/canvas-darkbrown.usdz',
   },
   // Pre-generated GLB models for Android Scene Viewer
   glb: {
-    black: 'https://cdn.example.com/ar/canvas-black.glb',
     white: 'https://cdn.example.com/ar/canvas-white.glb',
+    black: 'https://cdn.example.com/ar/canvas-black.glb',
     natural: 'https://cdn.example.com/ar/canvas-natural.glb',
-    walnut: 'https://cdn.example.com/ar/canvas-walnut.glb',
-    gold: 'https://cdn.example.com/ar/canvas-gold.glb',
+    darkbrown: 'https://cdn.example.com/ar/canvas-darkbrown.glb',
   }
 }
 
@@ -43,7 +41,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const productId = searchParams.get('productId')
-    const frameStyle = searchParams.get('frameStyle') || 'black'
+    const frameStyle = searchParams.get('frameStyle') || 'white'
     const size = searchParams.get('size') || '24x36'
     const imageUrl = searchParams.get('imageUrl')
 

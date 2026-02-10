@@ -63,14 +63,14 @@ function SimpleMarquee() {
   const items = ['PREMIUM CANVAS', '•', 'LIMITED EDITIONS', '•', 'ARCHIVAL QUALITY', '•', 'MUSEUM GRADE', '•']
 
   return (
-    <div className="relative overflow-hidden py-6 bg-white/[0.02] border-y border-white/5">
+    <div className="relative overflow-hidden py-6 bg-accent/[0.03] border-y border-[rgb(var(--border))]">
       <div className="flex animate-marquee whitespace-nowrap">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="flex items-center gap-8 mx-8">
             {items.map((item, j) => (
               <span
                 key={j}
-                className={`text-[11px] md:text-sm uppercase tracking-[0.3em] ${item === '•' ? 'text-white' : 'text-white/40'} font-medium`}
+                className={`text-[11px] md:text-sm uppercase tracking-[0.3em] ${item === '•' ? 'text-accent' : 'text-on-muted'} font-medium`}
               >
                 {item}
               </span>
@@ -82,7 +82,7 @@ function SimpleMarquee() {
   )
 }
 
-// Simplified product card - no 3D tilt, just hover scale
+// Simplified product card
 function ProductCard({ product, index }: { product: typeof products[0]; index: number }) {
   const triggerHaptic = useHaptic()
   const { dispatch } = useCart()
@@ -113,7 +113,7 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
       className="group"
     >
       <Link href={`/product/${product.id}`}>
-        <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-white/5 hover:border-white/20 transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,255,255,0.08)]">
+        <div className="relative overflow-hidden rounded-2xl bg-surface-raised dark:bg-zinc-900 border border-[rgb(var(--border))] hover:border-accent/30 transition-all duration-300 hover:shadow-[0_0_25px_rgba(45,212,191,0.1)]">
           {/* Image */}
           <div className="relative aspect-[4/5] overflow-hidden">
             <Image
@@ -134,7 +134,7 @@ function ProductCard({ product, index }: { product: typeof products[0]; index: n
               <span className="text-sm text-gray-400">{product.variants[0]?.size}</span>
               <button
                 onClick={handleQuickAdd}
-                className="px-4 py-1.5 bg-white/10 hover:bg-white text-white hover:text-black rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+                className="px-4 py-1.5 bg-accent/20 hover:bg-accent text-white rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
               >
                 Add
               </button>
@@ -150,7 +150,7 @@ export default function HomePage() {
   const featuredProducts = products.slice(0, 6)
 
   return (
-    <div className="bg-black text-white">
+    <div className="bg-surface text-on-surface">
       {/* Hero */}
       <Hero />
 
@@ -159,15 +159,15 @@ export default function HomePage() {
 
       {/* Featured Products */}
       <section className="py-20 px-4 md:px-8 relative overflow-hidden">
-        {/* ═══ Ambient Glow ═══ */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-white/[0.03] blur-[180px] rounded-full pointer-events-none animate-pulse-glow" />
+        {/* ═══ Ambient Turquoise Glow ═══ */}
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-accent/[0.04] blur-[180px] rounded-full pointer-events-none animate-pulse-glow" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-4">
-              Featured <span className="text-white/70">Works</span>
+              Featured <span className="text-accent">Works</span>
             </h2>
-            <p className="text-gray-400 max-w-md mx-auto">
+            <p className="text-on-muted max-w-md mx-auto">
               Curated selection of our most celebrated pieces
             </p>
           </div>
@@ -181,7 +181,7 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <Link
               href="/gallery"
-              className="inline-block px-8 py-4 border border-white/20 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-white hover:text-black transition-all glow laser-btn laser-btn-dark"
+              className="inline-block px-8 py-4 border border-accent/30 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-accent hover:text-white transition-all glow laser-btn laser-btn-dark"
             >
               View All Works
             </Link>
@@ -190,31 +190,31 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section className="py-20 px-4 border-t border-white/5">
+      <section className="py-20 px-4 border-t border-[rgb(var(--border))]">
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div>
-            <div className="text-4xl md:text-5xl font-black text-white mb-2">
+            <div className="text-4xl md:text-5xl font-black text-accent mb-2">
               <AnimatedCounter value={18} />
             </div>
-            <p className="text-sm text-gray-500 uppercase tracking-wider">Artworks</p>
+            <p className="text-sm text-on-muted uppercase tracking-wider">Artworks</p>
           </div>
           <div>
-            <div className="text-4xl md:text-5xl font-black text-white mb-2">
+            <div className="text-4xl md:text-5xl font-black text-accent mb-2">
               <AnimatedCounter value={50} suffix="+" />
             </div>
-            <p className="text-sm text-gray-500 uppercase tracking-wider">Size Options</p>
+            <p className="text-sm text-on-muted uppercase tracking-wider">Size Options</p>
           </div>
           <div>
-            <div className="text-4xl md:text-5xl font-black text-white mb-2">
+            <div className="text-4xl md:text-5xl font-black text-accent mb-2">
               <AnimatedCounter value={100} suffix="%" />
             </div>
-            <p className="text-sm text-gray-500 uppercase tracking-wider">Archival</p>
+            <p className="text-sm text-on-muted uppercase tracking-wider">Archival</p>
           </div>
           <div>
-            <div className="text-4xl md:text-5xl font-black text-white mb-2">
+            <div className="text-4xl md:text-5xl font-black text-accent mb-2">
               <AnimatedCounter value={5} suffix="★" />
             </div>
-            <p className="text-sm text-gray-500 uppercase tracking-wider">Rated</p>
+            <p className="text-sm text-on-muted uppercase tracking-wider">Rated</p>
           </div>
         </div>
       </section>
