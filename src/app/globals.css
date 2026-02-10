@@ -697,3 +697,21 @@
   color: rgb(var(--accent));
   box-shadow: 0 0 15px rgb(var(--accent) / 0.1);
 }
+
+/* ═══ Utility: Animation Delays ═══ */
+.delay-0 { animation-delay: 0ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-2s { animation-delay: 2s; }
+
+/* ═══ Utility: Smooth Scroll ═══ */
+.scroll-smooth { scroll-behavior: smooth; }
+
+/* ═══ Utility: Gradient Accent Text ═══ */
+.text-gradient-accent {
+  background: linear-gradient(135deg, var(--accent-glow-hex, #5EEAD4) 0%, var(--accent-hex, #2DD4BF) 50%, var(--accent-glow-hex, #5EEAD4) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(45, 212, 191, 0.5);
+  filter: drop-shadow(0 0 20px rgba(94, 234, 212, 0.4));
+}

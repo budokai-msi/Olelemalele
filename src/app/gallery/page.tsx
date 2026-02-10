@@ -104,8 +104,7 @@ export default function Gallery() {
       {/* Infinite Scroll Container - Gemini Style */}
       <div
         ref={scrollContainerRef}
-        className="flex-1 overflow-y-auto scrollbar-hide"
-        style={{ scrollBehavior: 'smooth' }}
+        className="flex-1 overflow-y-auto scrollbar-hide scroll-smooth"
       >
         <div className="max-w-7xl mx-auto px-6 py-8">
           {/* Grid */}
@@ -223,9 +222,9 @@ export default function Gallery() {
                 animate={{ opacity: 1 }}
                 className="flex items-center gap-3"
               >
-                <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="w-2 h-2 bg-accent rounded-full animate-bounce delay-0" />
+                <div className="w-2 h-2 bg-accent rounded-full animate-bounce delay-150" />
+                <div className="w-2 h-2 bg-accent rounded-full animate-bounce delay-300" />
                 <span className="text-xs text-on-faint uppercase tracking-wider ml-2">Loading more...</span>
               </motion.div>
             )}

@@ -18,7 +18,7 @@ export default function ContactPage() {
     <main className="min-h-screen bg-surface text-on-surface pt-32 pb-24 px-4 md:px-12 relative overflow-hidden">
       {/* ═══ Ambient Glow Orbs ═══ */}
       <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-accent/[0.04] blur-[150px] rounded-full pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-accent/[0.06] blur-[120px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
+      <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-accent/[0.06] blur-[120px] rounded-full pointer-events-none animate-pulse-glow delay-2s" />
 
       <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24 relative z-10">
 

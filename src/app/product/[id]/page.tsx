@@ -272,14 +272,7 @@ export default function ProductPage() {
                 }}
               >
                 <span
-                  className="text-2xl md:text-4xl font-black tracking-wider uppercase"
-                  style={{
-                    background: 'linear-gradient(135deg, var(--accent-glow-hex, #5EEAD4) 0%, var(--accent-hex, #2DD4BF) 50%, var(--accent-glow-hex, #5EEAD4) 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    textShadow: '0 0 40px rgba(45, 212, 191, 0.5)',
-                    filter: 'drop-shadow(0 0 20px rgba(94, 234, 212, 0.4))',
-                  }}
+                  className="text-2xl md:text-4xl font-black tracking-wider uppercase text-gradient-accent"
                 >
                   {flowText.text}
                 </span>

@@ -137,6 +137,7 @@ export default function MobileNav() {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
+                  aria-label="Close navigation menu"
                   className="w-8 h-8 flex items-center justify-center text-on-muted hover:text-on-surface relative z-10"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -14,7 +14,7 @@ export default function GeminiSparkle({
   return (
     <div
       className={`inline-block relative ${className}`}
-      style={{ '--sparkle-size': `${size}px`, width: 'var(--sparkle-size)', height: 'var(--sparkle-size)' } as React.CSSProperties}
+      style={{ width: `${size}px`, height: `${size}px` }}
     >
       {/* Four-color glow effect */}
       {glow && (

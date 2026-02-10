@@ -8,7 +8,7 @@ export default function AboutPage() {
     <main className="min-h-screen bg-surface text-on-surface pt-32 pb-24 px-4 md:px-12 relative overflow-hidden">
       {/* ═══ Ambient Glow Orbs ═══ */}
       <div className="absolute top-32 left-1/3 w-[600px] h-[600px] bg-accent/[0.04] blur-[180px] rounded-full pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-40 right-1/4 w-[400px] h-[400px] bg-accent/[0.05] blur-[140px] rounded-full pointer-events-none animate-pulse-glow" style={{ animationDelay: '2s' }} />
+      <div className="absolute bottom-40 right-1/4 w-[400px] h-[400px] bg-accent/[0.05] blur-[140px] rounded-full pointer-events-none animate-pulse-glow delay-2s" />
 
       <div className="max-w-4xl mx-auto relative z-10">
         <motion.div
