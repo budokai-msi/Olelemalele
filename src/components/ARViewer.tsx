@@ -132,43 +132,58 @@ export default function ARViewer({
   const requestCamera = useCallback(async () => {
     setMode('loading')
 
-    // Skip camera on non-HTTPS
+    // Skip camera on non-HTTPS (except localhost)
     if (
       typeof window !== 'undefined' &&
       window.location.protocol !== 'https:' &&
-      window.location.hostname !== 'localhost'
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
     ) {
       setMode('wall')
       return
     }
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-        },
-        audio: false,
-      })
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        await videoRef.current.play().catch(() => { })
-        setMode('camera')
-        setShowGuide(true)
-        setPosition({ x: 0, y: 0 })
-        setScale(1)
-        setTimeout(() => setShowGuide(false), 3000)
-      } else {
-        stream.getTracks().forEach(t => t.stop())
-        setMode('wall')
-      }
-    } catch {
-      // Camera denied/unavailable → wall preview (no popup!)
+    // Check if getUserMedia is even available
+    if (!navigator.mediaDevices?.getUserMedia) {
       setMode('wall')
+      return
     }
-  }, [])
+
+    // Small delay to ensure video ref is mounted
+    await new Promise(r => setTimeout(r, 100))
+
+    // Try environment camera first (mobile back cam), then any camera (desktop webcam)
+    const attempts = [
+      { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false },
+      { video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
+      { video: true, audio: false },
+    ]
+
+    for (const constraints of attempts) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints)
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+          await videoRef.current.play()
+          setMode('camera')
+          setShowGuide(true)
+          setPosition({ x: 0, y: 0 })
+          setScale(1)
+          setTimeout(() => setShowGuide(false), 3000)
+          return // Success — exit
+        } else {
+          stream.getTracks().forEach(t => t.stop())
+        }
+      } catch {
+        // This constraint failed, try the next one
+        continue
+      }
+    }
+
+    // All attempts failed → wall preview
+    setMode('wall')
+  }, [setPosition])
 
   // Auto-request on mount
   useEffect(() => {

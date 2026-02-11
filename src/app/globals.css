@@ -912,10 +912,10 @@
   right: 10%;
   top: 50%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.8), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 245, 0.7), transparent);
   z-index: 45;
   pointer-events: none;
-  box-shadow: 0 0 8px rgba(45, 212, 191, 0.4);
+  box-shadow: 0 0 8px rgba(255, 255, 245, 0.3);
 }
 
 .ar-snap-guide-v {
@@ -924,10 +924,10 @@
   bottom: 10%;
   left: 50%;
   width: 1px;
-  background: linear-gradient(180deg, transparent, rgba(45, 212, 191, 0.8), transparent);
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 245, 0.7), transparent);
   z-index: 45;
   pointer-events: none;
-  box-shadow: 0 0 8px rgba(45, 212, 191, 0.4);
+  box-shadow: 0 0 8px rgba(255, 255, 245, 0.3);
 }
 
 /* Edge snap indicators */
@@ -935,7 +935,7 @@
   position: absolute;
   z-index: 45;
   pointer-events: none;
-  background: rgba(45, 212, 191, 0.6);
+  background: rgba(255, 255, 245, 0.5);
 }
 
 .ar-snap-edge-left {
@@ -943,7 +943,7 @@
   top: 10%;
   bottom: 10%;
   width: 2px;
-  box-shadow: 0 0 12px rgba(45, 212, 191, 0.5);
+  box-shadow: 0 0 12px rgba(255, 255, 245, 0.3);
 }
 
 .ar-snap-edge-right {
@@ -951,7 +951,7 @@
   top: 10%;
   bottom: 10%;
   width: 2px;
-  box-shadow: 0 0 12px rgba(45, 212, 191, 0.5);
+  box-shadow: 0 0 12px rgba(255, 255, 245, 0.3);
 }
 
 .ar-snap-edge-top {
@@ -959,7 +959,7 @@
   left: 10%;
   right: 10%;
   height: 2px;
-  box-shadow: 0 0 12px rgba(45, 212, 191, 0.5);
+  box-shadow: 0 0 12px rgba(255, 255, 245, 0.3);
 }
 
 .ar-snap-edge-bottom {
@@ -967,7 +967,7 @@
   left: 10%;
   right: 10%;
   height: 2px;
-  box-shadow: 0 0 12px rgba(45, 212, 191, 0.5);
+  box-shadow: 0 0 12px rgba(255, 255, 245, 0.3);
 }
 
 /* Center snap dot */
@@ -980,11 +980,11 @@
   margin-left: -6px;
   margin-top: -6px;
   border-radius: 50%;
-  background: rgba(45, 212, 191, 1);
+  background: rgba(255, 255, 245, 0.95);
   z-index: 46;
   pointer-events: none;
-  box-shadow: 0 0 16px rgba(45, 212, 191, 0.8),
-              0 0 32px rgba(45, 212, 191, 0.4);
+  box-shadow: 0 0 16px rgba(255, 255, 245, 0.6),
+              0 0 32px rgba(255, 255, 245, 0.3);
   animation: snap-pulse 1.2s ease-in-out infinite;
 }
 
