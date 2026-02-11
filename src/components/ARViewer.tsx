@@ -50,7 +50,12 @@ export default function ARViewer({
   const containerRef = useRef<HTMLDivElement>(null)
 
   /* ── Touch state for drag + pinch ── */
-  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const [position, _setPosition] = useState({ x: 0, y: 0 })
+  const posRef = useRef({ x: 0, y: 0 })
+  const setPosition = useCallback((p: { x: number; y: number }) => {
+    posRef.current = p
+    _setPosition(p)
+  }, [])
   const [scale, setScale] = useState(1)
   const touchState = useRef({
     dragging: false,
@@ -222,7 +227,7 @@ export default function ARViewer({
     if (touchState.current.dragging && e.touches.length === 1) {
       const dx = e.touches[0].clientX - touchState.current.lastX
       const dy = e.touches[0].clientY - touchState.current.lastY
-      const raw = { x: position.x + dx, y: position.y + dy }
+      const raw = { x: posRef.current.x + dx, y: posRef.current.y + dy }
       const snapped = checkSnap(raw)
       setPosition(snapped)
       touchState.current.lastX = e.touches[0].clientX
@@ -237,7 +242,7 @@ export default function ARViewer({
       setScale(prev => Math.min(Math.max(prev * delta, 0.3), 4))
       touchState.current.lastDist = dist
     }
-  }, [])
+  }, [checkSnap, setPosition])
 
   const handleTouchEnd = useCallback(() => {
     touchState.current.dragging = false
@@ -255,12 +260,12 @@ export default function ARViewer({
     if (!touchState.current.dragging) return
     const dx = e.clientX - touchState.current.lastX
     const dy = e.clientY - touchState.current.lastY
-    const raw = { x: position.x + dx, y: position.y + dy }
+    const raw = { x: posRef.current.x + dx, y: posRef.current.y + dy }
     const snapped = checkSnap(raw)
     setPosition(snapped)
     touchState.current.lastX = e.clientX
     touchState.current.lastY = e.clientY
-  }, [position, checkSnap])
+  }, [checkSnap, setPosition])
 
   const handleMouseUp = useCallback(() => {
     touchState.current.dragging = false
