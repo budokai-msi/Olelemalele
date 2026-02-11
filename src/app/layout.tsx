@@ -75,6 +75,7 @@ export const metadata: Metadata = {
 }
 
 
+import AdminOverlay from '@/components/admin/AdminOverlay'
 import LoadingScreenWrapper from './LoadingScreenWrapper'
 
 export default function RootLayout({
@@ -105,6 +106,7 @@ export default function RootLayout({
               <Cart />
               <CookieConsent />
               <NewsletterPopup />
+              <AdminOverlay />
             </CartProvider>
           </WishlistProvider>
         </ThemeProvider>

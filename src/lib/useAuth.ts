@@ -1,10 +1,11 @@
 // src/lib/useAuth.ts
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export interface User {
   id: string
   name: string
   email: string
+  role: 'user' | 'admin' | 'super_admin' | 'curator'
 }
 
 export function useAuth() {

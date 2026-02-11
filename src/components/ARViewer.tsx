@@ -39,6 +39,12 @@ export default function ARViewer({
   const [showGuide, setShowGuide] = useState(true)
   const [captured, setCaptured] = useState(false)
 
+  /* ── Snap guide state ── */
+  const [snapH, setSnapH] = useState(false)  // horizontal center snap active
+  const [snapV, setSnapV] = useState(false)  // vertical center snap active
+  const [snapEdge, setSnapEdge] = useState<'left' | 'right' | 'top' | 'bottom' | null>(null)
+  const snapTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   /* ── Refs ── */
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -61,6 +67,61 @@ export default function ARViewer({
   const baseHeight = 240
   const baseWidth = baseHeight * aspectRatio
   const frameBorderWidth = 12
+
+  /* ── Snap detection ── */
+  const SNAP_THRESHOLD = 18 // px to trigger snap
+  const EDGE_MARGIN = 40    // px from viewport edge for edge snap
+
+  const checkSnap = useCallback((newPos: { x: number; y: number }) => {
+    const container = containerRef.current
+    if (!container) return newPos
+
+    const cw = container.offsetWidth
+    const ch = container.offsetHeight
+    let { x, y } = newPos
+    let didSnapH = false
+    let didSnapV = false
+    let edgeSnap: 'left' | 'right' | 'top' | 'bottom' | null = null
+
+    // Center snap (artwork center → viewport center)
+    if (Math.abs(x) < SNAP_THRESHOLD) {
+      x = 0
+      didSnapV = true
+    }
+    if (Math.abs(y) < SNAP_THRESHOLD) {
+      y = 0
+      didSnapH = true
+    }
+
+    // Edge snap detection (artwork approaching viewport edges)
+    const artHalfW = (baseWidth * scale) / 2
+    const artHalfH = (baseHeight * scale) / 2
+    const artLeft = cw / 2 + x - artHalfW
+    const artRight = cw / 2 + x + artHalfW
+    const artTop = ch / 2 + y - artHalfH
+    const artBottom = ch / 2 + y + artHalfH
+
+    if (Math.abs(artLeft - EDGE_MARGIN) < SNAP_THRESHOLD) edgeSnap = 'left'
+    else if (Math.abs(artRight - (cw - EDGE_MARGIN)) < SNAP_THRESHOLD) edgeSnap = 'right'
+    else if (Math.abs(artTop - EDGE_MARGIN) < SNAP_THRESHOLD) edgeSnap = 'top'
+    else if (Math.abs(artBottom - (ch - EDGE_MARGIN)) < SNAP_THRESHOLD) edgeSnap = 'bottom'
+
+    setSnapH(didSnapH)
+    setSnapV(didSnapV)
+    setSnapEdge(edgeSnap)
+
+    // Clear snap indicators after a delay
+    if (snapTimeout.current) clearTimeout(snapTimeout.current)
+    if (didSnapH || didSnapV || edgeSnap) {
+      snapTimeout.current = setTimeout(() => {
+        setSnapH(false)
+        setSnapV(false)
+        setSnapEdge(null)
+      }, 1200)
+    }
+
+    return { x, y }
+  }, [baseWidth, baseHeight, scale, SNAP_THRESHOLD, EDGE_MARGIN])
 
   /* ── Try camera, fall back to wall preview ── */
   const requestCamera = useCallback(async () => {
@@ -161,7 +222,9 @@ export default function ARViewer({
     if (touchState.current.dragging && e.touches.length === 1) {
       const dx = e.touches[0].clientX - touchState.current.lastX
       const dy = e.touches[0].clientY - touchState.current.lastY
-      setPosition(prev => ({ x: prev.x + dx, y: prev.y + dy }))
+      const raw = { x: position.x + dx, y: position.y + dy }
+      const snapped = checkSnap(raw)
+      setPosition(snapped)
       touchState.current.lastX = e.touches[0].clientX
       touchState.current.lastY = e.touches[0].clientY
     }
@@ -192,10 +255,12 @@ export default function ARViewer({
     if (!touchState.current.dragging) return
     const dx = e.clientX - touchState.current.lastX
     const dy = e.clientY - touchState.current.lastY
-    setPosition(prev => ({ x: prev.x + dx, y: prev.y + dy }))
+    const raw = { x: position.x + dx, y: position.y + dy }
+    const snapped = checkSnap(raw)
+    setPosition(snapped)
     touchState.current.lastX = e.clientX
     touchState.current.lastY = e.clientY
-  }, [])
+  }, [position, checkSnap])
 
   const handleMouseUp = useCallback(() => {
     touchState.current.dragging = false
@@ -273,6 +338,59 @@ export default function ARViewer({
       console.error('Capture failed:', err)
     }
   }, [position, scale, baseWidth, baseHeight, frameBorderWidth, frame.border, productImage, productName, mode])
+
+  /* ── Snap guide lines (rendered behind artwork) ── */
+  const snapGuides = (
+    <>
+      {/* Horizontal center guide */}
+      <AnimatePresence>
+        {snapH && (
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            exit={{ opacity: 0, scaleX: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="ar-snap-guide-h"
+          />
+        )}
+      </AnimatePresence>
+      {/* Vertical center guide */}
+      <AnimatePresence>
+        {snapV && (
+          <motion.div
+            initial={{ opacity: 0, scaleY: 0 }}
+            animate={{ opacity: 1, scaleY: 1 }}
+            exit={{ opacity: 0, scaleY: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            className="ar-snap-guide-v"
+          />
+        )}
+      </AnimatePresence>
+      {/* Edge snap indicator */}
+      <AnimatePresence>
+        {snapEdge && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={`ar-snap-edge ar-snap-edge-${snapEdge}`}
+          />
+        )}
+      </AnimatePresence>
+      {/* Snap feedback dot at center */}
+      <AnimatePresence>
+        {(snapH && snapV) && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+            className="ar-snap-center-dot"
+          />
+        )}
+      </AnimatePresence>
+    </>
+  )
 
   /* ── Shared artwork overlay (used in both camera + wall modes) ── */
   const artworkOverlay = (
@@ -428,6 +546,7 @@ export default function ARViewer({
             )}
           </AnimatePresence>
 
+          {snapGuides}
           {artworkOverlay}
 
           {/* Capture flash */}
@@ -494,6 +613,7 @@ export default function ARViewer({
             )}
           </AnimatePresence>
 
+          {snapGuides}
           {artworkOverlay}
 
           {/* Capture flash */}

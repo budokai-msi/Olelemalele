@@ -650,6 +650,112 @@
   );
 }
 
+/* ── AR Snap Guides ── */
+
+.ar-snap-guide-h {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 50%;
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgb(var(--accent)) 0px,
+    rgb(var(--accent)) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  box-shadow: 0 0 8px rgb(var(--accent) / 0.5);
+  z-index: 35;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.ar-snap-guide-v {
+  position: absolute;
+  top: 5%;
+  bottom: 5%;
+  left: 50%;
+  width: 1px;
+  background: repeating-linear-gradient(
+    180deg,
+    rgb(var(--accent)) 0px,
+    rgb(var(--accent)) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  box-shadow: 0 0 8px rgb(var(--accent) / 0.5);
+  z-index: 35;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.ar-snap-edge {
+  position: absolute;
+  z-index: 35;
+  pointer-events: none;
+  background: rgb(var(--accent) / 0.4);
+  box-shadow: 0 0 12px rgb(var(--accent) / 0.3);
+}
+
+.ar-snap-edge-left {
+  left: 40px;
+  top: 10%;
+  bottom: 10%;
+  width: 2px;
+}
+
+.ar-snap-edge-right {
+  right: 40px;
+  top: 10%;
+  bottom: 10%;
+  width: 2px;
+}
+
+.ar-snap-edge-top {
+  top: 40px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+}
+
+.ar-snap-edge-bottom {
+  bottom: 40px;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+}
+
+.ar-snap-center-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: rgb(var(--accent));
+  box-shadow: 0 0 16px rgb(var(--accent) / 0.6), 0 0 4px rgb(var(--accent));
+  z-index: 36;
+  pointer-events: none;
+  animation: ar-snap-pulse 0.6s ease-out;
+}
+
+@keyframes ar-snap-pulse {
+  0% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════
    Themed utility classes for common patterns
    ═══════════════════════════════════════════════════════════ */

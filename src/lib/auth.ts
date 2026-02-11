@@ -1,11 +1,7 @@
 // src/lib/auth.ts
-import jwt from 'jsonwebtoken'
+import UserModel from '@/models/User'
 import bcrypt from 'bcryptjs'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { getUserById, getUserByEmail, saveUser } from './storage'
-import { User } from '@/types'
-import UserModal from '@/models/User' // Import the Mongoose User model
-import { Types } from 'mongoose'
+import jwt from 'jsonwebtoken'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
@@ -17,44 +13,40 @@ export async function comparePassword(password: string, hashedPassword: string):
   return bcrypt.compare(password, hashedPassword)
 }
 
-export function generateToken(userId: string): string {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' })
+export function generateToken(userId: string, role: string = 'user'): string {
+  return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '7d' })
 }
 
-export function verifyToken(token: string): any {
+export function verifyToken(token: string): { userId: string; role: string } | null {
   try {
-    return jwt.verify(token, JWT_SECRET)
+    return jwt.verify(token, JWT_SECRET) as { userId: string; role: string }
   } catch {
     return null
   }
 }
 
-export async function getUserFromToken(req: NextApiRequest): Promise<InstanceType<typeof UserModal> | null> {
-  const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '')
+// Role hierarchy check
+const ROLE_LEVELS: Record<string, number> = {
+  super_admin: 4,
+  admin: 3,
+  curator: 2,
+  user: 1,
+}
 
-  if (!token) return null
+export function hasRole(userRole: string, requiredRole: string): boolean {
+  return (ROLE_LEVELS[userRole] || 0) >= (ROLE_LEVELS[requiredRole] || 0)
+}
 
-  const decoded: any = verifyToken(token)
+// Get user from token string (for API routes)
+export async function getUserFromToken(token: string) {
+  const decoded = verifyToken(token)
   if (!decoded) return null
 
-  // Find the user using Mongoose model instead of simple storage
   try {
-    const user = await UserModal.findById(decoded.userId)
+    const user = await UserModel.findById(decoded.userId)
     return user
   } catch (error) {
     console.error('Error getting user from token:', error)
     return null
   }
-}
-
-// Authentication middleware
-export async function authenticate(req: NextApiRequest, res: NextApiResponse, next: () => void) {
-  const user = await getUserFromToken(req)
-
-  if (!user) {
-    return res.status(401).json({ error: 'Unauthorized' })
-  }
-
-  req.user = user
-  next()
 }

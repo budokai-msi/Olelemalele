@@ -10,6 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 interface JwtPayload {
   userId: string
   email: string
+  role: string
 }
 
 export async function GET(request: NextRequest) {
@@ -42,7 +43,8 @@ export async function GET(request: NextRequest) {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role || 'user'
       }
     }, { status: 200 })
   } catch (error) {

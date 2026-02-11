@@ -5,6 +5,7 @@ export interface IUser extends Document {
   name: string
   email: string
   password: string
+  role: 'user' | 'admin' | 'super_admin' | 'curator'
   cart: {
     productId: string
     quantity: number
@@ -19,6 +20,11 @@ const UserSchema = new Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: {
+    type: String,
+    enum: ['user', 'admin', 'super_admin', 'curator'],
+    default: 'user'
+  },
   cart: [{
     productId: { type: String, required: true },
     quantity: { type: Number, default: 1 },

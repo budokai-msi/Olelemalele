@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { userId: user._id, email: user.email, role: user.role || 'user' },
       JWT_SECRET,
       { expiresIn: '7d' }
     )
@@ -54,7 +54,8 @@ export async function POST(request: NextRequest) {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role || 'user'
       }
     }, { status: 200 })
   } catch (error) {
