@@ -1,14 +1,20 @@
 import Cart from '@/components/Cart'
-import CookieConsent from '@/components/CookieConsent'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
-import NewsletterPopup from '@/components/NewsletterPopup'
 import { CartProvider } from '@/lib/cartContext'
 import { ThemeProvider } from '@/lib/ThemeProvider'
 import { WishlistProvider } from '@/lib/wishlistContext'
 import type { Metadata, Viewport } from 'next'
+import dynamic from 'next/dynamic'
 import { Inter, Outfit } from 'next/font/google'
 import './globals.css'
+
+const CookieConsent = dynamic(() => import('@/components/CookieConsent'), {
+  ssr: false,
+})
+const NewsletterPopup = dynamic(() => import('@/components/NewsletterPopup'), {
+  ssr: false,
+})
 
 const outfit = Outfit({
   subsets: ['latin'],
