@@ -293,7 +293,7 @@ export default function ARViewer({
       case 'NotFoundError':
       case 'DevicesNotFoundError':
         msg = 'No camera found'
-        detail = mobile ? 'Make sure your device has a camera and it\'s not in use by another app' : 'Your computer may not have a camera, or it\'s being used by another application (Zoom, Teams, etc.)'
+        detail = isMobileDevice ? 'Make sure your device has a camera and it\'s not in use by another app' : 'Your computer may not have a camera, or it\'s being used by another application (Zoom, Teams, etc.)'
         break
       case 'NotReadableError':
       case 'TrackStartError':
