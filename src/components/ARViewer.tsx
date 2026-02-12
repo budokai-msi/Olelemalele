@@ -12,7 +12,6 @@ interface ARViewerProps {
   onClose: () => void
 }
 
-/* ── Frame color map — matches Gelato's actual framed canvas catalog ── */
 const FRAME_COLORS: Record<string, { border: string; shadow: string; label: string }> = {
   white: { border: '#f5f5f0', shadow: 'rgba(200,200,200,0.4)', label: 'Gallery Wrap' },
   black: { border: '#000000', shadow: 'rgba(0,0,0,0.6)', label: 'Black' },
@@ -20,7 +19,6 @@ const FRAME_COLORS: Record<string, { border: string; shadow: string; label: stri
   darkbrown: { border: '#5C4033', shadow: 'rgba(60,40,25,0.5)', label: 'Dark Brown' },
 }
 
-/* ── Parse "12x16" → { w, h } ── */
 function parseSize(size: string): { w: number; h: number } {
   const match = size.match(/(\d+)\s*[x×]\s*(\d+)/i)
   if (match) return { w: parseInt(match[1]), h: parseInt(match[2]) }
@@ -34,22 +32,22 @@ export default function ARViewer({
   size,
   onClose,
 }: ARViewerProps) {
-  /* ── State ── */
-  const [mode, setMode] = useState<'loading' | 'camera' | 'wall'>('loading')
+  const [mode, setMode] = useState<'loading' | 'camera' | 'wall' | 'error'>('loading')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [errorDetail, setErrorDetail] = useState('')
   const [showGuide, setShowGuide] = useState(true)
   const [captured, setCaptured] = useState(false)
+  const [debugInfo, setDebugInfo] = useState<string[]>([])
 
-  /* ── Snap guide state ── */
-  const [snapH, setSnapH] = useState(false)  // horizontal center snap active
-  const [snapV, setSnapV] = useState(false)  // vertical center snap active
+  const [snapH, setSnapH] = useState(false)
+  const [snapV, setSnapV] = useState(false)
   const [snapEdge, setSnapEdge] = useState<'left' | 'right' | 'top' | 'bottom' | null>(null)
   const snapTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  /* ── Refs ── */
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
 
-  /* ── Touch state for drag + pinch ── */
   const [position, _setPosition] = useState({ x: 0, y: 0 })
   const posRef = useRef({ x: 0, y: 0 })
   const setPosition = useCallback((p: { x: number; y: number }) => {
@@ -65,7 +63,6 @@ export default function ARViewer({
     pinching: false,
   })
 
-  /* ── Derived values ── */
   const { w, h } = parseSize(size)
   const frame = FRAME_COLORS[frameStyle] || FRAME_COLORS.white
   const aspectRatio = w / h
@@ -73,9 +70,13 @@ export default function ARViewer({
   const baseWidth = baseHeight * aspectRatio
   const frameBorderWidth = 12
 
-  /* ── Snap detection ── */
-  const SNAP_THRESHOLD = 18 // px to trigger snap
-  const EDGE_MARGIN = 40    // px from viewport edge for edge snap
+  const addDebug = (msg: string) => {
+    console.log(`[AR] ${msg}`)
+    setDebugInfo(prev => [...prev.slice(-4), msg])
+  }
+
+  const SNAP_THRESHOLD = 18
+  const EDGE_MARGIN = 40
 
   const checkSnap = useCallback((newPos: { x: number; y: number }) => {
     const container = containerRef.current
@@ -88,7 +89,6 @@ export default function ARViewer({
     let didSnapV = false
     let edgeSnap: 'left' | 'right' | 'top' | 'bottom' | null = null
 
-    // Center snap (artwork center → viewport center)
     if (Math.abs(x) < SNAP_THRESHOLD) {
       x = 0
       didSnapV = true
@@ -98,7 +98,6 @@ export default function ARViewer({
       didSnapH = true
     }
 
-    // Edge snap detection (artwork approaching viewport edges)
     const artHalfW = (baseWidth * scale) / 2
     const artHalfH = (baseHeight * scale) / 2
     const artLeft = cw / 2 + x - artHalfW
@@ -115,7 +114,6 @@ export default function ARViewer({
     setSnapV(didSnapV)
     setSnapEdge(edgeSnap)
 
-    // Clear snap indicators after a delay
     if (snapTimeout.current) clearTimeout(snapTimeout.current)
     if (didSnapH || didSnapV || edgeSnap) {
       snapTimeout.current = setTimeout(() => {
@@ -126,71 +124,189 @@ export default function ARViewer({
     }
 
     return { x, y }
-  }, [baseWidth, baseHeight, scale, SNAP_THRESHOLD, EDGE_MARGIN])
+  }, [baseWidth, baseHeight, scale])
 
-  /* ── Try camera, fall back to wall preview ── */
   const requestCamera = useCallback(async () => {
+    addDebug('Starting camera request...')
     setMode('loading')
+    setErrorMessage('')
+    setErrorDetail('')
 
-    // Skip camera on non-HTTPS (except localhost)
-    if (
-      typeof window !== 'undefined' &&
-      window.location.protocol !== 'https:' &&
-      window.location.hostname !== 'localhost' &&
-      window.location.hostname !== '127.0.0.1'
-    ) {
+    // Check browser support
+    if (typeof window === 'undefined') {
+      addDebug('ERROR: Window not defined (SSR)')
       setMode('wall')
       return
     }
 
-    // Check if getUserMedia is even available
-    if (!navigator.mediaDevices?.getUserMedia) {
+    addDebug(`Protocol: ${window.location.protocol}`)
+    addDebug(`Host: ${window.location.hostname}`)
+    addDebug(`UserAgent: ${navigator.userAgent.slice(0, 50)}...`)
+
+    // Check HTTPS (required for camera)
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    const isHTTPS = window.location.protocol === 'https:'
+    
+    if (!isHTTPS && !isLocalhost) {
+      const msg = 'Camera requires HTTPS'
+      addDebug(`ERROR: ${msg}`)
+      setErrorMessage(msg)
+      setErrorDetail(`Current: ${window.location.protocol}//${window.location.hostname}`)
       setMode('wall')
       return
     }
 
-    // Small delay to ensure video ref is mounted
-    await new Promise(r => setTimeout(r, 100))
+    // Check getUserMedia support
+    if (!navigator.mediaDevices) {
+      addDebug('ERROR: navigator.mediaDevices not available')
+      setErrorMessage('Browser does not support camera API')
+      setErrorDetail('Try Chrome, Safari, or Edge')
+      setMode('wall')
+      return
+    }
 
-    // Try environment camera first (mobile back cam), then any camera (desktop webcam)
-    const attempts = [
-      { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false },
-      { video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
-      { video: true, audio: false },
-    ]
+    if (!navigator.mediaDevices.getUserMedia) {
+      addDebug('ERROR: getUserMedia not available')
+      setErrorMessage('Camera access not supported')
+      setMode('wall')
+      return
+    }
 
-    for (const constraints of attempts) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints)
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-          await videoRef.current.play()
-          setMode('camera')
-          setShowGuide(true)
-          setPosition({ x: 0, y: 0 })
-          setScale(1)
-          setTimeout(() => setShowGuide(false), 3000)
-          return // Success — exit
-        } else {
-          stream.getTracks().forEach(t => t.stop())
-        }
-      } catch {
-        // This constraint failed, try the next one
-        continue
+    // Check for permission API (to show better UX)
+    let permissionState: string | null = null
+    try {
+      if (navigator.permissions && navigator.permissions.query) {
+        const permission = await navigator.permissions.query({ name: 'camera' as PermissionName })
+        permissionState = permission.state
+        addDebug(`Camera permission state: ${permissionState}`)
       }
+    } catch (e) {
+      addDebug('Permission API not available')
     }
 
-    // All attempts failed → wall preview
-    setMode('wall')
+    // Wait for video element to be mounted
+    await new Promise(resolve => setTimeout(resolve, 300))
+
+    if (!videoRef.current) {
+      addDebug('ERROR: videoRef not mounted after 300ms')
+      setErrorMessage('Camera setup failed')
+      setErrorDetail('Video element not ready')
+      setMode('wall')
+      return
+    }
+
+    // Try to get camera
+    try {
+      addDebug('Requesting camera stream...')
+      
+      const constraints: MediaStreamConstraints = {
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      addDebug(`Stream obtained: ${stream.id}`)
+      addDebug(`Tracks: ${stream.getTracks().length}`)
+      
+      stream.getTracks().forEach(track => {
+        addDebug(`Track: ${track.kind} - ${track.label} - ${track.readyState}`)
+      })
+
+      streamRef.current = stream
+
+      const video = videoRef.current
+      video.srcObject = stream
+
+      addDebug('Waiting for video metadata...')
+      
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Video load timeout (5s)'))
+        }, 5000)
+
+        video.onloadedmetadata = () => {
+          clearTimeout(timeout)
+          addDebug(`Video metadata: ${video.videoWidth}x${video.videoHeight}`)
+          resolve()
+        }
+
+        video.onerror = (e) => {
+          clearTimeout(timeout)
+          reject(new Error(`Video error: ${e}`))
+        }
+      })
+
+      addDebug('Starting video playback...')
+      await video.play()
+      addDebug('Video playing!')
+
+      setMode('camera')
+      setShowGuide(true)
+      setPosition({ x: 0, y: 0 })
+      setScale(1)
+      setTimeout(() => setShowGuide(false), 3000)
+      
+    } catch (err: any) {
+      addDebug(`CAMERA FAILED: ${err.name}: ${err.message}`)
+      
+      // Clean up
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop())
+        streamRef.current = null
+      }
+
+      // User-friendly error messages
+      let msg = 'Camera unavailable'
+      let detail = err.message
+
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        msg = 'Camera permission denied'
+        detail = 'Please allow camera access in your browser settings and try again'
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        msg = 'No camera found'
+        detail = 'This device does not have a camera, or it is in use by another app'
+      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+        msg = 'Camera is busy'
+        detail = 'Another application is using the camera. Close other apps and try again'
+      } else if (err.name === 'OverconstrainedError') {
+        msg = 'Camera constraints not supported'
+        detail = 'Trying fallback...'
+        // Try with no constraints
+        try {
+          addDebug('Trying fallback camera...')
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream
+            streamRef.current = stream
+            await videoRef.current.play()
+            setMode('camera')
+            return
+          }
+        } catch (fallbackErr: any) {
+          detail = `Fallback also failed: ${fallbackErr.message}`
+        }
+      } else if (err.name === 'SecurityError') {
+        msg = 'Camera blocked by security settings'
+        detail = 'Check your browser privacy settings'
+      }
+
+      setErrorMessage(msg)
+      setErrorDetail(detail)
+      setMode('error')
+    }
   }, [setPosition])
 
-  // Auto-request on mount
   useEffect(() => {
-    requestCamera()
+    const timer = setTimeout(() => {
+      requestCamera()
+    }, 500)
+    return () => clearTimeout(timer)
   }, [requestCamera])
 
-  // When entering wall mode, reset position and show guide
   useEffect(() => {
     if (mode === 'wall') {
       setPosition({ x: 0, y: 0 })
@@ -198,30 +314,34 @@ export default function ARViewer({
       setShowGuide(true)
       setTimeout(() => setShowGuide(false), 3000)
     }
-  }, [mode])
+  }, [mode, setPosition])
 
-  /* ── Stop camera + close ── */
   const stopCamera = useCallback(() => {
+    addDebug('Stopping camera...')
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        track.stop()
+        addDebug(`Stopped track: ${track.label}`)
+      })
+      streamRef.current = null
+    }
     if (videoRef.current?.srcObject) {
-      const tracks = (videoRef.current.srcObject as MediaStream).getTracks()
-      tracks.forEach(track => track.stop())
+      (videoRef.current.srcObject as MediaStream).getTracks().forEach(t => t.stop())
       videoRef.current.srcObject = null
     }
     setCaptured(false)
     onClose()
   }, [onClose])
 
-  /* ── Cleanup on unmount ── */
   useEffect(() => {
-    const videoEl = videoRef.current
     return () => {
-      if (videoEl?.srcObject) {
-        (videoEl.srcObject as MediaStream).getTracks().forEach(t => t.stop())
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(t => t.stop())
+        streamRef.current = null
       }
     }
   }, [])
 
-  /* ── Touch handlers for drag + pinch-to-zoom ── */
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (e.touches.length === 1) {
       touchState.current.dragging = true
@@ -264,7 +384,6 @@ export default function ARViewer({
     touchState.current.pinching = false
   }, [])
 
-  /* ── Mouse drag (desktop) ── */
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     touchState.current.dragging = true
     touchState.current.lastX = e.clientX
@@ -286,14 +405,12 @@ export default function ARViewer({
     touchState.current.dragging = false
   }, [])
 
-  /* ── Mouse wheel zoom (desktop) ── */
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault()
     const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05
     setScale(prev => Math.min(Math.max(prev * zoomFactor, 0.3), 4))
   }, [])
 
-  /* ── Capture screenshot ── */
   const captureScreenshot = useCallback(async () => {
     const container = containerRef.current
     if (!container) return
@@ -307,11 +424,9 @@ export default function ARViewer({
       const ctx = canvas.getContext('2d')
       if (!ctx) return
 
-      // Draw background
       if (mode === 'camera' && videoRef.current) {
         ctx.drawImage(videoRef.current, 0, 0, cw, ch)
       } else {
-        // Draw wall gradient
         const wallGrad = ctx.createLinearGradient(0, 0, 0, ch)
         wallGrad.addColorStop(0, '#e8e4df')
         wallGrad.addColorStop(0.7, '#d8d4cf')
@@ -326,11 +441,9 @@ export default function ARViewer({
       const overlayH = (baseHeight / container.offsetHeight) * ch * scale
       const frameW = (frameBorderWidth / container.offsetWidth) * cw * scale
 
-      // Draw frame
       ctx.fillStyle = frame.border
       ctx.fillRect(centerX - overlayW / 2 - frameW, centerY - overlayH / 2 - frameW, overlayW + frameW * 2, overlayH + frameW * 2)
 
-      // Draw artwork
       const img = new window.Image()
       img.crossOrigin = 'anonymous'
       img.src = productImage
@@ -359,10 +472,8 @@ export default function ARViewer({
     }
   }, [position, scale, baseWidth, baseHeight, frameBorderWidth, frame.border, productImage, productName, mode])
 
-  /* ── Snap guide lines (rendered behind artwork) ── */
   const snapGuides = (
     <>
-      {/* Horizontal center guide */}
       <AnimatePresence>
         {snapH && (
           <motion.div
@@ -374,7 +485,6 @@ export default function ARViewer({
           />
         )}
       </AnimatePresence>
-      {/* Vertical center guide */}
       <AnimatePresence>
         {snapV && (
           <motion.div
@@ -386,7 +496,6 @@ export default function ARViewer({
           />
         )}
       </AnimatePresence>
-      {/* Edge snap indicator */}
       <AnimatePresence>
         {snapEdge && (
           <motion.div
@@ -397,7 +506,6 @@ export default function ARViewer({
           />
         )}
       </AnimatePresence>
-      {/* Snap feedback dot at center */}
       <AnimatePresence>
         {(snapH && snapV) && (
           <motion.div
@@ -412,7 +520,6 @@ export default function ARViewer({
     </>
   )
 
-  /* ── Shared artwork overlay (used in both camera + wall modes) ── */
   const artworkOverlay = (
     <div
       className="absolute z-40 cursor-grab active:cursor-grabbing ar-draggable-overlay"
@@ -422,25 +529,18 @@ export default function ARViewer({
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleMouseDown}
     >
-      {/* Frame shadow */}
       <div
         className="absolute -inset-1 rounded-sm ar-frame-shadow"
         style={{ '--shadow-color': frame.shadow } as React.CSSProperties}
       />
-
-      {/* Outer frame */}
       <div
         className="absolute rounded-sm ar-frame-shadow-inset ar-outer-frame"
         style={{ '--frame-inset': `${-frameBorderWidth}px`, '--frame-bg': frame.border } as React.CSSProperties}
       />
-
-      {/* Inner mat */}
       <div
         className="absolute rounded-[1px] ar-mat-shadow ar-inner-mat"
         style={{ '--mat-bg': frameStyle === 'white' ? '#e8e8e4' : '#faf8f5' } as React.CSSProperties}
       />
-
-      {/* Artwork */}
       <div className="relative w-full h-full overflow-hidden">
         <Image
           src={productImage}
@@ -451,8 +551,6 @@ export default function ARViewer({
           unoptimized
         />
       </div>
-
-      {/* Size label */}
       <div
         className="absolute -bottom-10 left-1/2 whitespace-nowrap pointer-events-none ar-size-label"
         style={{ '--label-scale': 1 / scale } as React.CSSProperties}
@@ -464,7 +562,6 @@ export default function ARViewer({
     </div>
   )
 
-  /* ── Shared bottom control bar ── */
   const controlBar = (
     <div className="absolute bottom-0 left-0 right-0 z-50">
       <div className="bg-black/60 backdrop-blur-xl border-t border-white/10 px-4 py-4 pb-safe">
@@ -499,12 +596,8 @@ export default function ARViewer({
     </div>
   )
 
-  /* ═══════════════════════════════════════════════════════
-     RENDER
-     ═══════════════════════════════════════════════════════ */
   return (
     <>
-      {/* Always-mounted video for camera mode */}
       <video
         ref={videoRef}
         autoPlay
@@ -513,7 +606,7 @@ export default function ARViewer({
         className={mode === 'camera' ? 'fixed inset-0 w-full h-full object-cover z-[299]' : 'fixed top-0 left-0 w-0 h-0 opacity-0 pointer-events-none'}
       />
 
-      {/* ═══════ LOADING (brief spinner) ═══════ */}
+      {/* ═══════ LOADING ═══════ */}
       {mode === 'loading' && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -522,7 +615,8 @@ export default function ARViewer({
         >
           <div className="text-center">
             <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-6" />
-            <p className="text-white/70 text-sm uppercase tracking-wider font-bold">Setting up preview...</p>
+            <p className="text-white/70 text-sm uppercase tracking-wider font-bold">Accessing camera...</p>
+            <p className="text-white/40 text-xs mt-2">Please allow camera permission when prompted</p>
           </div>
           <button
             onClick={stopCamera}
@@ -536,7 +630,51 @@ export default function ARViewer({
         </motion.div>
       )}
 
-      {/* ═══════ CAMERA MODE (live camera feed + artwork) ═══════ */}
+      {/* ═══════ ERROR STATE ═══════ */}
+      {mode === 'error' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[300] bg-black flex items-center justify-center p-6"
+        >
+          <div className="text-center max-w-md">
+            <div className="text-5xl mb-4">📷❌</div>
+            <h3 className="text-xl font-bold text-white mb-2">{errorMessage}</h3>
+            <p className="text-gray-400 mb-4">{errorDetail}</p>
+            
+            {/* Debug info */}
+            <div className="bg-gray-900 rounded-lg p-3 mb-4 text-left">
+              <p className="text-xs text-gray-500 mb-2">Debug Info:</p>
+              {debugInfo.map((info, i) => (
+                <p key={i} className="text-xs text-gray-400 font-mono">{info}</p>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              <button 
+                onClick={requestCamera}
+                className="w-full px-4 py-3 bg-white text-black rounded-full font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors"
+              >
+                Try Camera Again
+              </button>
+              <button 
+                onClick={() => setMode('wall')}
+                className="w-full px-4 py-3 border border-white/30 text-white rounded-full font-bold uppercase tracking-wider hover:bg-white/10 transition-colors"
+              >
+                Use Wall Preview
+              </button>
+              <button 
+                onClick={stopCamera}
+                className="w-full px-4 py-3 text-white/50 hover:text-white transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* ═══════ CAMERA MODE ═══════ */}
       {mode === 'camera' && (
         <motion.div
           ref={containerRef}
@@ -548,7 +686,6 @@ export default function ARViewer({
           onMouseLeave={handleMouseUp}
           onWheel={handleWheel}
         >
-          {/* Guide toast */}
           <AnimatePresence>
             {showGuide && (
               <motion.div
@@ -559,7 +696,7 @@ export default function ARViewer({
               >
                 <div className="px-6 py-3 bg-black/70 backdrop-blur-md rounded-full border border-white/20">
                   <p className="text-white text-sm font-medium text-center">
-                    📐 Point at a wall • Drag to position • Pinch to resize
+                    📐 Point at wall • Drag to move • Pinch to resize
                   </p>
                 </div>
               </motion.div>
@@ -569,7 +706,6 @@ export default function ARViewer({
           {snapGuides}
           {artworkOverlay}
 
-          {/* Capture flash */}
           <AnimatePresence>
             {captured && (
               <motion.div
@@ -585,7 +721,7 @@ export default function ARViewer({
         </motion.div>
       )}
 
-      {/* ═══════ WALL MODE (static wall background + artwork) ═══════ */}
+      {/* ═══════ WALL MODE ═══════ */}
       {mode === 'wall' && (
         <motion.div
           ref={containerRef}
@@ -597,12 +733,9 @@ export default function ARViewer({
           onMouseLeave={handleMouseUp}
           onWheel={handleWheel}
         >
-          {/* Ambient lighting overlay */}
           <div className="absolute inset-0 ar-wall-light pointer-events-none" />
-          {/* Floor gradient */}
           <div className="absolute bottom-0 left-0 right-0 h-[30%] ar-wall-floor pointer-events-none" />
 
-          {/* Use Camera button — lets user retry browser permission */}
           <button
             onClick={requestCamera}
             className="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full border border-white/20 transition-all"
@@ -612,10 +745,9 @@ export default function ARViewer({
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span className="text-white text-xs font-bold uppercase tracking-wider">Use Camera</span>
+            <span className="text-white text-xs font-bold uppercase tracking-wider">Try Camera</span>
           </button>
 
-          {/* Guide toast */}
           <AnimatePresence>
             {showGuide && (
               <motion.div
@@ -626,7 +758,7 @@ export default function ARViewer({
               >
                 <div className="px-6 py-3 bg-black/70 backdrop-blur-md rounded-full border border-white/20">
                   <p className="text-white text-sm font-medium text-center">
-                    🖼️ Drag to reposition • Scroll to resize
+                    🖼️ Drag to move • Scroll to resize
                   </p>
                 </div>
               </motion.div>
@@ -636,7 +768,6 @@ export default function ARViewer({
           {snapGuides}
           {artworkOverlay}
 
-          {/* Capture flash */}
           <AnimatePresence>
             {captured && (
               <motion.div
