@@ -25,7 +25,6 @@ function parseSize(size: string): { w: number; h: number } {
   return { w: 12, h: 16 }
 }
 
-// Detect if mobile device
 function isMobile(): boolean {
   if (typeof navigator === 'undefined') return false
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
@@ -38,7 +37,7 @@ export default function ARViewer({
   size,
   onClose,
 }: ARViewerProps) {
-  const [mode, setMode] = useState<'loading' | 'camera' | 'wall' | 'error'>('loading')
+  const [mode, setMode] = useState<'loading' | 'camera' | 'wall' | 'error' | 'permission_denied'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [errorDetail, setErrorDetail] = useState('')
   const [showGuide, setShowGuide] = useState(true)
@@ -144,15 +143,14 @@ export default function ARViewer({
     setErrorDetail('')
 
     if (typeof window === 'undefined') {
-      addDebug('ERROR: Window not defined (SSR)')
+      addDebug('Window not defined')
       setMode('wall')
       return
     }
 
     const mobile = isMobile()
     addDebug(`Device: ${mobile ? 'MOBILE' : 'DESKTOP'}`)
-    addDebug(`Protocol: ${window.location.protocol}`)
-    addDebug(`Host: ${window.location.hostname}`)
+    addDebug(`UserAgent: ${navigator.userAgent.slice(0, 50)}`)
 
     // Check HTTPS
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -160,33 +158,33 @@ export default function ARViewer({
     
     if (!isHTTPS && !isLocalhost) {
       setErrorMessage('Camera requires HTTPS')
-      setErrorDetail(`Current: ${window.location.protocol}//${window.location.hostname}`)
+      setErrorDetail('This site must be served over HTTPS to access camera')
       setMode('wall')
       return
     }
 
-    // Check getUserMedia
+    // Check getUserMedia support
     if (!navigator.mediaDevices?.getUserMedia) {
+      addDebug('getUserMedia not supported')
       setErrorMessage('Camera not supported')
-      setErrorDetail('Your browser does not support camera access')
+      setErrorDetail('Please use Chrome, Safari, or Edge')
       setMode('wall')
       return
     }
 
-    // Check permission state
-    let permissionState: string | null = null
+    // Check permission state FIRST - before attempting camera
     try {
       if (navigator.permissions?.query) {
         const permission = await navigator.permissions.query({ name: 'camera' as PermissionName })
-        permissionState = permission.state
-        addDebug(`Permission: ${permissionState}`)
+        addDebug(`Permission state: ${permission.state}`)
         
-        if (permissionState === 'denied') {
-          setErrorMessage('Camera permission denied')
-          setErrorDetail('Please reset camera permissions in your browser settings (click the lock icon in the address bar)')
-          setMode('error')
+        if (permission.state === 'denied') {
+          addDebug('PERMANENTLY DENIED')
+          setMode('permission_denied')
           return
         }
+        // If prompt, we'll try to request and the browser will show the prompt
+        // If granted, we proceed
       }
     } catch (e) {
       addDebug('Permission API not available')
@@ -197,16 +195,14 @@ export default function ARViewer({
 
     if (!videoRef.current) {
       setErrorMessage('Camera setup failed')
-      setErrorDetail('Video element not ready')
       setMode('wall')
       return
     }
 
-    // Try cameras with different constraints
+    // Try cameras
     const attempts: MediaStreamConstraints[] = []
     
     if (mobile) {
-      // Mobile: Try back camera first
       attempts.push(
         { video: { facingMode: { exact: 'environment' } }, audio: false },
         { video: { facingMode: 'environment' }, audio: false },
@@ -214,10 +210,8 @@ export default function ARViewer({
         { video: true, audio: false }
       )
     } else {
-      // Desktop: Any camera
       attempts.push(
         { video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
-        { video: { width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
         { video: true, audio: false }
       )
     }
@@ -228,7 +222,7 @@ export default function ARViewer({
         addDebug(`Trying camera ${i + 1}/${attempts.length}...`)
         
         const stream = await navigator.mediaDevices.getUserMedia(constraints)
-        addDebug(`✓ Camera obtained!`)
+        addDebug('Camera obtained!')
         
         const track = stream.getVideoTracks()[0]
         addDebug(`Track: ${track?.label || 'unknown'}`)
@@ -242,7 +236,7 @@ export default function ARViewer({
           const timeout = setTimeout(() => reject(new Error('Timeout')), 5000)
           video.onloadedmetadata = () => {
             clearTimeout(timeout)
-            addDebug(`Video: ${video.videoWidth}x${video.videoHeight}`)
+            addDebug(`Video ready: ${video.videoWidth}x${video.videoHeight}`)
             resolve()
           }
           video.onerror = () => {
@@ -252,7 +246,7 @@ export default function ARViewer({
         })
 
         await video.play()
-        addDebug('✓ Camera active!')
+        addDebug('Camera active!')
 
         setMode('camera')
         setShowGuide(true)
@@ -262,24 +256,29 @@ export default function ARViewer({
         return
         
       } catch (err: any) {
-        addDebug(`✗ Attempt ${i + 1} failed: ${err.name}`)
+        addDebug(`Attempt ${i + 1} failed: ${err.name}`)
         
-        // Clean up failed stream
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(t => t.stop())
           streamRef.current = null
         }
 
-        // Last attempt failed
+        // Check for permission denied on first attempt
+        if (i === 0 && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+          addDebug('Permission denied on first attempt')
+          setMode('permission_denied')
+          return
+        }
+
         if (i === attempts.length - 1) {
-          handleCameraError(err)
+          handleCameraError(err, mobile)
         }
       }
     }
   }, [setPosition])
 
-  function handleCameraError(err: any) {
-    addDebug(`FINAL ERROR: ${err.name}: ${err.message}`)
+  function handleCameraError(err: any, mobile: boolean) {
+    addDebug(`Final error: ${err.name}: ${err.message}`)
     
     let msg = 'Camera unavailable'
     let detail = err.message
@@ -287,30 +286,23 @@ export default function ARViewer({
     switch (err.name) {
       case 'NotAllowedError':
       case 'PermissionDeniedError':
-        msg = 'Permission denied'
-        detail = 'Click the lock icon in your address bar and allow camera access, then try again'
-        break
+        setMode('permission_denied')
+        return
       case 'NotFoundError':
       case 'DevicesNotFoundError':
         msg = 'No camera found'
-        detail = isMobileDevice ? 'Make sure your device has a camera and it\'s not in use by another app' : 'Your computer may not have a camera, or it\'s being used by another application (Zoom, Teams, etc.)'
+        detail = mobile 
+          ? 'Your device may not have a camera, or it\'s being used by another app (Instagram, TikTok, etc.)'
+          : 'Your computer may not have a camera, or it\'s being used by Zoom, Teams, or another video app'
         break
       case 'NotReadableError':
       case 'TrackStartError':
         msg = 'Camera in use'
-        detail = 'Another app is using your camera. Close Zoom, Teams, or other video apps and try again'
-        break
-      case 'OverconstrainedError':
-        msg = 'Camera not compatible'
-        detail = 'Your camera doesn\'t support the required settings'
-        break
-      case 'SecurityError':
-        msg = 'Security blocked'
-        detail = 'Camera access is blocked by your browser settings'
+        detail = 'Another app is using your camera. Close all other apps and try again'
         break
       case 'AbortError':
-        msg = 'Camera aborted'
-        detail = 'You cancelled the camera permission prompt'
+        msg = 'Camera cancelled'
+        detail = 'You closed the camera permission prompt. Click "Try Camera" to try again'
         break
     }
 
@@ -612,6 +604,19 @@ export default function ARViewer({
     </div>
   )
 
+  // Permission denied instructions
+  const getPermissionInstructions = () => {
+    if (isMobileDevice) {
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        return 'Settings → Safari → Camera → Allow "olelemale-store-wow.vercel.app"'
+      } else {
+        return 'Chrome menu (⋮) → Settings → Site settings → Camera → Allow this site'
+      }
+    } else {
+      return 'Click the 🔒 lock icon in your address bar → Camera → Allow'
+    }
+  }
+
   return (
     <>
       <video
@@ -634,9 +639,7 @@ export default function ARViewer({
             <p className="text-white/70 text-sm uppercase tracking-wider font-bold">
               {isMobileDevice ? 'Accessing camera...' : 'Looking for camera...'}
             </p>
-            <p className="text-white/40 text-xs mt-2">
-              {isMobileDevice ? 'Please allow camera permission' : 'Allow camera access when prompted'}
-            </p>
+            <p className="text-white/40 text-xs mt-2">Allow camera when prompted</p>
           </div>
           <button
             onClick={stopCamera}
@@ -646,6 +649,56 @@ export default function ARViewer({
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
+        </motion.div>
+      )}
+
+      {/* PERMISSION DENIED - Special screen */}
+      {mode === 'permission_denied' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[300] bg-black flex items-center justify-center p-6"
+        >
+          <div className="text-center max-w-md">
+            <div className="text-5xl mb-4">🔒📷</div>
+            <h3 className="text-xl font-bold text-white mb-2">Camera Access Blocked</h3>
+            <p className="text-gray-400 mb-4">
+              You previously denied camera access. The browser remembers this choice.
+            </p>
+            
+            <div className="bg-yellow-900/30 border border-yellow-600/50 rounded-lg p-4 mb-4">
+              <p className="text-yellow-200 text-sm font-bold mb-2">To enable camera:</p>
+              <p className="text-yellow-100/80 text-sm">{getPermissionInstructions()}</p>
+            </div>
+
+            <div className="bg-gray-900 rounded-lg p-3 mb-4 text-left">
+              <p className="text-xs text-gray-500 mb-2">Quick fix:</p>
+              {debugInfo.map((info, i) => (
+                <p key={i} className="text-xs text-gray-400 font-mono">{info}</p>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              <button 
+                onClick={() => setMode('wall')}
+                className="w-full px-4 py-3 bg-white text-black rounded-full font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors"
+              >
+                Use Wall Preview
+              </button>
+              <button 
+                onClick={() => window.location.reload()}
+                className="w-full px-4 py-3 border border-white/30 text-white rounded-full font-bold uppercase tracking-wider hover:bg-white/10 transition-colors"
+              >
+                Reload & Try Again
+              </button>
+              <button 
+                onClick={stopCamera}
+                className="w-full px-4 py-3 text-white/50 hover:text-white transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </motion.div>
       )}
 
