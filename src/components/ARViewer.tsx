@@ -79,6 +79,57 @@ export default function ARViewer({
     setIsMobileDevice(isMobile())
   }, [])
 
+  const SNAP_THRESHOLD = 18
+  const EDGE_MARGIN = 40
+
+  const checkSnap = useCallback((newPos: { x: number; y: number }) => {
+    const container = containerRef.current
+    if (!container) return newPos
+
+    const cw = container.offsetWidth
+    const ch = container.offsetHeight
+    let { x, y } = newPos
+    let didSnapH = false
+    let didSnapV = false
+    let edgeSnap: 'left' | 'right' | 'top' | 'bottom' | null = null
+
+    if (Math.abs(x) < SNAP_THRESHOLD) {
+      x = 0
+      didSnapV = true
+    }
+    if (Math.abs(y) < SNAP_THRESHOLD) {
+      y = 0
+      didSnapH = true
+    }
+
+    const artHalfW = (baseWidth * scale) / 2
+    const artHalfH = (baseHeight * scale) / 2
+    const artLeft = cw / 2 + x - artHalfW
+    const artRight = cw / 2 + x + artHalfW
+    const artTop = ch / 2 + y - artHalfH
+    const artBottom = ch / 2 + y + artHalfH
+
+    if (Math.abs(artLeft - EDGE_MARGIN) < SNAP_THRESHOLD) edgeSnap = 'left'
+    else if (Math.abs(artRight - (cw - EDGE_MARGIN)) < SNAP_THRESHOLD) edgeSnap = 'right'
+    else if (Math.abs(artTop - EDGE_MARGIN) < SNAP_THRESHOLD) edgeSnap = 'top'
+    else if (Math.abs(artBottom - (ch - EDGE_MARGIN)) < SNAP_THRESHOLD) edgeSnap = 'bottom'
+
+    setSnapH(didSnapH)
+    setSnapV(didSnapV)
+    setSnapEdge(edgeSnap)
+
+    if (snapTimeout.current) clearTimeout(snapTimeout.current)
+    if (didSnapH || didSnapV || edgeSnap) {
+      snapTimeout.current = setTimeout(() => {
+        setSnapH(false)
+        setSnapV(false)
+        setSnapEdge(null)
+      }, 1200)
+    }
+
+    return { x, y }
+  }, [baseWidth, baseHeight, scale])
+
   const requestCamera = useCallback(async () => {
     setMode('loading')
     setErrorMessage('')
