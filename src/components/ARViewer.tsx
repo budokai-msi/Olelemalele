@@ -25,6 +25,12 @@ function parseSize(size: string): { w: number; h: number } {
   return { w: 12, h: 16 }
 }
 
+// Detect if mobile device
+function isMobile(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
 export default function ARViewer({
   productImage,
   productName,
@@ -38,6 +44,7 @@ export default function ARViewer({
   const [showGuide, setShowGuide] = useState(true)
   const [captured, setCaptured] = useState(false)
   const [debugInfo, setDebugInfo] = useState<string[]>([])
+  const [isMobileDevice, setIsMobileDevice] = useState(false)
 
   const [snapH, setSnapH] = useState(false)
   const [snapV, setSnapV] = useState(false)
@@ -69,6 +76,10 @@ export default function ARViewer({
   const baseHeight = 240
   const baseWidth = baseHeight * aspectRatio
   const frameBorderWidth = 12
+
+  useEffect(() => {
+    setIsMobileDevice(isMobile())
+  }, [])
 
   const addDebug = (msg: string) => {
     console.log(`[AR] ${msg}`)
@@ -132,173 +143,181 @@ export default function ARViewer({
     setErrorMessage('')
     setErrorDetail('')
 
-    // Check browser support
     if (typeof window === 'undefined') {
       addDebug('ERROR: Window not defined (SSR)')
       setMode('wall')
       return
     }
 
+    const mobile = isMobile()
+    addDebug(`Device: ${mobile ? 'MOBILE' : 'DESKTOP'}`)
     addDebug(`Protocol: ${window.location.protocol}`)
     addDebug(`Host: ${window.location.hostname}`)
-    addDebug(`UserAgent: ${navigator.userAgent.slice(0, 50)}...`)
 
-    // Check HTTPS (required for camera)
+    // Check HTTPS
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     const isHTTPS = window.location.protocol === 'https:'
     
     if (!isHTTPS && !isLocalhost) {
-      const msg = 'Camera requires HTTPS'
-      addDebug(`ERROR: ${msg}`)
-      setErrorMessage(msg)
+      setErrorMessage('Camera requires HTTPS')
       setErrorDetail(`Current: ${window.location.protocol}//${window.location.hostname}`)
       setMode('wall')
       return
     }
 
-    // Check getUserMedia support
-    if (!navigator.mediaDevices) {
-      addDebug('ERROR: navigator.mediaDevices not available')
-      setErrorMessage('Browser does not support camera API')
-      setErrorDetail('Try Chrome, Safari, or Edge')
+    // Check getUserMedia
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setErrorMessage('Camera not supported')
+      setErrorDetail('Your browser does not support camera access')
       setMode('wall')
       return
     }
 
-    if (!navigator.mediaDevices.getUserMedia) {
-      addDebug('ERROR: getUserMedia not available')
-      setErrorMessage('Camera access not supported')
-      setMode('wall')
-      return
-    }
-
-    // Check for permission API (to show better UX)
+    // Check permission state
     let permissionState: string | null = null
     try {
-      if (navigator.permissions && navigator.permissions.query) {
+      if (navigator.permissions?.query) {
         const permission = await navigator.permissions.query({ name: 'camera' as PermissionName })
         permissionState = permission.state
-        addDebug(`Camera permission state: ${permissionState}`)
+        addDebug(`Permission: ${permissionState}`)
+        
+        if (permissionState === 'denied') {
+          setErrorMessage('Camera permission denied')
+          setErrorDetail('Please reset camera permissions in your browser settings (click the lock icon in the address bar)')
+          setMode('error')
+          return
+        }
       }
     } catch (e) {
       addDebug('Permission API not available')
     }
 
-    // Wait for video element to be mounted
+    // Wait for video element
     await new Promise(resolve => setTimeout(resolve, 300))
 
     if (!videoRef.current) {
-      addDebug('ERROR: videoRef not mounted after 300ms')
       setErrorMessage('Camera setup failed')
       setErrorDetail('Video element not ready')
       setMode('wall')
       return
     }
 
-    // Try to get camera
-    try {
-      addDebug('Requesting camera stream...')
-      
-      const constraints: MediaStreamConstraints = {
-        video: {
-          facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
-      }
+    // Try cameras with different constraints
+    const attempts: MediaStreamConstraints[] = []
+    
+    if (mobile) {
+      // Mobile: Try back camera first
+      attempts.push(
+        { video: { facingMode: { exact: 'environment' } }, audio: false },
+        { video: { facingMode: 'environment' }, audio: false },
+        { video: { facingMode: 'user' }, audio: false },
+        { video: true, audio: false }
+      )
+    } else {
+      // Desktop: Any camera
+      attempts.push(
+        { video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false },
+        { video: { width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
+        { video: true, audio: false }
+      )
+    }
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
-      addDebug(`Stream obtained: ${stream.id}`)
-      addDebug(`Tracks: ${stream.getTracks().length}`)
-      
-      stream.getTracks().forEach(track => {
-        addDebug(`Track: ${track.kind} - ${track.label} - ${track.readyState}`)
-      })
+    for (let i = 0; i < attempts.length; i++) {
+      const constraints = attempts[i]
+      try {
+        addDebug(`Trying camera ${i + 1}/${attempts.length}...`)
+        
+        const stream = await navigator.mediaDevices.getUserMedia(constraints)
+        addDebug(`✓ Camera obtained!`)
+        
+        const track = stream.getVideoTracks()[0]
+        addDebug(`Track: ${track?.label || 'unknown'}`)
 
-      streamRef.current = stream
+        streamRef.current = stream
 
-      const video = videoRef.current
-      video.srcObject = stream
+        const video = videoRef.current
+        video.srcObject = stream
 
-      addDebug('Waiting for video metadata...')
-      
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          reject(new Error('Video load timeout (5s)'))
-        }, 5000)
-
-        video.onloadedmetadata = () => {
-          clearTimeout(timeout)
-          addDebug(`Video metadata: ${video.videoWidth}x${video.videoHeight}`)
-          resolve()
-        }
-
-        video.onerror = (e) => {
-          clearTimeout(timeout)
-          reject(new Error(`Video error: ${e}`))
-        }
-      })
-
-      addDebug('Starting video playback...')
-      await video.play()
-      addDebug('Video playing!')
-
-      setMode('camera')
-      setShowGuide(true)
-      setPosition({ x: 0, y: 0 })
-      setScale(1)
-      setTimeout(() => setShowGuide(false), 3000)
-      
-    } catch (err: any) {
-      addDebug(`CAMERA FAILED: ${err.name}: ${err.message}`)
-      
-      // Clean up
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(t => t.stop())
-        streamRef.current = null
-      }
-
-      // User-friendly error messages
-      let msg = 'Camera unavailable'
-      let detail = err.message
-
-      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        msg = 'Camera permission denied'
-        detail = 'Please allow camera access in your browser settings and try again'
-      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-        msg = 'No camera found'
-        detail = 'This device does not have a camera, or it is in use by another app'
-      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
-        msg = 'Camera is busy'
-        detail = 'Another application is using the camera. Close other apps and try again'
-      } else if (err.name === 'OverconstrainedError') {
-        msg = 'Camera constraints not supported'
-        detail = 'Trying fallback...'
-        // Try with no constraints
-        try {
-          addDebug('Trying fallback camera...')
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream
-            streamRef.current = stream
-            await videoRef.current.play()
-            setMode('camera')
-            return
+        await new Promise<void>((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error('Timeout')), 5000)
+          video.onloadedmetadata = () => {
+            clearTimeout(timeout)
+            addDebug(`Video: ${video.videoWidth}x${video.videoHeight}`)
+            resolve()
           }
-        } catch (fallbackErr: any) {
-          detail = `Fallback also failed: ${fallbackErr.message}`
-        }
-      } else if (err.name === 'SecurityError') {
-        msg = 'Camera blocked by security settings'
-        detail = 'Check your browser privacy settings'
-      }
+          video.onerror = () => {
+            clearTimeout(timeout)
+            reject(new Error('Video error'))
+          }
+        })
 
-      setErrorMessage(msg)
-      setErrorDetail(detail)
-      setMode('error')
+        await video.play()
+        addDebug('✓ Camera active!')
+
+        setMode('camera')
+        setShowGuide(true)
+        setPosition({ x: 0, y: 0 })
+        setScale(1)
+        setTimeout(() => setShowGuide(false), 3000)
+        return
+        
+      } catch (err: any) {
+        addDebug(`✗ Attempt ${i + 1} failed: ${err.name}`)
+        
+        // Clean up failed stream
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(t => t.stop())
+          streamRef.current = null
+        }
+
+        // Last attempt failed
+        if (i === attempts.length - 1) {
+          handleCameraError(err)
+        }
+      }
     }
   }, [setPosition])
+
+  function handleCameraError(err: any) {
+    addDebug(`FINAL ERROR: ${err.name}: ${err.message}`)
+    
+    let msg = 'Camera unavailable'
+    let detail = err.message
+
+    switch (err.name) {
+      case 'NotAllowedError':
+      case 'PermissionDeniedError':
+        msg = 'Permission denied'
+        detail = 'Click the lock icon in your address bar and allow camera access, then try again'
+        break
+      case 'NotFoundError':
+      case 'DevicesNotFoundError':
+        msg = 'No camera found'
+        detail = mobile ? 'Make sure your device has a camera and it\'s not in use by another app' : 'Your computer may not have a camera, or it\'s being used by another application (Zoom, Teams, etc.)'
+        break
+      case 'NotReadableError':
+      case 'TrackStartError':
+        msg = 'Camera in use'
+        detail = 'Another app is using your camera. Close Zoom, Teams, or other video apps and try again'
+        break
+      case 'OverconstrainedError':
+        msg = 'Camera not compatible'
+        detail = 'Your camera doesn\'t support the required settings'
+        break
+      case 'SecurityError':
+        msg = 'Security blocked'
+        detail = 'Camera access is blocked by your browser settings'
+        break
+      case 'AbortError':
+        msg = 'Camera aborted'
+        detail = 'You cancelled the camera permission prompt'
+        break
+    }
+
+    setErrorMessage(msg)
+    setErrorDetail(detail)
+    setMode('error')
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -317,12 +336,8 @@ export default function ARViewer({
   }, [mode, setPosition])
 
   const stopCamera = useCallback(() => {
-    addDebug('Stopping camera...')
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => {
-        track.stop()
-        addDebug(`Stopped track: ${track.label}`)
-      })
+      streamRef.current.getTracks().forEach(track => track.stop())
       streamRef.current = null
     }
     if (videoRef.current?.srcObject) {
@@ -342,6 +357,7 @@ export default function ARViewer({
     }
   }, [])
 
+  // Touch handlers
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (e.touches.length === 1) {
       touchState.current.dragging = true
@@ -358,7 +374,6 @@ export default function ARViewer({
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     e.preventDefault()
-
     if (touchState.current.dragging && e.touches.length === 1) {
       const dx = e.touches[0].clientX - touchState.current.lastX
       const dy = e.touches[0].clientY - touchState.current.lastY
@@ -368,7 +383,6 @@ export default function ARViewer({
       touchState.current.lastX = e.touches[0].clientX
       touchState.current.lastY = e.touches[0].clientY
     }
-
     if (touchState.current.pinching && e.touches.length === 2) {
       const dx = e.touches[1].clientX - e.touches[0].clientX
       const dy = e.touches[1].clientY - e.touches[0].clientY
@@ -384,6 +398,7 @@ export default function ARViewer({
     touchState.current.pinching = false
   }, [])
 
+  // Mouse handlers
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     touchState.current.dragging = true
     touchState.current.lastX = e.clientX
@@ -411,6 +426,7 @@ export default function ARViewer({
     setScale(prev => Math.min(Math.max(prev * zoomFactor, 0.3), 4))
   }, [])
 
+  // Screenshot
   const captureScreenshot = useCallback(async () => {
     const container = containerRef.current
     if (!container) return
@@ -606,7 +622,7 @@ export default function ARViewer({
         className={mode === 'camera' ? 'fixed inset-0 w-full h-full object-cover z-[299]' : 'fixed top-0 left-0 w-0 h-0 opacity-0 pointer-events-none'}
       />
 
-      {/* ═══════ LOADING ═══════ */}
+      {/* LOADING */}
       {mode === 'loading' && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -615,13 +631,16 @@ export default function ARViewer({
         >
           <div className="text-center">
             <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-6" />
-            <p className="text-white/70 text-sm uppercase tracking-wider font-bold">Accessing camera...</p>
-            <p className="text-white/40 text-xs mt-2">Please allow camera permission when prompted</p>
+            <p className="text-white/70 text-sm uppercase tracking-wider font-bold">
+              {isMobileDevice ? 'Accessing camera...' : 'Looking for camera...'}
+            </p>
+            <p className="text-white/40 text-xs mt-2">
+              {isMobileDevice ? 'Please allow camera permission' : 'Allow camera access when prompted'}
+            </p>
           </div>
           <button
             onClick={stopCamera}
             className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-            aria-label="Close"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12" />
@@ -630,7 +649,7 @@ export default function ARViewer({
         </motion.div>
       )}
 
-      {/* ═══════ ERROR STATE ═══════ */}
+      {/* ERROR */}
       {mode === 'error' && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -642,9 +661,8 @@ export default function ARViewer({
             <h3 className="text-xl font-bold text-white mb-2">{errorMessage}</h3>
             <p className="text-gray-400 mb-4">{errorDetail}</p>
             
-            {/* Debug info */}
             <div className="bg-gray-900 rounded-lg p-3 mb-4 text-left">
-              <p className="text-xs text-gray-500 mb-2">Debug Info:</p>
+              <p className="text-xs text-gray-500 mb-2">Debug:</p>
               {debugInfo.map((info, i) => (
                 <p key={i} className="text-xs text-gray-400 font-mono">{info}</p>
               ))}
@@ -655,7 +673,7 @@ export default function ARViewer({
                 onClick={requestCamera}
                 className="w-full px-4 py-3 bg-white text-black rounded-full font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors"
               >
-                Try Camera Again
+                Try Again
               </button>
               <button 
                 onClick={() => setMode('wall')}
@@ -674,7 +692,7 @@ export default function ARViewer({
         </motion.div>
       )}
 
-      {/* ═══════ CAMERA MODE ═══════ */}
+      {/* CAMERA MODE */}
       {mode === 'camera' && (
         <motion.div
           ref={containerRef}
@@ -696,7 +714,7 @@ export default function ARViewer({
               >
                 <div className="px-6 py-3 bg-black/70 backdrop-blur-md rounded-full border border-white/20">
                   <p className="text-white text-sm font-medium text-center">
-                    📐 Point at wall • Drag to move • Pinch to resize
+                    📐 {isMobileDevice ? 'Point at wall • Drag • Pinch' : 'Drag to move • Scroll to resize'}
                   </p>
                 </div>
               </motion.div>
@@ -721,7 +739,7 @@ export default function ARViewer({
         </motion.div>
       )}
 
-      {/* ═══════ WALL MODE ═══════ */}
+      {/* WALL MODE */}
       {mode === 'wall' && (
         <motion.div
           ref={containerRef}
@@ -739,7 +757,6 @@ export default function ARViewer({
           <button
             onClick={requestCamera}
             className="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full border border-white/20 transition-all"
-            title="Switch to live camera"
           >
             <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -758,7 +775,7 @@ export default function ARViewer({
               >
                 <div className="px-6 py-3 bg-black/70 backdrop-blur-md rounded-full border border-white/20">
                   <p className="text-white text-sm font-medium text-center">
-                    🖼️ Drag to move • Scroll to resize
+                    🖼️ Drag to position • Scroll to resize
                   </p>
                 </div>
               </motion.div>
