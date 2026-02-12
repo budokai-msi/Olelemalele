@@ -13,17 +13,17 @@
   /* Dynamic viewport height fix for mobile browsers */
   --vh: 1vh;
 
-  /* Accent — luminous turquoise */
-  --accent: 45 212 191;          /* #2DD4BF teal-400 */
-  --accent-glow: 20 184 166;     /* #14B8A6 teal-500 */
-  --accent-muted: 94 234 212;    /* #5EEAD4 teal-300 */
-  --accent-hex: #2DD4BF;
-  --accent-glow-hex: #14B8A6;
+  /* Accent — bright vivid turquoise (more visible) */
+  --accent: 34 211 238;          /* #22D3EE cyan-400 - brighter */
+  --accent-glow: 6 182 212;      /* #06B6D4 cyan-500 */
+  --accent-muted: 103 232 249;   /* #67E8F9 cyan-300 */
+  --accent-hex: #22D3EE;
+  --accent-glow-hex: #06B6D4;
 
-  /* Surfaces — warm off-white */
-  --surface: 250 250 248;        /* #FAFAF8 */
-  --surface-raised: 244 244 240; /* #F4F4F0 */
-  --surface-overlay: 255 255 255;/* #FFFFFF */
+  /* Surfaces — pearl white (warmer, softer) */
+  --surface: 252 250 245;        /* #FCFAF5 - pearl white */
+  --surface-raised: 248 245 238; /* #F8F5EE - warmer pearl */
+  --surface-overlay: 255 253 248;/* #FFFDF8 - cream pearl */
 
   /* Text */
   --on-surface: 23 23 23;        /* #171717 near-black */

@@ -78,7 +78,7 @@ export default function MobileNav() {
       {/* Hamburger Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden fixed top-6 right-6 z-[100] w-12 h-12 flex items-center justify-center bg-surface/60 dark:bg-black/50 backdrop-blur-md rounded-full border border-[rgb(var(--border))]"
+        className="md:hidden fixed top-6 right-6 z-[400] w-12 h-12 flex items-center justify-center bg-surface/60 dark:bg-black/50 backdrop-blur-md rounded-full border border-[rgb(var(--border))]"
         whileTap={{ scale: 0.95 }}
         animate={{
           y: isVisible ? 0 : -100,
@@ -116,7 +116,7 @@ export default function MobileNav() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-surface/90 dark:bg-black/90 backdrop-blur-md z-[90] md:hidden"
+              className="fixed inset-0 bg-surface/90 dark:bg-black/90 backdrop-blur-md z-[390] md:hidden"
             />
 
             {/* Menu Panel */}
@@ -125,7 +125,7 @@ export default function MobileNav() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed top-0 right-0 bottom-0 w-[80%] max-w-[320px] bg-surface-raised dark:bg-zinc-950 z-[95] md:hidden flex flex-col border-l border-[rgb(var(--border))]"
+              className="fixed top-0 right-0 bottom-0 w-[80%] max-w-[320px] bg-surface-raised dark:bg-zinc-950 z-[395] md:hidden flex flex-col border-l border-[rgb(var(--border))]"
             >
               {/* Header with Close */}
               <div className="p-6 border-b border-[rgb(var(--border))] flex items-center justify-between">
